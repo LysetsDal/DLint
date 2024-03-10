@@ -7,19 +7,16 @@ open Absyn
 
 %token <string> NAME
 
-%token CHAR IMG
+%token CHAR
 
-%nonassoc IMG
+%nonassoc 
 
 
 
 %start Main
-%type <Absyn.expr> Main Expr AtExpr Const
+%type <Absyn.stmt> Main Expr AtExpr Const
 
 Main:
-    Expr EOF                     { $1 }
+    Stmt EOF                     { $1 }
 ;
 
-Expr:
-    AtExpr                       { $1 }
-   | 

@@ -11,16 +11,26 @@ let lexemeAsString lexbuf =
 
 let keyword s = 
     match s with 
-    | "char"    -> CHAR
-    | "image"   -> IMG
-    | _         -> NAME s
+    | "from"        -> FROM
+    | "workdir"     -> WORKDIR
 
-
+    | _             -> NAME s
 }
+
 
 rule Token = parse
     | [' ' '\t' '\r'] { Token lexbuf }
     | '\n'            { lexbuf.EndPos <- lexbuf.EndPos.NextLine; Token lexbuf }
-    | ['a'-'z''A'-'Z']['a'-'z''A'-'Z''0'-'9']*
-                      { keyword (lexemeAsString lexbuf) }
-    | 
+    | ['a'-'z''A'-'Z']['a'-'z''A'-'Z''0'-'9']* { keyword (lexemeAsString lexbuf) }
+    | ':'             { COLON }
+    | '.'             { DOT }
+    | '['             { LBRACK }
+    | ']'             { RBRACK }
+    | '#'             { EndLineComment lexbuf; Token lexbuf }
+    | eof             { EOF }
+    | _               { failwith "Lexer error: illegal symbol" }
+
+and EndLineComment = parse
+    | '\n'            { lexbuf.EndPos <- lexbuf.EndPos.NextLine }
+    | (eof | '\026') { () }
+    | _              { EndLineComment lexbuf }
