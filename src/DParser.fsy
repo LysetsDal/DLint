@@ -1,0 +1,25 @@
+%{
+
+open Absyn
+
+
+%}
+
+%token <string> NAME
+
+%token CHAR IMG
+
+%nonassoc IMG
+
+
+
+%start Main
+%type <Absyn.expr> Main Expr AtExpr Const
+
+Main:
+    Expr EOF                     { $1 }
+;
+
+Expr:
+    AtExpr                       { $1 }
+   | 
