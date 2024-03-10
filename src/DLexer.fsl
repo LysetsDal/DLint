@@ -13,7 +13,7 @@ let keyword s =
     match s with 
     | "from"        -> FROM
     | "workdir"     -> WORKDIR
-
+    | "expose"      -> EXPOSE
     | _             -> NAME s
 }
 
@@ -21,7 +21,8 @@ let keyword s =
 rule Token = parse
     | [' ' '\t' '\r'] { Token lexbuf }
     | '\n'            { lexbuf.EndPos <- lexbuf.EndPos.NextLine; Token lexbuf }
-    | ['a'-'z''A'-'Z']['a'-'z''A'-'Z''0'-'9']* { keyword (lexemeAsString lexbuf) }
+    | ['0'-'9']+      { INT (System.Int32.Parse (lexemeAsString lexbuf)) }  
+    | ['a'-'z''A'-'Z']['a'-'z''A'-'Z''0'-'9']* { keyword ((lexemeAsString lexbuf).ToLower()) }
     | ':'             { COLON }
     | '.'             { DOT }
     | '['             { LBRACK }

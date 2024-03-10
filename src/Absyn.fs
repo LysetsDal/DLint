@@ -6,11 +6,12 @@ type stmt =
     | Workdir of path            (* Specify working directory      *)
     | Copy of path * path        (* Copy from:<path> to:<path>     *)
     | Var of string              (* No Use so far                  *)
-    | Expose of int              (* Expose a port of int           *)
+    | Expose of int  
+    | Path of path               (* Expose a port of int           *)
 
 and path =
-    | Path of string             (* A path to a directory          *)
+    | DirPath of string
 
 and dockerfile =
-    | File of stmt list          
+    | DFile of stmt list          
 

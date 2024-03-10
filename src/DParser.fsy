@@ -1,22 +1,45 @@
 %{
-
 open Absyn
-
 
 %}
 
 %token <string> NAME
+%token <int> INT
 
-%token CHAR
+%token FROM WORKDIR 
+%token EXPOSE
+%token COLON DOT LBRACK RBRACK 
+%token EOF
 
-%nonassoc 
+%nonassoc COLON DOT
+%right FROM WORKDIR
+%right EXPOSE
+%nonassoc LBRACK RBRACK
 
 
 
 %start Main
-%type <Absyn.stmt> Main Expr AtExpr Const
+%type <Absyn.dockerfile> Main 
+
+%%
 
 Main:
-    Stmt EOF                     { $1 }
+    File EOF                      { DFile $1   }
 ;
 
+/* A file is a list of stmts */
+File:
+   /* Empty */                    { []         }
+  | Stmt File                     { $1 :: $2   }
+;
+
+Stmt:
+    NAME                          { Var($1)          }
+  | FROM NAME COLON NAME          { From($2, $4)     }
+  | WORKDIR Path                  { Workdir($2)      }
+;
+
+Path:
+    /**/ 
+  | NAME                         { DirPath ($1)      }
+;
