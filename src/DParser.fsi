@@ -7,6 +7,7 @@ type token =
   | LBRACK
   | RBRACK
   | EXPOSE
+  | FSLASH
   | FROM
   | WORKDIR
   | INT of (int)
@@ -18,6 +19,7 @@ type tokenId =
     | TOKEN_LBRACK
     | TOKEN_RBRACK
     | TOKEN_EXPOSE
+    | TOKEN_FSLASH
     | TOKEN_FROM
     | TOKEN_WORKDIR
     | TOKEN_INT
@@ -28,7 +30,9 @@ type nonTerminalId =
     | NONTERM__startMain
     | NONTERM_Main
     | NONTERM_File
-    | NONTERM_Stmt
+    | NONTERM_BaseImg
+    | NONTERM_Instrs
+    | NONTERM_Instr
     | NONTERM_Path
 /// This function maps tokens to integer indexes
 val tagOfToken: token -> int

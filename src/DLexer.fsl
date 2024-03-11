@@ -1,28 +1,30 @@
 {
-
 module DLexer
 
 open FSharp.Text.Lexing
 open DParser
 
-let lexemeAsString lexbuf = 
+let lexeme lexbuf = 
     LexBuffer<char>.LexemeString lexbuf
 
 
 let keyword s = 
     match s with 
     | "from"        -> FROM
-    | "workdir"     -> WORKDIR
+    | "workdir"     -> WORKDIR 
     | "expose"      -> EXPOSE
     | _             -> NAME s
 }
 
+let int = ['0'-'9']
+let letter = ['a'-'z''A'-'Z']['a'-'z''A'-'Z''0'-'9']
 
 rule Token = parse
     | [' ' '\t' '\r'] { Token lexbuf }
     | '\n'            { lexbuf.EndPos <- lexbuf.EndPos.NextLine; Token lexbuf }
-    | ['0'-'9']+      { INT (System.Int32.Parse (lexemeAsString lexbuf)) }  
-    | ['a'-'z''A'-'Z']['a'-'z''A'-'Z''0'-'9']* { keyword ((lexemeAsString lexbuf).ToLower()) }
+    | digit+          { INT (System.Int32.Parse (lexeme lexbuf)) }  
+    | letter*         { keyword ((lexeme lexbuf).ToLower()) }
+    | '/'             { FSLASH }
     | ':'             { COLON }
     | '.'             { DOT }
     | '['             { LBRACK }

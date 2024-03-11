@@ -1,7 +1,7 @@
 
 module Absyn
 
-type stmt =
+type instr =
     | From of string * string    (* Build Image <name>:<tag>       *)
     | Workdir of path            (* Specify working directory      *)
     | Copy of path * path        (* Copy from:<path> to:<path>     *)
@@ -13,5 +13,5 @@ and path =
     | DirPath of string
 
 and dockerfile =
-    | DFile of stmt list          
+    | DFile of instr list          
 

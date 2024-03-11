@@ -36,11 +36,11 @@ type value =
     | Int of int
 
 
-let rec eval (s: stmt) (env: value env) =
+let rec eval (s: instr) (env: value env) =
     match s with
     | From(img, tag) -> failwith "not implemented"
     | Path p -> failwith "not implemented"
-
+    | Expose i -> failwith "not implemented"
     | _ -> failwith "Case not covered by eval"
 
 

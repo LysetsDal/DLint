@@ -1,12 +1,12 @@
 %{
 open Absyn
-
 %}
 
 %token <string> NAME
 %token <int> INT
 
 %token FROM WORKDIR 
+%token FSLASH
 %token EXPOSE
 %token COLON DOT LBRACK RBRACK 
 %token EOF
@@ -17,29 +17,37 @@ open Absyn
 %nonassoc LBRACK RBRACK
 
 
-
 %start Main
 %type <Absyn.dockerfile> Main 
 
 %%
 
 Main:
-    File EOF                      { DFile $1   }
+    File EOF                      { DFile $1         }
 ;
 
 /* A file is a list of stmts */
 File:
-   /* Empty */                    { []         }
-  | Stmt File                     { $1 :: $2   }
+    BaseImg                       { [$1]             }
+  | BaseImg Instrs                { $1 :: $2         }
 ;
 
-Stmt:
+BaseImg:
+    FROM NAME COLON NAME          { From($2, $4)     }
+;
+
+Instrs:
+    Instr                         { [$1]             }
+  | Instr Instrs                  { $1 :: $2         }
+
+Instr:
     NAME                          { Var($1)          }
   | FROM NAME COLON NAME          { From($2, $4)     }
   | WORKDIR Path                  { Workdir($2)      }
+  | EXPOSE INT                    { Expose($2)       }
 ;
 
 Path:
     /**/ 
-  | NAME                         { DirPath ($1)      }
+    NAME                         { DirPath ($1)      }
 ;
