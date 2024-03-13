@@ -8,6 +8,7 @@ type token =
   | RBRACK
   | EXPOSE
   | FSLASH
+  | DASH
   | FROM
   | WORKDIR
   | INT of (int)
@@ -20,6 +21,7 @@ type tokenId =
     | TOKEN_RBRACK
     | TOKEN_EXPOSE
     | TOKEN_FSLASH
+    | TOKEN_DASH
     | TOKEN_FROM
     | TOKEN_WORKDIR
     | TOKEN_INT
@@ -31,6 +33,9 @@ type nonTerminalId =
     | NONTERM_Main
     | NONTERM_File
     | NONTERM_BaseImg
+    | NONTERM_Version
+    | NONTERM_MinorVersion
+    | NONTERM_DashedName
     | NONTERM_Instrs
     | NONTERM_Instr
     | NONTERM_Path

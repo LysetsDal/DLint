@@ -1,5 +1,6 @@
-FROM ubuntu:latest
-
-WORKDIR /etc/tmp
+FROM ubuntu:18.9
 # I am a comment 
-EXPOSE 8080
+
+WORKDIR /etc/tmp/
+
+EXPOSE 80:8080

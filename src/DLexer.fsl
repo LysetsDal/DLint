@@ -26,6 +26,7 @@ rule Token = parse
     | '/'             { FSLASH }
     | ':'             { COLON }
     | '.'             { DOT }
+    | '-'             { DASH }
     | '['             { LBRACK }
     | ']'             { RBRACK }
     | '#'             { EndLineComment lexbuf; Token lexbuf }

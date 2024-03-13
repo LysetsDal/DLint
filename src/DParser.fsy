@@ -2,19 +2,22 @@
 open Absyn
 %}
 
+/*   CONSTRUCTORS   */
 %token <string> NAME
 %token <int> INT
 
+/*   LEXER TOKENS   */
 %token FROM WORKDIR 
-%token FSLASH
+%token FSLASH DASH
 %token EXPOSE
 %token COLON DOT LBRACK RBRACK 
 %token EOF
 
-%nonassoc COLON DOT FSLASH 
+/*   PRECEDENCE RULES    */
+%nonassoc COLON DOT FSLASH      /* Lowest */
 %left FROM WORKDIR
 %left EXPOSE
-%nonassoc LBRACK RBRACK
+%nonassoc LBRACK RBRACK         /* Highest */
 
 
 %start Main
@@ -23,35 +26,60 @@ open Absyn
 %%
 
 Main:
-    File EOF                      { DFile $1         }
+    File EOF                      { DFile $1 }
 ;
 
-/* A file is a list of stmts */
+/* A file is a Base image and a list of stmts */
 File:
-    BaseImg                       { [$1]             }
-  | BaseImg Instrs                { $1 :: $2         }
+    BaseImg                       { [$1]      }
+  | BaseImg Instrs                { $1 :: $2  }
 ;
 
 BaseImg:
-    FROM NAME COLON NAME          { From($2, $4)     }
+    FROM NAME COLON Version       { BaseImage($2, Tag $4) }
+
+;
+
+Version:
+    NAME                          { $1                              }
+  | INT                           { string $1                       }
+  | INT MinorVersion              { string $1 + "." + $2            } 
+  | INT DashedName                { string $1 + "-" + $2            }
+  | INT MinorVersion DashedName   { string $1 + "." + $2 + "-" + $3 }     
+;
+
+/* Used to parse tag numbers*/
+MinorVersion:
+    DOT INT                       { string $2             }
+  | DOT INT MinorVersion          { string $2 + "." + $3  }   
+;
+
+/* Used to parse docker tag names (standard is dash seperated names) */
+DashedName:
+    DASH NAME                     { string $2               }
+  | DASH INT                      { string $2               }
+  | DASH INT MinorVersion         { string $2 + "." + $3    }
+  | DASH NAME DashedName          { string $2 + "-" + $3    }
 ;
 
 Instrs:
-    Instr                         { [$1]             }
-  | Instr Instrs                  { $1 :: $2         }
+    Instr                         { [$1]        }
+  | Instr Instrs                  { $1 :: $2    }
 
 Instr:
-    NAME                          { Var($1)          }
-  | FROM NAME COLON NAME          { From($2, $4)     }
-  | WORKDIR Path                  { Workdir($2)      }
-  | EXPOSE INT                    { Expose($2)       }
+    NAME                          { Var($1)                   }
+  | FROM NAME COLON NAME          { BaseImage($2, Tag($4))    }
+  | WORKDIR Path                  { Workdir($2)               }
+  | EXPOSE INT                    { Expose($2)                }
+  | EXPOSE INT COLON INT          { Expose2($2, $4)           }
 ;
 
 Path:
-    Dirs                           { Dirs($1)        }
+    Dirs                           { Dirs($1) } 
 ;
 
 Dirs:
-    FSLASH NAME                    { [(Dir $2)]      }
-  | FSLASH NAME Dirs               { Dir $2 :: $3    }
+    FSLASH NAME                    { [(Dir $2)]      }   /* End without '/'          */
+  | FSLASH NAME FSLASH             { [(Dir $2)]      }   /* End with '/'             */
+  | FSLASH NAME Dirs               { Dir $2 :: $3    }   /* Construct list of dirs   */
 ;

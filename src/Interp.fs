@@ -38,7 +38,7 @@ type value =
 
 let rec eval (s: instr) (env: value env) =
     match s with
-    | From(img, tag) -> failwith "not implemented"
+    | BaseImage(img, tag) -> failwith "not implemented"
     | Workdir p -> failwith "not implemented"
     | Expose i -> failwith "not implemented"
     | _ -> failwith "Case not covered by eval"
