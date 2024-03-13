@@ -34,6 +34,7 @@ type nonTerminalId =
     | NONTERM_Instrs
     | NONTERM_Instr
     | NONTERM_Path
+    | NONTERM_Dirs
 /// This function maps tokens to integer indexes
 val tagOfToken: token -> int
 

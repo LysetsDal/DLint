@@ -1,0 +1,5 @@
+FROM ubuntu:latest
+
+WORKDIR /etc/tmp
+# I am a comment 
+EXPOSE 8080

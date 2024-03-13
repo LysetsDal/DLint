@@ -11,9 +11,9 @@ open Absyn
 %token COLON DOT LBRACK RBRACK 
 %token EOF
 
-%nonassoc COLON DOT
-%right FROM WORKDIR
-%right EXPOSE
+%nonassoc COLON DOT FSLASH 
+%left FROM WORKDIR
+%left EXPOSE
 %nonassoc LBRACK RBRACK
 
 
@@ -48,6 +48,10 @@ Instr:
 ;
 
 Path:
-    /**/ 
-    NAME                         { DirPath ($1)      }
+    Dirs                           { Dirs($1)        }
+;
+
+Dirs:
+    FSLASH NAME                    { [(Dir $2)]      }
+  | FSLASH NAME Dirs               { Dir $2 :: $3    }
 ;

@@ -39,7 +39,7 @@ type value =
 let rec eval (s: instr) (env: value env) =
     match s with
     | From(img, tag) -> failwith "not implemented"
-    | Path p -> failwith "not implemented"
+    | Workdir p -> failwith "not implemented"
     | Expose i -> failwith "not implemented"
     | _ -> failwith "Case not covered by eval"
 
@@ -47,4 +47,4 @@ let rec eval (s: instr) (env: value env) =
 
 let run s = eval s []
 
-let dfile = DFile([From("ubuntu", "latest"); Workdir(DirPath("/tmp/esc")); Expose(8080)])
+// let dfile = DFile([From("ubuntu", "latest"); Workdir(DirPath("/tmp/esc")); Expose(8080)])
