@@ -1,8 +1,8 @@
 {
-module DLexer
+module DLex
 
 open FSharp.Text.Lexing
-open DParser
+open DPar
 
 let lexeme lexbuf = 
     LexBuffer<char>.LexemeString lexbuf

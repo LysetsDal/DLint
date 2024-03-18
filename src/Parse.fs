@@ -11,7 +11,7 @@ open Absyn
 let fromString (str : string) : dockerfile =
     let lexbuf = (*Lexing.*)LexBuffer<char>.FromString(str)
     try 
-      DParser.Main DLexer.Token lexbuf
+      DPar.Main DLex.Token lexbuf
     with 
       | exn -> let pos = lexbuf.EndPos 
                failwithf "%s near line %d, column %d\n" 
@@ -23,7 +23,7 @@ let fromFile (filename : string) =
     use reader = new StreamReader(filename)
     let lexbuf = (*Lexing.*)LexBuffer<char>.FromTextReader reader
     try 
-      DParser.Main DLexer.Token lexbuf
+      DPar.Main DLex.Token lexbuf
     with 
       | exn -> let pos = lexbuf.EndPos 
                failwithf "%s in file %s near line %d, column %d, last parsed:  '%s'\n" 

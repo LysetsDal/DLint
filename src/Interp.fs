@@ -6,22 +6,6 @@ module Interp
 
 open Absyn
 
-// type stmt =
-//     | From of string * string        
-//     | Workdir of path
-//     | Copy of path * path
-//     | Var of string
-//     | Expose of int
-//     | Path of path
-
-// and path =
-//     | DirPath of string
-//     | MntPath of string
-
-// and dockerfile =
-//     | DFile of stmt list
-
-
 (* Environment operations *)
 
 type 'v env = (string * 'v) list
@@ -44,7 +28,4 @@ let rec eval (s: instr) (env: value env) =
     | _ -> failwith "Case not covered by eval"
 
 
-
 let run s = eval s []
-
-// let dfile = DFile([From("ubuntu", "latest"); Workdir(DirPath("/tmp/esc")); Expose(8080)])
