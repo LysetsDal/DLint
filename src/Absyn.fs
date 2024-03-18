@@ -8,7 +8,7 @@ type instr =
     | Var of string                (* No Use so far                  *)
     | Expose of int                (* Expose a port of int           *)           
     | Expose2 of int * int    
-    | User of string * int option   
+    | User of string option * int option   
 
 and path =
     | Dirs of dir list

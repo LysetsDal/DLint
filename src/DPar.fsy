@@ -55,8 +55,9 @@ Instr:
 
 
 User:
-    NAME                          { ($1, None)                }
-  | NAME INT                      { ($1, Some($2))            }
+    NAME                          { (Some($1), None)          }
+  | INT                           { (None, Some($1))          }
+  | NAME INT                      { (Some($1), Some($2))      }
 ;
 
 Version:
