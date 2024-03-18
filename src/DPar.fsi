@@ -37,6 +37,7 @@ type nonTerminalId =
     | NONTERM_BaseImg
     | NONTERM_Instrs
     | NONTERM_Instr
+    | NONTERM_Expose
     | NONTERM_User
     | NONTERM_Version
     | NONTERM_MinorVersion
