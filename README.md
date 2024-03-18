@@ -1,13 +1,21 @@
 # Linterd
+
 Prototype for Dockerfile Linter
 
-
-Generating the lexer and parser for linterd:
+## Generating the lexer and parser for Linterd:
 
 ```
-    fslex --unicode DLexer.fsl
-    fsyacc --module DParser DParser.fsy
+    fslex --unicode DLex.fsl ;\
+    fsyacc --module DPar DPar.fsy ;\
+    fsharpi -r /etc/fsharp/FsLexYacc.Runtime.dll Absyn.fs DPar.fs \
+    DLex.fs Parse.fs Interp.fs ParseAndRun.fs
+```
 
-    fsharpi -r /etc/fsharp/FsLexYacc.Runtime.dll Absyn.fs DParser.fs \
-    DLexer.fs Parse.fs Interp.fs ParseAndRun.fs
+## Running with runArg.fs (for less typing):
+
+```
+    mono $fslex --unicode DLex.fsl;\
+    mono $fsyacc --module DPar DPar.fsy;\
+    fsharpi -r /etc/fsharp/FsLexYacc.Runtime.dll Absyn.fs DPar.fs \
+    DLex.fs Parse.fs Interp.fs ParseAndRun.fs --use:runArg.fs
 ```
