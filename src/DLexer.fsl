@@ -12,6 +12,7 @@ let keyword s =
     | "from"        -> FROM
     | "workdir"     -> WORKDIR
     | "expose"      -> EXPOSE
+    | "user"        -> USER
     | _             -> NAME s
 }
 

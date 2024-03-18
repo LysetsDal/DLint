@@ -11,6 +11,7 @@ type token =
   | DASH
   | FROM
   | WORKDIR
+  | USER
   | INT of (int)
   | NAME of (string)
 type tokenId = 
@@ -24,6 +25,7 @@ type tokenId =
     | TOKEN_DASH
     | TOKEN_FROM
     | TOKEN_WORKDIR
+    | TOKEN_USER
     | TOKEN_INT
     | TOKEN_NAME
     | TOKEN_end_of_input
@@ -33,11 +35,12 @@ type nonTerminalId =
     | NONTERM_Main
     | NONTERM_File
     | NONTERM_BaseImg
+    | NONTERM_Instrs
+    | NONTERM_Instr
+    | NONTERM_User
     | NONTERM_Version
     | NONTERM_MinorVersion
     | NONTERM_DashedName
-    | NONTERM_Instrs
-    | NONTERM_Instr
     | NONTERM_Path
     | NONTERM_Dirs
 /// This function maps tokens to integer indexes

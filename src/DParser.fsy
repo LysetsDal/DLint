@@ -7,7 +7,7 @@ open Absyn
 %token <int> INT
 
 /*   LEXER TOKENS   */
-%token FROM WORKDIR 
+%token FROM WORKDIR USER
 %token FSLASH DASH
 %token EXPOSE
 %token COLON DOT LBRACK RBRACK 
@@ -15,11 +15,11 @@ open Absyn
 
 /*   PRECEDENCE RULES    */
 %nonassoc COLON DOT FSLASH      /* Lowest */
-%left FROM WORKDIR
+%left FROM WORKDIR USER
 %left EXPOSE
 %nonassoc LBRACK RBRACK         /* Highest */
 
-
+/*   START SYMBOL   */
 %start Main
 %type <Absyn.dockerfile> Main 
 
@@ -37,7 +37,26 @@ File:
 
 BaseImg:
     FROM NAME COLON Version       { BaseImage($2, Tag $4) }
+;
 
+Instrs:
+    Instr                         { [$1]        }
+  | Instr Instrs                  { $1 :: $2    }
+;
+
+Instr:
+    NAME                          { Var($1)                   }
+  | FROM NAME COLON NAME          { BaseImage($2, Tag($4))    }
+  | WORKDIR Path                  { Workdir($2)               }
+  | EXPOSE INT                    { Expose($2)                }
+  | EXPOSE INT COLON INT          { Expose2($2, $4)           }
+  | USER User                     { User($2)                  }
+;
+
+
+User:
+    NAME                          { ($1, None)                }
+  | NAME INT                      { ($1, Some($2))            }
 ;
 
 Version:
@@ -62,17 +81,6 @@ DashedName:
   | DASH NAME DashedName          { string $2 + "-" + $3    }
 ;
 
-Instrs:
-    Instr                         { [$1]        }
-  | Instr Instrs                  { $1 :: $2    }
-
-Instr:
-    NAME                          { Var($1)                   }
-  | FROM NAME COLON NAME          { BaseImage($2, Tag($4))    }
-  | WORKDIR Path                  { Workdir($2)               }
-  | EXPOSE INT                    { Expose($2)                }
-  | EXPOSE INT COLON INT          { Expose2($2, $4)           }
-;
 
 Path:
     Dirs                           { Dirs($1) } 

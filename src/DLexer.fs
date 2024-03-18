@@ -13,9 +13,10 @@ let keyword s =
     | "from"        -> FROM
     | "workdir"     -> WORKDIR
     | "expose"      -> EXPOSE
+    | "user"        -> USER
     | _             -> NAME s
 
-# 18 "DLexer.fs"
+# 19 "DLexer.fs"
 let trans : uint16[] array = 
     [| 
     (* State 0 *)
@@ -68,88 +69,88 @@ let rec _fslex_dummy () = _fslex_dummy()
 and Token  lexbuf =
   match _fslex_tables.Interpret(5,lexbuf) with
   | 0 -> ( 
-# 22 "DLexer.fsl"
+# 23 "DLexer.fsl"
                                        Token lexbuf 
-# 73 "DLexer.fs"
+# 74 "DLexer.fs"
           )
   | 1 -> ( 
-# 23 "DLexer.fsl"
+# 24 "DLexer.fsl"
                                        lexbuf.EndPos <- lexbuf.EndPos.NextLine; Token lexbuf 
-# 78 "DLexer.fs"
+# 79 "DLexer.fs"
           )
   | 2 -> ( 
-# 24 "DLexer.fsl"
+# 25 "DLexer.fsl"
                                        INT (System.Int32.Parse (lexeme lexbuf)) 
-# 83 "DLexer.fs"
+# 84 "DLexer.fs"
           )
   | 3 -> ( 
-# 25 "DLexer.fsl"
+# 26 "DLexer.fsl"
                                        keyword ((lexeme lexbuf).ToLower()) 
-# 88 "DLexer.fs"
+# 89 "DLexer.fs"
           )
   | 4 -> ( 
-# 26 "DLexer.fsl"
+# 27 "DLexer.fsl"
                                        FSLASH 
-# 93 "DLexer.fs"
+# 94 "DLexer.fs"
           )
   | 5 -> ( 
-# 27 "DLexer.fsl"
+# 28 "DLexer.fsl"
                                        COLON 
-# 98 "DLexer.fs"
+# 99 "DLexer.fs"
           )
   | 6 -> ( 
-# 28 "DLexer.fsl"
+# 29 "DLexer.fsl"
                                        DOT 
-# 103 "DLexer.fs"
+# 104 "DLexer.fs"
           )
   | 7 -> ( 
-# 29 "DLexer.fsl"
+# 30 "DLexer.fsl"
                                        DASH 
-# 108 "DLexer.fs"
+# 109 "DLexer.fs"
           )
   | 8 -> ( 
-# 30 "DLexer.fsl"
+# 31 "DLexer.fsl"
                                        LBRACK 
-# 113 "DLexer.fs"
+# 114 "DLexer.fs"
           )
   | 9 -> ( 
-# 31 "DLexer.fsl"
+# 32 "DLexer.fsl"
                                        RBRACK 
-# 118 "DLexer.fs"
+# 119 "DLexer.fs"
           )
   | 10 -> ( 
-# 32 "DLexer.fsl"
+# 33 "DLexer.fsl"
                                        EndLineComment lexbuf; Token lexbuf 
-# 123 "DLexer.fs"
+# 124 "DLexer.fs"
           )
   | 11 -> ( 
-# 33 "DLexer.fsl"
+# 34 "DLexer.fsl"
                                        EOF 
-# 128 "DLexer.fs"
+# 129 "DLexer.fs"
           )
   | 12 -> ( 
-# 34 "DLexer.fsl"
+# 35 "DLexer.fsl"
                                        failwith "Lexer error: illegal symbol" 
-# 133 "DLexer.fs"
+# 134 "DLexer.fs"
           )
   | _ -> failwith "Token"
 // Rule EndLineComment
 and EndLineComment  lexbuf =
   match _fslex_tables.Interpret(0,lexbuf) with
   | 0 -> ( 
-# 37 "DLexer.fsl"
+# 38 "DLexer.fsl"
                                        lexbuf.EndPos <- lexbuf.EndPos.NextLine 
-# 142 "DLexer.fs"
+# 143 "DLexer.fs"
           )
   | 1 -> ( 
-# 38 "DLexer.fsl"
+# 39 "DLexer.fsl"
                                       () 
-# 147 "DLexer.fs"
+# 148 "DLexer.fs"
           )
   | 2 -> ( 
-# 39 "DLexer.fsl"
+# 40 "DLexer.fsl"
                                       EndLineComment lexbuf 
-# 152 "DLexer.fs"
+# 153 "DLexer.fs"
           )
   | _ -> failwith "EndLineComment"
 

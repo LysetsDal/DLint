@@ -7,7 +7,9 @@ type instr =
     | Copy of path * path          (* Copy from:<path> to:<path>     *)
     | Var of string                (* No Use so far                  *)
     | Expose of int                (* Expose a port of int           *)           
-    | Expose2 of int * int       
+    | Expose2 of int * int    
+    | User of string * int option   
+
 and path =
     | Dirs of dir list
 
