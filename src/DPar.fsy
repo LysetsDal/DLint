@@ -48,15 +48,19 @@ Instr:
     NAME                          { Var($1)                   }
   | FROM NAME COLON NAME          { BaseImage($2, Tag($4))    }
   | WORKDIR Path                  { Workdir($2)               }
-  | EXPOSE INT                    { Expose($2)                }
-  | EXPOSE INT COLON INT          { Expose2($2, $4)           }
+  | EXPOSE Expose                 { Expose($2)                }
   | USER User                     { User($2)                  }
 ;
 
+Expose:
+    INT                           { Port($1)                  }
+  | INT COLON INT                 { Ports($1, $3)             }
+;
 
 User:
-    NAME                          { ($1, None)                }
-  | NAME INT                      { ($1, Some($2))            }
+    NAME                          { (Some($1), None)          }
+  | INT                           { (None, Some($1))          }
+  | NAME INT                      { (Some($1), Some($2))      }
 ;
 
 Version:
