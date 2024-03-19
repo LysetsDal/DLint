@@ -7,8 +7,12 @@ type instr =
     | Var of string (* No Use so far  *)
     | Expose of expose (* Expose a port of int *)
     | User of string option * int option
+    | Run of shell_cmd
 
 and path = Dirs of dir list
+
+and shell_cmd = 
+    | Cmd of string
 
 and dir = Dir of string
 

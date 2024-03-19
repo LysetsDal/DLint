@@ -2,27 +2,49 @@
 module DLex
 
 open FSharp.Text.Lexing
+open System
 open DPar
 
-let lexeme lexbuf = 
+(* Read a char and lex it as a string *)
+let lexeme (lexbuf: LexBuffer<char>) = 
     LexBuffer<char>.LexemeString lexbuf
 
-let keyword s = 
+(* Trim multiple following spaces into one space *)
+let trimWhitespace (str: string) =
+    let rec aux (str: char list) (acc: char list) =
+        match str with
+        | [] -> List.rev acc
+        | ' ' :: (' ' :: rest as tail) -> aux tail acc
+        | ' ' :: rest -> aux rest (' ' :: acc)
+        | char :: rest -> aux rest (char :: acc)
+    aux (List.ofSeq str) []
+    |> List.ofSeq
+    |> String.Concat
+    
+(* Used to parse shell commands for the RUN instruction*)
+let shellcmd (s: string) = 
+    match s with
+    | _ -> RUNCMD (trimWhitespace s)
+
+let keyword (s: string) = 
     match s with 
     | "from"        -> FROM
     | "workdir"     -> WORKDIR
     | "expose"      -> EXPOSE
     | "user"        -> USER
     | _             -> NAME s
+
 }
 
 let int = ['0'-'9']
 let letter = ['a'-'z''A'-'Z']['a'-'z''A'-'Z''0'-'9']*
+let run = "RUN"   
 
 rule Token = parse
     | [' ' '\t' '\r'] { Token lexbuf }
     | '\n'            { lexbuf.EndPos <- lexbuf.EndPos.NextLine; Token lexbuf }
     | int+            { INT (System.Int32.Parse (lexeme lexbuf)) }  
+    | run             { shellcmd (RunCmds [] lexbuf) } 
     | letter          { keyword ((lexeme lexbuf).ToLower()) }
     | '/'             { FSLASH }
     | ':'             { COLON }
@@ -36,5 +58,22 @@ rule Token = parse
 
 and EndLineComment = parse
     | '\n'            { lexbuf.EndPos <- lexbuf.EndPos.NextLine }
-    | (eof | '\026') { () }
-    | _              { EndLineComment lexbuf }
+    | (eof | '\026')  { () }
+    | _               { EndLineComment lexbuf }
+
+and RunCmds acc = parse
+    | "\\\n"          { lexbuf.EndPos <- lexbuf.EndPos.NextLine; RunCmds acc lexbuf }
+    | '\n'            { Microsoft.FSharp.Core.String.concat "" (List.map string (List.rev acc)) }
+    | '\t'            { RunCmds acc lexbuf }
+    | _               { RunCmds (char (lexbuf.LexemeChar 0) :: acc)  lexbuf }
+
+
+// and String chars = parse 
+//   | '"' { Microsoft.FSharp.Core.String.concat "" (List.map string (List.rev chars)) }
+//   | '\\' ['\\' '"' 'a' 'b' 't' 'n' 'v' 'f' 'r'] { String (cEscape (lexemeAsString lexbuf) :: chars) lexbuf }
+//   | "''" { String ('\'' :: chars) lexbuf }
+//   | '\\' { failwith "Lexer error: illegal escape sequence" }
+//   | (eof | '\026') { failwith "Lexer error: unterminated string" }
+//   | ['\n' '\r'] { failwith "Lexer error: newline in string" }
+//   | ['\000'-'\031' '\127' '\255'] { failwith "Lexer error: invalid character in string" }
+//   | _ { String (char (lexbuf.LexemeChar 0) :: chars) lexbuf }

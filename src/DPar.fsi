@@ -13,6 +13,7 @@ type token =
   | WORKDIR
   | USER
   | INT of (int)
+  | RUNCMD of (string)
   | NAME of (string)
 type tokenId = 
     | TOKEN_EOF
@@ -27,6 +28,7 @@ type tokenId =
     | TOKEN_WORKDIR
     | TOKEN_USER
     | TOKEN_INT
+    | TOKEN_RUNCMD
     | TOKEN_NAME
     | TOKEN_end_of_input
     | TOKEN_error
@@ -37,6 +39,7 @@ type nonTerminalId =
     | NONTERM_BaseImg
     | NONTERM_Instrs
     | NONTERM_Instr
+    | NONTERM_Runcmd
     | NONTERM_Expose
     | NONTERM_User
     | NONTERM_Version

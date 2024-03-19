@@ -14,8 +14,8 @@ DLex.fs Parse.fs Interp.fs ParseAndRun.fs
 ## Running with runArg.fs (for less typing):
 
 ```
-mono $fslex --unicode DLex.fsl;\
-mono $fsyacc --module DPar DPar.fsy;\
+mono $fslex --unicode DLex.fsl ;\
+mono $fsyacc --module DPar DPar.fsy ;\
 fsharpi -r /etc/fsharp/FsLexYacc.Runtime.dll Absyn.fs DPar.fs \
 DLex.fs Parse.fs Interp.fs ParseAndRun.fs --use:runArg.fs
 ```

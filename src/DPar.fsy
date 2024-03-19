@@ -3,7 +3,8 @@ open Absyn
 %}
 
 /*   CONSTRUCTORS   */
-%token <string> NAME
+%token <string> NAME 
+%token <string> RUNCMD
 %token <int> INT
 
 /*   LEXER TOKENS   */
@@ -15,7 +16,7 @@ open Absyn
 
 /*   PRECEDENCE RULES    */
 %nonassoc COLON DOT FSLASH      /* Lowest */
-%left FROM WORKDIR USER
+%left FROM WORKDIR USER 
 %left EXPOSE
 %nonassoc LBRACK RBRACK         /* Highest */
 
@@ -50,7 +51,13 @@ Instr:
   | WORKDIR Path                  { Workdir($2)               }
   | EXPOSE Expose                 { Expose($2)                }
   | USER User                     { User($2)                  }
+  | Runcmd                        { Run($1)                   }
 ;
+
+Runcmd:
+    RUNCMD                        { Cmd $1 }
+;
+
 
 Expose:
     INT                           { Port($1)                  }

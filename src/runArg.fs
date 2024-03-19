@@ -1,2 +1,2 @@
-open ParseAndRun;;
-let fd = ff "Dockerfile";;
+open ParseAndRun
+printfn "\n%A\n" (ff "Dockerfile")
