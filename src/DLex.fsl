@@ -36,9 +36,10 @@ let keyword (s: string) =
 
 }
 
+// RegEx patterns 
 let int = ['0'-'9']
 let letter = ['a'-'z''A'-'Z']['a'-'z''A'-'Z''0'-'9']*
-let run = "RUN"   
+let run = "RUN"[' ']+   
 
 rule Token = parse
     | [' ' '\t' '\r'] { Token lexbuf }
@@ -62,18 +63,7 @@ and EndLineComment = parse
     | _               { EndLineComment lexbuf }
 
 and RunCmds acc = parse
-    | "\\\n"          { lexbuf.EndPos <- lexbuf.EndPos.NextLine; RunCmds acc lexbuf }
+    | '\\'[' ']*'\n'  { lexbuf.EndPos <- lexbuf.EndPos.NextLine; RunCmds acc lexbuf }
     | '\n'            { Microsoft.FSharp.Core.String.concat "" (List.map string (List.rev acc)) }
     | '\t'            { RunCmds acc lexbuf }
     | _               { RunCmds (char (lexbuf.LexemeChar 0) :: acc)  lexbuf }
-
-
-// and String chars = parse 
-//   | '"' { Microsoft.FSharp.Core.String.concat "" (List.map string (List.rev chars)) }
-//   | '\\' ['\\' '"' 'a' 'b' 't' 'n' 'v' 'f' 'r'] { String (cEscape (lexemeAsString lexbuf) :: chars) lexbuf }
-//   | "''" { String ('\'' :: chars) lexbuf }
-//   | '\\' { failwith "Lexer error: illegal escape sequence" }
-//   | (eof | '\026') { failwith "Lexer error: unterminated string" }
-//   | ['\n' '\r'] { failwith "Lexer error: newline in string" }
-//   | ['\000'-'\031' '\127' '\255'] { failwith "Lexer error: invalid character in string" }
-//   | _ { String (char (lexbuf.LexemeChar 0) :: chars) lexbuf }

@@ -4,10 +4,10 @@ USER root 1001
 
 WORKDIR /etc/tmp/
 
-RUN rm -f /etc/apt/apt.conf.d/docker-clean; echo 'Binary::apt::APT::Keep-Downloaded-Packages "true";' > /etc/apt/apt.conf.d/keep-cache
+RUN --mount=type=bind, target=/var/run/docker.sock 2&1>/dev/null
 
-RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
-  --mount=type=cache,target=/var/lib/apt,sharing=locked \
-  apt update && apt-get --no-install-recommends install -y gcc
+RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \ 
+    && --mount=type=cache,target=/var/lib/apt,sharing=locked \ 
+    && apt update && apt-get --no-install-recommends install -y gcc
 
 EXPOSE 80:8080
