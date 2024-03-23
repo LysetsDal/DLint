@@ -26,5 +26,5 @@ let fromFile (filename : string) =
       DPar.Main DLex.Token lexbuf
     with 
       | exn -> let pos = lexbuf.EndPos 
-               failwithf "%s in file %s near line %d, column %d, last parsed:  '%s'\n" 
+               failwithf "%s in file %s near line %d, column %d, last parsed: '%s' \n" 
                   (exn.Message) filename (pos.Line+1) pos.Column (new String(lexbuf.Lexeme))

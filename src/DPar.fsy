@@ -3,20 +3,21 @@ open Absyn
 %}
 
 /*   CONSTRUCTORS   */
-%token <string> NAME 
-%token <string> RUNCMD
+%token <string> NAME WPATH RUNCMD
+%token <string * string> CPATH
 %token <int> INT
 
 /*   LEXER TOKENS   */
-%token FROM WORKDIR USER
-%token FSLASH DASH
+%token FROM USER
+%token FSLASH DASH COMMA
 %token EXPOSE
 %token COLON DOT LBRACK RBRACK 
 %token EOF
 
 /*   PRECEDENCE RULES    */
 %nonassoc COLON DOT FSLASH      /* Lowest */
-%left FROM WORKDIR USER 
+%left USER FROM
+%left COMMA
 %left EXPOSE
 %nonassoc LBRACK RBRACK         /* Highest */
 
@@ -30,75 +31,120 @@ Main:
     File EOF                      { DFile $1 }
 ;
 
-/* A file is a Base image and a list of stmts */
+/* 
+ * Defining a file: a Base image and a list of intrsutcions 
+ */
 File:
     BaseImg                       { [$1]      }
   | BaseImg Instrs                { $1 :: $2  }
 ;
 
+/*
+ * Base Image (Single stage build only pt.)
+ */
 BaseImg:
-    FROM NAME COLON Version       { BaseImage($2, Tag $4) }
+    FROM NAME COLON Version       { BaseImage($2, Tag $4)     }
 ;
 
+/*
+ * Parse one isntruction or many
+ */
 Instrs:
     Instr                         { [$1]        }
   | Instr Instrs                  { $1 :: $2    }
 ;
 
+/*
+ * Docker instructions that are supported
+ */
 Instr:
-    NAME                          { Var($1)                   }
-  | FROM NAME COLON NAME          { BaseImage($2, Tag($4))    }
-  | WORKDIR Path                  { Workdir($2)               }
-  | EXPOSE Expose                 { Expose($2)                }
-  | USER User                     { User($2)                  }
-  | Runcmd                        { Run($1)                   }
+    NAME                          { Var $1                    }
+  | FROM NAME COLON Version       { BaseImage($2, Tag $4)     }
+  | WPath                         { Workdir $1                }
+  | EXPOSE Expose                 { Expose $2                 }
+  | USER User                     { User $2                   }
+  | Runcmd                        { Run $1                    }
+  | CPath                         { Copy $1                   }
 ;
 
+
+/*
+ * Path: parsed as a string 
+ */
+WPath:
+    WPATH                         { WPath $1 }  
+;
+
+
+/*
+ * Path: parsed as a string 
+ */
+CPath:
+    CPATH                         { CPath $1 }  
+;
+
+
+/*
+ * Parsing shell commands (string)
+ */
 Runcmd:
     RUNCMD                        { Cmd $1 }
 ;
 
-
+/*
+ * Expose instr:  port, port:port or [port; ..; port]  
+ */
 Expose:
-    INT                           { Port($1)                  }
-  | INT COLON INT                 { Ports($1, $3)             }
+    INT                           { Port $1                    }  /*  EXPOSE 80          */
+  | INT COLON INT                 { PortM ($1, $3)             }  /*  EXPOSE 80 : 808    */
+  | INT COMMA Ports               { Ports ($1 :: $3)           }  /*  EXPOSE 22, 80, 443 */
 ;
 
+/*
+ * Construct a list of ports 
+ */
+Ports:
+    INT                           { [$1]     }
+  | INT COMMA Ports               { $1 :: $3 }
+;
+
+
+/*
+ * User instr (Name || GUID || both) inside the container  
+ */
 User:
-    NAME                          { (Some($1), None)          }
-  | INT                           { (None, Some($1))          }
-  | NAME INT                      { (Some($1), Some($2))      }
+    NAME                          { (Some $1, None)          }
+  | INT                           { (None, Some $1)          }
+  | NAME INT                      { (Some $1, Some $2)      }
 ;
 
+/* 
+ * Version of BaseImg
+ */
 Version:
     NAME                          { $1                              }
   | INT                           { string $1                       }
-  | INT MinorVersion              { string $1 + "." + $2            } 
+  | INT DottedName                { string $1 + "." + $2            } 
   | INT DashedName                { string $1 + "-" + $2            }
-  | INT MinorVersion DashedName   { string $1 + "." + $2 + "-" + $3 }     
+  | NAME DottedName               { string $1 + "." + $2            }
+  | NAME DashedName               { string $1 + "-" + $2            }
+  | INT DottedName DashedName     { string $1 + "." + $2 + "-" + $3 }     
 ;
 
-/* Used to parse tag numbers*/
-MinorVersion:
-    DOT INT                       { string $2             }
-  | DOT INT MinorVersion          { string $2 + "." + $3  }   
+/* 
+ * Used to parse tag numbers with dots
+ */
+DottedName:
+    DOT INT                       { string $2               }
+  | DOT INT DottedName            { string $2 + "." + $3    }   
 ;
 
-/* Used to parse docker tag names (standard is dash seperated names) */
+/* 
+ * Used to parse tag numbers with dashes
+ */
 DashedName:
     DASH NAME                     { string $2               }
   | DASH INT                      { string $2               }
-  | DASH INT MinorVersion         { string $2 + "." + $3    }
+  | DASH INT DottedName           { string $2 + "." + $3    }
   | DASH NAME DashedName          { string $2 + "-" + $3    }
-;
-
-
-Path:
-    Dirs                           { Dirs($1) } 
-;
-
-Dirs:
-    FSLASH NAME                    { [(Dir $2)]      }   /* End without '/'          */
-  | FSLASH NAME FSLASH             { [(Dir $2)]      }   /* End with '/'             */
-  | FSLASH NAME Dirs               { Dir $2 :: $3    }   /* Construct list of dirs   */
 ;

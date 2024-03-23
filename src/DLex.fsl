@@ -4,52 +4,52 @@ module DLex
 open FSharp.Text.Lexing
 open System
 open DPar
+open Utils
 
 (* Read a char and lex it as a string *)
 let lexeme (lexbuf: LexBuffer<char>) = 
     LexBuffer<char>.LexemeString lexbuf
 
-(* Trim multiple following spaces into one space *)
-let trimWhitespace (str: string) =
-    let rec aux (str: char list) (acc: char list) =
-        match str with
-        | [] -> List.rev acc
-        | ' ' :: (' ' :: rest as tail) -> aux tail acc
-        | ' ' :: rest -> aux rest (' ' :: acc)
-        | char :: rest -> aux rest (char :: acc)
-    aux (List.ofSeq str) []
-    |> List.ofSeq
-    |> String.Concat
-    
 (* Used to parse shell commands for the RUN instruction*)
-let shellcmd (s: string) = 
-    match s with
-    | _ -> RUNCMD (trimWhitespace s)
+let sCmd (s: string) = RUNCMD (trimWhitespace s)
 
+(* Used to parse paths s for the COPY and WORKDIR instruction*)
+let wPath (s: string) = WPATH s
+
+(* Used to parse paths s for the COPY and WORKDIR instruction*)
+let cPath (s: string) = CPATH (stringToCPath s)
+
+(* Used to parse specefic keywords *)
 let keyword (s: string) = 
     match s with 
     | "from"        -> FROM
-    | "workdir"     -> WORKDIR
     | "expose"      -> EXPOSE
     | "user"        -> USER
     | _             -> NAME s
-
 }
 
 // RegEx patterns 
 let int = ['0'-'9']
 let letter = ['a'-'z''A'-'Z']['a'-'z''A'-'Z''0'-'9']*
-let run = "RUN"[' ']+   
+let whitespace = [' ' '\t' '\r'] 
+// RegEx for instruction types
+let run = "RUN"[' ']+ 
+let cpath = "COPY"[' ']+ 
+let wpath = "WORKDIR"[' ']+
+
 
 rule Token = parse
-    | [' ' '\t' '\r'] { Token lexbuf }
+    | whitespace { Token lexbuf }
     | '\n'            { lexbuf.EndPos <- lexbuf.EndPos.NextLine; Token lexbuf }
     | int+            { INT (System.Int32.Parse (lexeme lexbuf)) }  
-    | run             { shellcmd (RunCmds [] lexbuf) } 
+    | run             { sCmd (RunCmd [] lexbuf) } 
+    | wpath           { wPath (Path [] lexbuf)  }
+    | cpath           { cPath (Path [] lexbuf)  }
     | letter          { keyword ((lexeme lexbuf).ToLower()) }
     | '/'             { FSLASH }
     | ':'             { COLON }
     | '.'             { DOT }
+    | ','             { COMMA }
     | '-'             { DASH }
     | '['             { LBRACK }
     | ']'             { RBRACK }
@@ -62,8 +62,12 @@ and EndLineComment = parse
     | (eof | '\026')  { () }
     | _               { EndLineComment lexbuf }
 
-and RunCmds acc = parse
-    | '\\'[' ']*'\n'  { lexbuf.EndPos <- lexbuf.EndPos.NextLine; RunCmds acc lexbuf }
+and RunCmd acc = parse
+    | '\\'[' ']*'\n'  { lexbuf.EndPos <- lexbuf.EndPos.NextLine; RunCmd acc lexbuf }
     | '\n'            { Microsoft.FSharp.Core.String.concat "" (List.map string (List.rev acc)) }
-    | '\t'            { RunCmds acc lexbuf }
-    | _               { RunCmds (char (lexbuf.LexemeChar 0) :: acc)  lexbuf }
+    | '\t'            { RunCmd acc lexbuf }
+    | _               { RunCmd (char (lexbuf.LexemeChar 0) :: acc)  lexbuf }
+
+and Path acc = parse
+    | [' ']*'\n'[' ']* { Microsoft.FSharp.Core.String.concat "" (List.map string (List.rev acc)) }
+    | _                { Path (char (lexbuf.LexemeChar 0) :: acc)  lexbuf }

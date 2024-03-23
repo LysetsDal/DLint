@@ -9,12 +9,14 @@ type token =
   | EXPOSE
   | FSLASH
   | DASH
+  | COMMA
   | FROM
-  | WORKDIR
   | USER
   | INT of (int)
-  | RUNCMD of (string)
+  | CPATH of (string * string)
   | NAME of (string)
+  | WPATH of (string)
+  | RUNCMD of (string)
 type tokenId = 
     | TOKEN_EOF
     | TOKEN_COLON
@@ -24,12 +26,14 @@ type tokenId =
     | TOKEN_EXPOSE
     | TOKEN_FSLASH
     | TOKEN_DASH
+    | TOKEN_COMMA
     | TOKEN_FROM
-    | TOKEN_WORKDIR
     | TOKEN_USER
     | TOKEN_INT
-    | TOKEN_RUNCMD
+    | TOKEN_CPATH
     | TOKEN_NAME
+    | TOKEN_WPATH
+    | TOKEN_RUNCMD
     | TOKEN_end_of_input
     | TOKEN_error
 type nonTerminalId = 
@@ -39,14 +43,15 @@ type nonTerminalId =
     | NONTERM_BaseImg
     | NONTERM_Instrs
     | NONTERM_Instr
+    | NONTERM_WPath
+    | NONTERM_CPath
     | NONTERM_Runcmd
     | NONTERM_Expose
+    | NONTERM_Ports
     | NONTERM_User
     | NONTERM_Version
-    | NONTERM_MinorVersion
+    | NONTERM_DottedName
     | NONTERM_DashedName
-    | NONTERM_Path
-    | NONTERM_Dirs
 /// This function maps tokens to integer indexes
 val tagOfToken: token -> int
 

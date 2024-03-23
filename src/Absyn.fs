@@ -2,14 +2,18 @@ module Absyn
 
 type instr =
     | BaseImage of string * tag (* Build Image <name>:<tag> *)
-    | Workdir of path (* Specify working directory  *)
-    | Copy of path * path (* Copy from:<path> to:<path> *)
+    | Workdir of wpath (* Specify working directory  *)
+    | Copy of cpath   (* Copy from:<path> to:<path> *)
     | Var of string (* No Use so far  *)
     | Expose of expose (* Expose a port of int *)
     | User of string option * int option
     | Run of shell_cmd
 
-and path = Dirs of dir list
+and wpath = 
+    | WPath of string
+
+and cpath = 
+    | CPath of string * string
 
 and shell_cmd = 
     | Cmd of string
@@ -18,7 +22,8 @@ and dir = Dir of string
 
 and expose =
     | Port of int
-    | Ports of int * int
+    | PortM of int * int
+    | Ports of int list
 
 and tag =
     | Tag of string
