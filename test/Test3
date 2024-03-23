@@ -1,0 +1,27 @@
+FROM test3:1
+
+COPY . .
+
+FROM test3:2
+
+COPY / /
+
+FROM test3:3
+
+COPY ~/ ~/
+
+FROM test3:4
+
+COPY ./ ./
+
+FROM test3:5
+
+COPY ./var ./ver/tmp
+
+FROM test3:6
+
+COPY ./var ./ver/tmp\ /end
+
+FROM test3:7
+
+COPY ./var.c .
