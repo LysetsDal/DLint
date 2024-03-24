@@ -1,0 +1,36 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <OutputType>Exe</OutputType>
+        <TargetFramework>net6.0</TargetFramework>
+        <FsLexToolExe>fslex.dll</FsLexToolExe>
+        <FsYaccToolExe>fsyacc.dll</FsYaccToolExe>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="FsLexYacc" Version="11.2.0" />
+        <Compile Include="Utils.fs" />
+        <FsLex Include="DLex.fsl">
+            <OtherFlags>--module DLex --unicode</OtherFlags>
+        </FsLex>
+
+
+        <!-- Ordering Precedence IMPORTANT -->
+        
+        <!-- Parse needs absyn above it --> 
+        <Compile Include="Absyn.fs" />
+        <Compile Include="DPar.fsi" />
+        <FsYacc Include="DPar.fsy">
+          <OtherFlags>--module DPar</OtherFlags>
+        </FsYacc>
+        <Compile Include="DPar.fs" />
+<!--        <Compile Include="DPar.fsy" />-->
+        <Compile Include="DLex.fs" />
+<!--        <Compile Include="DLex.fsl" />-->
+        <Compile Include="Parse.fs" />
+        
+        <Compile Include="Interp.fs" />
+        <Compile Include="Program.fs" />
+    </ItemGroup>
+
+</Project>
