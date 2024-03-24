@@ -3,8 +3,8 @@ module Utils
 open System.Text.RegularExpressions
 
 (* Trim multiple following spaces into one space *)
-let trimWhitespace (str: string) =
-    let rec aux (str: char list) (acc: char list) =
+let trimWhitespace str =
+    let rec aux str acc =
         match str with
         | [] -> List.rev acc
         | ' ' :: (' ' :: rest as tail) -> aux tail acc
@@ -14,11 +14,16 @@ let trimWhitespace (str: string) =
     |> List.ofSeq
     |> List.map string
     |> String.concat ""
-    
+
+(* Used to split a string (envVar) at the '=' (equal) *)
+let splitEnvVar input =
+    let pattern = @"(?<!\\)=" // match un-escaped '=' sign
+    Regex.Split(input, pattern)
+    |> List.ofArray
 
 (* Used to split a string (path) at the ' ' (spaces) *)
-let splitAtSpaces (input: string) =
-    let pattern = @"(?<!\\) " // Negative lookbehind assertion to match spaces not preceded by a backslash
+let splitAtSpaces input =
+    let pattern = @"(?<!\\) " // Match spaces not preceded by a backslash
     Regex.Split(input, pattern)
     |> List.ofArray
 
@@ -29,7 +34,11 @@ let returnPair lst =
     | [x] -> failwith "Only one path"
     | x :: y :: _ -> (x, y)
 
-(* Return a CPath (Copy-path) (from, to) from a string *)
-let stringToCPath str =
+(* Return a Path (Copy-path) (from, to) from a string *)
+let stringToPath str =
     splitAtSpaces str
+    |> returnPair
+
+let stringToEnvPair str =
+    splitEnvVar str
     |> returnPair

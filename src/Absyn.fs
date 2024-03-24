@@ -7,7 +7,10 @@ type instr =
     | Var of string (* No Use so far  *)
     | Expose of expose (* Expose a port of int *)
     | User of string option * int option
-    | Run of shell_cmd
+    | Run of cmd
+    | EntryCmd of cmd
+    | Env of env
+    | Add of apath
 
 and wpath = 
     | WPath of string
@@ -15,10 +18,16 @@ and wpath =
 and cpath = 
     | CPath of string * string
 
-and shell_cmd = 
+and apath =
+    | APath of string * string
+
+and cmd = 
     | Cmd of string
+    | Cmds of string list
 
 and dir = Dir of string
+
+and env = EnvVar of string * string
 
 and expose =
     | Port of int

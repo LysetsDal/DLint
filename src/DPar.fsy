@@ -1,23 +1,26 @@
 %{
 open Absyn
+
 %}
 
 /*   CONSTRUCTORS   */
-%token <string> NAME WPATH RUNCMD
-%token <string * string> CPATH
+%token <string> NAME WPATH RCMD ECMD 
+%token <string> CSTST
+%token <string * string> CPATH APATH ENVVAR
 %token <int> INT
 
 /*   LEXER TOKENS   */
-%token FROM USER
-%token FSLASH DASH COMMA
-%token EXPOSE
+%token FROM USER 
+%token FSLASH DASH COMMA EQ
+%token EXPOSE ENV
 %token COLON DOT LBRACK RBRACK 
 %token EOF
 
 /*   PRECEDENCE RULES    */
-%nonassoc COLON DOT FSLASH      /* Lowest */
-%left USER FROM
+%nonassoc COLON DOT FSLASH     /* Lowest */
+%left USER FROM ENV
 %left COMMA
+%left EQ
 %left EXPOSE
 %nonassoc LBRACK RBRACK         /* Highest */
 
@@ -63,10 +66,19 @@ Instr:
   | WPath                         { Workdir $1                }
   | EXPOSE Expose                 { Expose $2                 }
   | USER User                     { User $2                   }
-  | Runcmd                        { Run $1                    }
   | CPath                         { Copy $1                   }
+  | Runcmd                        { Run $1                    }
+  | Entrycmd                      { EntryCmd $1               }
+  | AddPath                       { Add $1                    }
+  | EnvVar                        { Env $1                    }
 ;
 
+/*
+ * ENV: parsed as a key-value pair of strings
+ */
+EnvVar:
+    ENVVAR                        { EnvVar($1) }
+;
 
 /*
  * Path: parsed as a string 
@@ -75,7 +87,6 @@ WPath:
     WPATH                         { WPath $1 }  
 ;
 
-
 /*
  * Path: parsed as a string 
  */
@@ -83,12 +94,22 @@ CPath:
     CPATH                         { CPath $1 }  
 ;
 
+/*
+ * Path: parsed as a string 
+ */
+AddPath:
+    APATH                         { APath $1 }  
+;
 
 /*
  * Parsing shell commands (string)
  */
 Runcmd:
-    RUNCMD                        { Cmd $1 }
+    RCMD                          { Cmd $1 }
+;
+
+Entrycmd:
+    ECMD                          { Cmd $1 }
 ;
 
 /*
@@ -107,7 +128,6 @@ Ports:
     INT                           { [$1]     }
   | INT COMMA Ports               { $1 :: $3 }
 ;
-
 
 /*
  * User instr (Name || GUID || both) inside the container  

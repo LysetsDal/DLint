@@ -7,16 +7,22 @@ type token =
   | LBRACK
   | RBRACK
   | EXPOSE
+  | ENV
   | FSLASH
   | DASH
   | COMMA
+  | EQ
   | FROM
   | USER
   | INT of (int)
   | CPATH of (string * string)
+  | APATH of (string * string)
+  | ENVVAR of (string * string)
+  | CSTST of (string)
   | NAME of (string)
   | WPATH of (string)
-  | RUNCMD of (string)
+  | RCMD of (string)
+  | ECMD of (string)
 type tokenId = 
     | TOKEN_EOF
     | TOKEN_COLON
@@ -24,16 +30,22 @@ type tokenId =
     | TOKEN_LBRACK
     | TOKEN_RBRACK
     | TOKEN_EXPOSE
+    | TOKEN_ENV
     | TOKEN_FSLASH
     | TOKEN_DASH
     | TOKEN_COMMA
+    | TOKEN_EQ
     | TOKEN_FROM
     | TOKEN_USER
     | TOKEN_INT
     | TOKEN_CPATH
+    | TOKEN_APATH
+    | TOKEN_ENVVAR
+    | TOKEN_CSTST
     | TOKEN_NAME
     | TOKEN_WPATH
-    | TOKEN_RUNCMD
+    | TOKEN_RCMD
+    | TOKEN_ECMD
     | TOKEN_end_of_input
     | TOKEN_error
 type nonTerminalId = 
@@ -43,9 +55,12 @@ type nonTerminalId =
     | NONTERM_BaseImg
     | NONTERM_Instrs
     | NONTERM_Instr
+    | NONTERM_EnvVar
     | NONTERM_WPath
     | NONTERM_CPath
+    | NONTERM_AddPath
     | NONTERM_Runcmd
+    | NONTERM_Entrycmd
     | NONTERM_Expose
     | NONTERM_Ports
     | NONTERM_User

@@ -10,14 +10,23 @@ open Utils
 let lexeme (lexbuf: LexBuffer<char>) = 
     LexBuffer<char>.LexemeString lexbuf
 
-(* Used to parse shell commands for the RUN instruction*)
-let sCmd (s: string) = RUNCMD (trimWhitespace s)
+(* Used to parse shell commands for the RUN instruction *)
+let runcmd (s: string) = RCMD (trimWhitespace s)
 
-(* Used to parse paths s for the COPY and WORKDIR instruction*)
+(* Used to parse shell commands for the CMD instruction *)
+let entrycmd (s: string) = ECMD (trimWhitespace s)
+
+(* Used to parse paths s for the COPY and WORKDIR instruction *)
 let wPath (s: string) = WPATH s
 
-(* Used to parse paths s for the COPY and WORKDIR instruction*)
-let cPath (s: string) = CPATH (stringToCPath s)
+(* Used to parse paths s for the COPY and WORKDIR instruction *)
+let cPath (s: string) = CPATH (stringToPath s)
+
+(* Used to parse paths s for the ADD instruction *)
+let aPath (s: string) = APATH (stringToPath s)
+
+(* Used to parse key value pairs for the ENV instruction *)
+let envVar (s: string) = ENVVAR (stringToEnvPair s)
 
 (* Used to parse specefic keywords *)
 let keyword (s: string) = 
@@ -25,35 +34,44 @@ let keyword (s: string) =
     | "from"        -> FROM
     | "expose"      -> EXPOSE
     | "user"        -> USER
+    | "env"         -> ENV
     | _             -> NAME s
 }
 
-// RegEx patterns 
+// RegEx general patterns 
 let int = ['0'-'9']
-let letter = ['a'-'z''A'-'Z']['a'-'z''A'-'Z''0'-'9']*
+let letter = ['a'-'z''A'-'Z']['a'-'z''A'-'Z''0'-'9''_']*
 let whitespace = [' ' '\t' '\r'] 
 // RegEx for instruction types
 let run = "RUN"[' ']+ 
 let cpath = "COPY"[' ']+ 
 let wpath = "WORKDIR"[' ']+
+let cmd = "CMD"[' ']+
+let add = "ADD"[' ']+
+let env = "ENV"[' ']+
 
 
 rule Token = parse
     | whitespace { Token lexbuf }
     | '\n'            { lexbuf.EndPos <- lexbuf.EndPos.NextLine; Token lexbuf }
     | int+            { INT (System.Int32.Parse (lexeme lexbuf)) }  
-    | run             { sCmd (RunCmd [] lexbuf) } 
+    | run             { runcmd (Shell [] lexbuf) } 
+    | cmd             { entrycmd (Shell [] lexbuf) }
     | wpath           { wPath (Path [] lexbuf)  }
     | cpath           { cPath (Path [] lexbuf)  }
+    | add             { aPath (Path [] lexbuf)  }
+    | env             { envVar (Path [] lexbuf) }
     | letter          { keyword ((lexeme lexbuf).ToLower()) }
     | '/'             { FSLASH }
     | ':'             { COLON }
     | '.'             { DOT }
     | ','             { COMMA }
+    | '='             { EQ }
     | '-'             { DASH }
     | '['             { LBRACK }
     | ']'             { RBRACK }
     | '#'             { EndLineComment lexbuf; Token lexbuf }
+    | '"'             { CSTST (String [] lexbuf) }
     | eof             { EOF }
     | _               { failwith "Lexer error: illegal symbol" }
 
@@ -62,12 +80,21 @@ and EndLineComment = parse
     | (eof | '\026')  { () }
     | _               { EndLineComment lexbuf }
 
-and RunCmd acc = parse
-    | '\\'[' ']*'\n'  { lexbuf.EndPos <- lexbuf.EndPos.NextLine; RunCmd acc lexbuf }
+and Shell acc = parse
+    | '\\'[' ']*'\n'  { lexbuf.EndPos <- lexbuf.EndPos.NextLine; Shell acc lexbuf }
     | '\n'            { Microsoft.FSharp.Core.String.concat "" (List.map string (List.rev acc)) }
-    | '\t'            { RunCmd acc lexbuf }
-    | _               { RunCmd (char (lexbuf.LexemeChar 0) :: acc)  lexbuf }
+    | '\t'            { Shell acc lexbuf }
+    | (eof | '\026')  { failwith "Lexer error: unterminated shell cmd" }
+    | _               { Shell (char (lexbuf.LexemeChar 0) :: acc)  lexbuf }
 
 and Path acc = parse
     | [' ']*'\n'[' ']* { Microsoft.FSharp.Core.String.concat "" (List.map string (List.rev acc)) }
+    | (eof | '\026')   { failwith "Lexer error: unterminated path" }
     | _                { Path (char (lexbuf.LexemeChar 0) :: acc)  lexbuf }
+
+and String chars = parse 
+    | '"' { Microsoft.FSharp.Core.String.concat "" (List.map string (List.rev chars)) }
+    | "''" { String ('\'' :: chars) lexbuf }    
+    | (eof | '\026') { failwith "Lexer error: unterminated string" }
+    | ['\000'-'\031' '\127' '\255'] { failwith "Lexer error: invalid character in string" }
+    | _ { String (char (lexbuf.LexemeChar 0) :: chars) lexbuf }

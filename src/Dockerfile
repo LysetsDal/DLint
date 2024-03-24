@@ -4,6 +4,8 @@ USER toor
 
 USER 1001
 
+ENV SECRET_KEY="very secret key"
+
 WORKDIR /etc/tmp/
 
 RUN --mount=type=bind, target=/var/run/docker.sock 2&1>/dev/null
