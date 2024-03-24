@@ -2,7 +2,6 @@ module Parse
 
 open System
 open System.IO
-open System.Text
 open FSharp.Text.Lexing
 open Absyn
 
@@ -28,3 +27,4 @@ let fromFile (filename : string) =
       | exn -> let pos = lexbuf.EndPos 
                failwithf "%s in file %s near line %d, column %d, last parsed: '%s' \n" 
                   (exn.Message) filename (pos.Line+1) pos.Column (new String(lexbuf.Lexeme))
+                  

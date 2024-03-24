@@ -7,7 +7,7 @@ let trimWhitespace str =
     let rec aux str acc =
         match str with
         | [] -> List.rev acc
-        | ' ' :: (' ' :: rest as tail) -> aux tail acc
+        | ' ' :: (' ' :: _ as tail) -> aux tail acc
         | ' ' :: rest -> aux rest (' ' :: acc)
         | char :: rest -> aux rest (char :: acc)
     aux (List.ofSeq str) []
@@ -31,7 +31,7 @@ let splitAtSpaces input =
 let returnPair lst = 
     match lst with
     | [] -> failwith "Empty list"
-    | [x] -> failwith "Only one path"
+    | [_] -> failwith "Only one path"
     | x :: y :: _ -> (x, y)
 
 (* Return a Path (Copy-path) (from, to) from a string *)
