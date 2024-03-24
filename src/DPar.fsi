@@ -4,11 +4,7 @@ type token =
   | EOF
   | COLON
   | DOT
-  | LBRACK
-  | RBRACK
   | EXPOSE
-  | ENV
-  | FSLASH
   | DASH
   | COMMA
   | EQ
@@ -27,11 +23,7 @@ type tokenId =
     | TOKEN_EOF
     | TOKEN_COLON
     | TOKEN_DOT
-    | TOKEN_LBRACK
-    | TOKEN_RBRACK
     | TOKEN_EXPOSE
-    | TOKEN_ENV
-    | TOKEN_FSLASH
     | TOKEN_DASH
     | TOKEN_COMMA
     | TOKEN_EQ

@@ -11,18 +11,17 @@ open Absyn
 
 /*   LEXER TOKENS   */
 %token FROM USER 
-%token FSLASH DASH COMMA EQ
-%token EXPOSE ENV
-%token COLON DOT LBRACK RBRACK 
+%token DASH COMMA EQ
+%token EXPOSE 
+%token COLON DOT
 %token EOF
 
 /*   PRECEDENCE RULES    */
-%nonassoc COLON DOT FSLASH     /* Lowest */
-%left USER FROM ENV
+%nonassoc COLON DOT           /* Lowest */
+%left USER FROM
 %left COMMA
 %left EQ
-%left EXPOSE
-%nonassoc LBRACK RBRACK         /* Highest */
+%left EXPOSE                  /* Highest */
 
 /*   START SYMBOL   */
 %start Main
@@ -81,33 +80,35 @@ EnvVar:
 ;
 
 /*
- * Path: parsed as a string 
+ * Workdir Path: parsed as a string 
  */
 WPath:
     WPATH                         { WPath $1 }  
 ;
 
 /*
- * Path: parsed as a string 
+ * Copy Path: parsed as a tuple (string * string)
  */
 CPath:
     CPATH                         { CPath $1 }  
 ;
 
 /*
- * Path: parsed as a string 
+ * Add Path: parsed as a tuple (string * string)
  */
 AddPath:
     APATH                         { APath $1 }  
 ;
 
 /*
- * Parsing shell commands (string)
+ * Parsing shell commands as a string
  */
 Runcmd:
     RCMD                          { Cmd $1 }
 ;
-
+/*
+ * Parsing the CMD command (string)
+ */
 Entrycmd:
     ECMD                          { Cmd $1 }
 ;

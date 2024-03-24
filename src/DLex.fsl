@@ -10,76 +10,78 @@ open Utils
 let lexeme (lexbuf: LexBuffer<char>) = 
     LexBuffer<char>.LexemeString lexbuf
 
-(* Used to parse shell commands for the RUN instruction *)
-let runcmd (s: string) = RCMD (trimWhitespace s)
-
-(* Used to parse shell commands for the CMD instruction *)
-let entrycmd (s: string) = ECMD (trimWhitespace s)
-
-(* Used to parse paths s for the COPY and WORKDIR instruction *)
-let wPath (s: string) = WPATH s
+(* Used to parse paths s for the ADD instruction *)
+let aPath (s: string) = APATH (stringToPath s)
 
 (* Used to parse paths s for the COPY and WORKDIR instruction *)
 let cPath (s: string) = CPATH (stringToPath s)
 
-(* Used to parse paths s for the ADD instruction *)
-let aPath (s: string) = APATH (stringToPath s)
+(* Used to parse shell commands for the CMD instruction *)
+let entrycmd (s: string) = ECMD (trimWhitespace s)
 
 (* Used to parse key value pairs for the ENV instruction *)
 let envVar (s: string) = ENVVAR (stringToEnvPair s)
 
-(* Used to parse specefic keywords *)
+(* Used to parse shell commands for the RUN instruction *)
+let runcmd (s: string) = RCMD (trimWhitespace s)
+
+(* Used to parse paths s for the COPY and WORKDIR instruction *)
+let wPath (s: string) = WPATH s
+
+(* Used to parse keywords that dont precede string litereals *)
 let keyword (s: string) = 
     match s with 
     | "from"        -> FROM
     | "expose"      -> EXPOSE
     | "user"        -> USER
-    | "env"         -> ENV
     | _             -> NAME s
+
 }
 
-// RegEx general patterns 
+// Parse an INT
 let int = ['0'-'9']
+// Parse a letter (including INT and '_')
 let letter = ['a'-'z''A'-'Z']['a'-'z''A'-'Z''0'-'9''_']*
+// Parse a space a tab or a carriage return 
 let whitespace = [' ' '\t' '\r'] 
-// RegEx for instruction types
-let run = "RUN"[' ']+ 
-let cpath = "COPY"[' ']+ 
-let wpath = "WORKDIR"[' ']+
-let cmd = "CMD"[' ']+
+
+// RegEx for instructions
 let add = "ADD"[' ']+
+let cmd = "CMD"[' ']+
+let cpath = "COPY"[' ']+ 
 let env = "ENV"[' ']+
+let run = "RUN"[' ']+ 
+let wpath = "WORKDIR"[' ']+
 
 
 rule Token = parse
-    | whitespace { Token lexbuf }
+    | whitespace      { Token lexbuf }
     | '\n'            { lexbuf.EndPos <- lexbuf.EndPos.NextLine; Token lexbuf }
     | int+            { INT (System.Int32.Parse (lexeme lexbuf)) }  
-    | run             { runcmd (Shell [] lexbuf) } 
-    | cmd             { entrycmd (Shell [] lexbuf) }
-    | wpath           { wPath (Path [] lexbuf)  }
-    | cpath           { cPath (Path [] lexbuf)  }
     | add             { aPath (Path [] lexbuf)  }
+    | cmd             { entrycmd (Shell [] lexbuf) }
+    | cpath           { cPath (Path [] lexbuf)  }
     | env             { envVar (Path [] lexbuf) }
+    | run             { runcmd (Shell [] lexbuf) } 
+    | wpath           { wPath (Path [] lexbuf)  }
     | letter          { keyword ((lexeme lexbuf).ToLower()) }
-    | '/'             { FSLASH }
     | ':'             { COLON }
     | '.'             { DOT }
     | ','             { COMMA }
     | '='             { EQ }
     | '-'             { DASH }
-    | '['             { LBRACK }
-    | ']'             { RBRACK }
     | '#'             { EndLineComment lexbuf; Token lexbuf }
     | '"'             { CSTST (String [] lexbuf) }
     | eof             { EOF }
     | _               { failwith "Lexer error: illegal symbol" }
 
+// Parse a single line comment: (# I am a comment)
 and EndLineComment = parse
     | '\n'            { lexbuf.EndPos <- lexbuf.EndPos.NextLine }
     | (eof | '\026')  { () }
     | _               { EndLineComment lexbuf }
 
+// Parse a shell command: supports multi line with '\'. Terminates on '\n'.
 and Shell acc = parse
     | '\\'[' ']*'\n'  { lexbuf.EndPos <- lexbuf.EndPos.NextLine; Shell acc lexbuf }
     | '\n'            { Microsoft.FSharp.Core.String.concat "" (List.map string (List.rev acc)) }
@@ -87,11 +89,13 @@ and Shell acc = parse
     | (eof | '\026')  { failwith "Lexer error: unterminated shell cmd" }
     | _               { Shell (char (lexbuf.LexemeChar 0) :: acc)  lexbuf }
 
+// Parse a Path: Terminates on '\n'.
 and Path acc = parse
     | [' ']*'\n'[' ']* { Microsoft.FSharp.Core.String.concat "" (List.map string (List.rev acc)) }
     | (eof | '\026')   { failwith "Lexer error: unterminated path" }
     | _                { Path (char (lexbuf.LexemeChar 0) :: acc)  lexbuf }
 
+// Parse a Path: Terminates on '"'. Escapes single line quotes with '\'
 and String chars = parse 
     | '"' { Microsoft.FSharp.Core.String.concat "" (List.map string (List.rev chars)) }
     | "''" { String ('\'' :: chars) lexbuf }    
