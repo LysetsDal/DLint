@@ -1,6 +1,7 @@
 module Absyn
 
 type instr =
+    
     | BaseImage of string * tag (* Build Image <name>:<tag> *)
     | Workdir of wpath (* Specify working directory  *)
     | Copy of cpath   (* Copy from:<path> to:<path> *)

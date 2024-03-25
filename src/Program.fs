@@ -3,14 +3,8 @@ module Program
 open System
 open System.IO
 open FSharp.Text.Lexing
+open Interp
 
-let fromString = Parse.fromString
-let fs = Parse.fromString
-
-let fromFile = Parse.fromFile
-let ff = Parse.fromFile
-
-let interp = Interp.run
  
 [<EntryPoint>]
 let Main args =
@@ -26,6 +20,7 @@ let Main args =
                 | err -> let pos = lexbuf.EndPos 
                          failwithf $"%s{err.Message} in file %s{filename} near line %d{pos.Line+1}, \
                          column %d{pos.Column}, last parsed: '%s{String(lexbuf.Lexeme)}' \n"
-        Interp.run dfile |> ignore
+        run dfile |> ignore
+
     0
     
