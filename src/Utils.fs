@@ -1,8 +1,11 @@
+// ================================================
+//   Helper functions for the Lexer and Parser 
+// ================================================
 module Utils
 
 open System.Text.RegularExpressions
 
-(* Trim multiple following spaces into one space *)
+// Trim multiple following spaces into one space
 let trimWhitespace str =
     let rec aux str acc =
         match str with
@@ -15,30 +18,36 @@ let trimWhitespace str =
     |> List.map string
     |> String.concat ""
 
-(* Used to split a string (envVar) at the '=' (equal) *)
+
+// Used to split a string (envVar) at the '=' (equal)
 let splitEnvVar input =
     let pattern = @"(?<!\\)=" // match un-escaped '=' sign
     Regex.Split(input, pattern)
     |> List.ofArray
 
-(* Used to split a string (path) at the ' ' (spaces) *)
+
+// Used to split a string (path) at the ' ' (spaces)
 let splitAtSpaces input =
     let pattern = @"(?<!\\) " // Match spaces not preceded by a backslash
     Regex.Split(input, pattern)
     |> List.ofArray
 
-(* Construct a tuple of the first two elements of a list*)
+
+// Construct a tuple of the first two elements of a list 
 let returnPair lst = 
     match lst with
     | [] -> failwith "Empty list"
     | [_] -> failwith "Only one path"
     | x :: y :: _ -> (x, y)
 
-(* Return a Path (Copy-path) (from, to) from a string *)
+
+// Return a Path (Copy-path) (from, to) from a string 
 let stringToPath str =
     splitAtSpaces str
     |> returnPair
 
+
+// Return a Key-Value pair (Key, Val) from a string
 let stringToEnvPair str =
     splitEnvVar str
     |> returnPair

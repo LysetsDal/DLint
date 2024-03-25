@@ -4,18 +4,32 @@ Prototype for Dockerfile Linter
 
 ## Generating the lexer and parser for Linterd:
 
-```
+From the src directory run this command in a shell:
+````
 fslex --unicode DLex.fsl ;\
 fsyacc --module DPar DPar.fsy ;\
 fsharpi -r /etc/fsharp/FsLexYacc.Runtime.dll Absyn.fs Utils.fs DPar.fs \
-DLex.fs Parse.fs Interp.fs ParseAndRun.fs
+DLex.fs Interp.fs Program.fs
+````
+Now open the Program module and run the main function like this:
+```
+open Program
+Main <args>
+
+//Example: 
+Main Dockerilfe1 Dockerfile2
 ```
 
-## Running with runArg.fs (for less typing):
-
+## Building the project:
+From the root folder: Linterd do
 ```
-mono $fslex --unicode DLex.fsl ;\
-mono $fsyacc --module DPar DPar.fsy ;\
-fsharpi -r /etc/fsharp/FsLexYacc.Runtime.dll Absyn.fs Utils.fs DPar.fs \
-DLex.fs Parse.fs Interp.fs ParseAndRun.fs --use:runArg.fs
+dotnet clean && dotnet restore;
+dotnet build 
+```
+Binary compiled to: ``Linterd/src/bin/Debug/net6.0/Linterd``
+
+## Running the project:
+From the root folder: Linterd run
+```
+dotnet run <Dockerfile1> 
 ```

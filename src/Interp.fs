@@ -1,8 +1,8 @@
-module Interp
+// =======================================================
+// F# interpreter of the abstract syntax of a Dockerfile.
+// =======================================================
 
-(*
-    F# interpreter of the abstract syntax of a Dockerfile.
-*)
+module Interp
 
 open Absyn
 
@@ -10,17 +10,15 @@ let unpackDFile (dfile: dockerfile) : instr list =
     match dfile with
     | DFile instruction -> instruction
 
-(*
- * Environment (store) functions 
- *)
+
+// Environment (store) functions 
 type store = (int * instr) list
 
 let emptyStore : (int * instr) list = List.empty 
 
-(*
- * This function initializes the store that is used 
- * to keep the docker file in memory.
- *)
+
+// This function initializes the store that is used 
+// to keep the docker file in memory.
 let initStore (dfile: dockerfile) : store =
     let rec addInstr instructions counter store =
         match instructions with 
@@ -31,9 +29,8 @@ let initStore (dfile: dockerfile) : store =
     addInstr (unpackDFile dfile) 0 []
     |> List.rev
 
-(*
- *  Print the content of the store (debug function)
- *)
+
+// Print the content of the store (debug function)
 let printStore (s: store) =
     printfn "\nSTORE CONTAINS: "
     let rec aux s =
@@ -44,7 +41,8 @@ let printStore (s: store) =
             aux rest
     aux s
     
-    
+
+// Debug function
 let returnStore (s: store) : instr list =
     let rec aux s acc =
         match s with
@@ -52,10 +50,9 @@ let returnStore (s: store) : instr list =
         | (idx, instr) :: rest -> aux rest (instr :: acc)
     aux s []
 
-(*
- *  Eval: this function should apply the rules all
- *  the different types in the docker file.
- *)
+
+//  Eval: this function should apply the rules all
+//  the different types in the docker file.
 let rec eval (s: instr) (store:  store) =
     match s with
     | BaseImage(name, tag) -> printfn "BaseImg {img: %s:%A}" name tag
@@ -70,9 +67,8 @@ let rec eval (s: instr) (store:  store) =
     | Add path -> failwith "not implemented"
 
 
-(*
- * Run: The entry point function of the interpreter
- *)
+
+// Run: The entry point function of the interpreter
 let run dfile =
     let gstore = initStore dfile
     printStore gstore

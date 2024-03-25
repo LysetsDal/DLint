@@ -23,8 +23,6 @@
         <Compile Include="DPar.fs" />
 
         <Compile Include="DLex.fs" />
-
-        <Compile Include="Parse.fs" />
         
         <Compile Include="Interp.fs" />
         <Compile Include="Program.fs" />
