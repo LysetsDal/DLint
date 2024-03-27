@@ -1,5 +1,5 @@
 # Exclude reources
-/resources/
+**/resources/
 
 # Exlude build files
 **/obj

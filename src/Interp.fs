@@ -49,7 +49,7 @@ let returnStore (s: store) : instr list =
     let rec aux s acc =
         match s with
         | [] -> acc
-        | (idx, instr) :: rest -> aux rest (instr :: acc)
+        | (_, instr) :: rest -> aux rest (instr :: acc)
     aux s []
 
 
@@ -57,20 +57,35 @@ let returnStore (s: store) : instr list =
 //             Shell check handling
 // ===============================================
 
-// A predicate filter
-let isShellCmd (ins: instr) =
+// A predicate filter for Run instructions
+let isRunCmd (ins: instr) =
     match ins with
     | Run _ -> true
     | _ -> false
     
+
     
 // Take an instruction and return a list
 let shellCmdToLst (ins: instr) =
     match ins with
     | Run (Cmd cmd) -> [cmd]
     | Run (Cmds cmds) -> cmds
-    | _ -> failwith "Unexpected type"
+    | _ -> []
+
+
+// Is a Run mount command
+let  isRunMountCmd (lst: string list) =
+    let mount_prefix = "--mount"
     
+    let rec aux (lst: string list) acc =
+        match lst with
+        | [] -> acc
+        | x :: rest ->
+            match x.StartsWith mount_prefix with
+            | true ->  aux rest (x :: acc)
+            | _ ->  aux rest acc
+    aux (List.rev lst) []
+            
     
 // Split at delimiter(s)
 let splitCmdAt (delim: string[]) (cmd: string) =
@@ -100,11 +115,20 @@ let appendSheBangs (lst: string list) =
 // Extract RUN commands from instruction list
 let getRunCmds (lst: instr list) : string list =
     lst
-    |> List.filter isShellCmd                                    // 1. Predicate
-    |> List.collect shellCmdToLst                               // 2. Unwrap instruction
-    |> List.fold (fun acc x -> (acc @ standardSplitCmd x)) []   // 3. Split runcommand
-    |> appendSheBangs                                                   // 4. Prepare for tmp-file
+    |> List.filter isRunCmd                                     // 1. Predicate
+    |> List.collect shellCmdToLst                              // 2. Unwrap instruction
+    |> List.fold (fun acc x -> (acc @ standardSplitCmd x)) []  // 3. Split runcommand
+    |> appendSheBangs                                                  // 4. Prepare for tmp-file
     
+
+// Get RUN mount commands from instruction list
+let getRunMountCmds (lst: instr list) : string list =
+    lst
+    |> List.filter isRunCmd                                     // 1. Predicate
+    |> List.collect shellCmdToLst                              // 2. Unwrap instruction
+    |> List.fold (fun acc x -> (acc @ standardSplitCmd x)) []          // 3. Split runcommand
+    |> isRunMountCmd
+
 
 // Create a temporary shell file (used to to invoke shellcheck on)
 let createShellFile (filepath: string) (cmd: string) =
@@ -113,7 +137,7 @@ let createShellFile (filepath: string) (cmd: string) =
     
 
 // Close an open file(stream) 
-let closeShellFile (stream: FileStream) =
+let closeFile (stream: FileStream) =
     stream.Close()
     
 
@@ -168,30 +192,93 @@ let executeShellCheck cmds =
     let mutable count = 0
     for cmd in cmds do
         let fpath = $"%s{Config.OUTPUT_DIR}cmd_%s{string count}"
-        let tmp_file = createShellFile fpath cmd                // Create the tmp. file
+        let tmp_file = createShellFile fpath cmd                   // Create the tmp. file
         
         let res = shellCheckFile Config.SHELLCHECK fpath tmp_file  // Spawn a new shellcheck process
-        closeShellFile tmp_file
+        closeFile tmp_file
         count <- count + 1
         
         if res <> "" then
             printfn $"{res}"
+            
+// ================================================
+//                Linting for Mounts
+// ================================================
+
+// A predicate filter for Volume instructions
+let isVolume (ins: instr) =
+    match ins with
+    | Volume _ -> true
+    | _ -> false
+
+// Unpack a Volume to an instruction
+let volumeToList (ins: instr) =
+    match ins with
+    | Volume (Mnt_pt cmd) -> [cmd]
+    
+    | _ -> failwith "Unexpected type"
 
     
-// Run: The entry point of the interpreter
+// Extract RUN commands from instruction list
+let getVolumes (lst: instr list) : string list =
+    lst
+    |> List.filter isVolume                     // 1. Predicate
+    |> List.collect volumeToList                       // 2. Unwrap instruction
+   
+
+let rec checkMountpoints (db: StreamReader) (target: string) =
+    let line = db.ReadLine()
+    match line with
+    | null -> false 
+    | _ -> if target.Contains(line) then true
+           else checkMountpoints db target
+            
+
+let executeMountScan mounts =
+    use sensitiveMounts = File.OpenText(Config.MNTS_DB)
+
+    for mnt in mounts do
+        let vulnerable = checkMountpoints sensitiveMounts mnt
+        if Config.VERBOSE then
+            if vulnerable then
+                printfn $"Mnt: [ %s{mnt} - isVulnerable %b{vulnerable} ]"
+            else
+                printfn $"Mnt: [ %s{mnt} - isVulnerable %b{vulnerable} ]"
+        
+        
+
+   
+// Run: The 'main' logic of the interpreter
 let run dfile =
     let gstore = initStore dfile  // Load dfile into store
-    if Config.DEBUG then
-        printStore gstore
+    if Config.DEBUG then printStore gstore
     
     // Transform dfile to instructions
     let instrs = returnStore gstore
+    
+    
+    // 1. Execute the shellcheck
     let cmds = getRunCmds instrs 
-    Utils.printStringList cmds  
-    
-    
-    // Execute the shellcheck 
+    if Config.VERBOSE then Utils.printStringList cmds  
     executeShellCheck cmds
-        
-    // Delete tmp files
     deleteAllFiles Config.OUTPUT_DIR
+    
+    
+    // 2. Execute mount check
+    let mnts = getVolumes instrs
+    let rmnts = getRunMountCmds instrs
+    Utils.printStringList mnts
+    Utils.printStringList rmnts
+    
+    executeMountScan mnts
+    executeMountScan rmnts
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
