@@ -32,6 +32,9 @@ let runcmd (s: string) = RCMD (trimWhitespace s)
 (* Used to parse paths s for the COPY and WORKDIR instruction *)
 let wPath (s: string) = WPATH s
 
+(* Used to parse paths s for the COPY and WORKDIR instruction *)
+let mntPt (s: string) = MNTPT s
+
 (* Used to parse keywords that dont precede string litereals *)
 let keyword (s: string) = 
     match s with 
@@ -55,6 +58,7 @@ let cmd = "CMD"[' ']+
 let cpath = "COPY"[' ']+ 
 let env = "ENV"[' ']+
 let run = "RUN"[' ']+ 
+let volume = "VOLUME"[' ']+
 let wpath = "WORKDIR"[' ']+
 
 
@@ -67,6 +71,7 @@ rule Token = parse
     | cpath           { cPath (Path [] lexbuf)  }
     | env             { envVar (Path [] lexbuf) }
     | run             { runcmd (Shell [] lexbuf) } 
+    | volume          { mntPt (Path [] lexbuf)  }
     | wpath           { wPath (Path [] lexbuf)  }
     | letter          { keyword ((lexeme lexbuf).ToLower()) }
     | ':'             { COLON }

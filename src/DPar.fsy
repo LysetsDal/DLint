@@ -7,7 +7,7 @@ open Absyn
 %}
 
 /*   CONSTRUCTORS   */
-%token <string> NAME WPATH RCMD ECMD 
+%token <string> NAME MNTPT WPATH RCMD ECMD 
 %token <string> CSTST
 %token <string * string> CPATH APATH ENVVAR
 %token <int> INT
@@ -65,6 +65,7 @@ Instrs:
 Instr:
     NAME                          { Var $1                    }
   | FROM NAME COLON Version       { BaseImage($2, Tag $4)     }
+  | MntPt                         { Volume $1                 } 
   | WPath                         { Workdir $1                }
   | EXPOSE Expose                 { Expose $2                 }
   | USER User                     { User $2                   }
@@ -80,6 +81,13 @@ Instr:
  */
 EnvVar:
     ENVVAR                        { EnvVar($1) }
+;
+
+/*
+ * Volume Mount point: parsed as a string 
+ */
+MntPt:
+    MNTPT                         { Mnt_pt $1 }  
 ;
 
 /*

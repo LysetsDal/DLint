@@ -16,6 +16,7 @@ type token =
   | ENVVAR of (string * string)
   | CSTST of (string)
   | NAME of (string)
+  | MNTPT of (string)
   | WPATH of (string)
   | RCMD of (string)
   | ECMD of (string)
@@ -35,6 +36,7 @@ type tokenId =
     | TOKEN_ENVVAR
     | TOKEN_CSTST
     | TOKEN_NAME
+    | TOKEN_MNTPT
     | TOKEN_WPATH
     | TOKEN_RCMD
     | TOKEN_ECMD
@@ -48,6 +50,7 @@ type nonTerminalId =
     | NONTERM_Instrs
     | NONTERM_Instr
     | NONTERM_EnvVar
+    | NONTERM_MntPt
     | NONTERM_WPath
     | NONTERM_CPath
     | NONTERM_AddPath
