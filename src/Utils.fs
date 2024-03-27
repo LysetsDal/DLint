@@ -1,9 +1,21 @@
 // ================================================
-//   Helper functions for the Lexer and Parser 
+//        UTILITY FUNCTIONS FOR LIMNTERD 
 // ================================================
 module Utils
 
 open System.Text.RegularExpressions
+
+// Print a list 
+let printStringList lst =
+    printfn "\nLIST CONTENT: "
+    let rec aux lst = 
+        match lst with
+        | [] -> printfn ""
+        | x :: rest ->
+            printfn $"[ %s{ string x} ]"
+            aux rest
+    aux lst
+
 
 // Trim multiple following spaces into one space
 let trimWhitespace str =

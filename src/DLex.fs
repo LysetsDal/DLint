@@ -1,5 +1,9 @@
 # 1 "DLex.fsl"
  
+// ================================================
+//          LEXER-GENERATOR SPECIFICATION
+// ================================================
+
 module DLex
 
 open FSharp.Text.Lexing
@@ -38,7 +42,7 @@ let keyword (s: string) =
     | _             -> NAME s
 
 
-# 41 "DLex.fs"
+# 45 "DLex.fs"
 let trans : uint16[] array = 
     [| 
     (* State 0 *)
@@ -211,195 +215,195 @@ let rec _fslex_dummy () = _fslex_dummy()
 and Token  lexbuf =
   match _fslex_tables.Interpret(31,lexbuf) with
   | 0 -> ( 
-# 58 "DLex.fsl"
+# 62 "DLex.fsl"
                                        Token lexbuf 
-# 216 "DLex.fs"
+# 220 "DLex.fs"
           )
   | 1 -> ( 
-# 59 "DLex.fsl"
+# 63 "DLex.fsl"
                                        lexbuf.EndPos <- lexbuf.EndPos.NextLine; Token lexbuf 
-# 221 "DLex.fs"
+# 225 "DLex.fs"
           )
   | 2 -> ( 
-# 60 "DLex.fsl"
+# 64 "DLex.fsl"
                                        INT (System.Int32.Parse (lexeme lexbuf)) 
-# 226 "DLex.fs"
+# 230 "DLex.fs"
           )
   | 3 -> ( 
-# 61 "DLex.fsl"
+# 65 "DLex.fsl"
                                        aPath (Path [] lexbuf)  
-# 231 "DLex.fs"
+# 235 "DLex.fs"
           )
   | 4 -> ( 
-# 62 "DLex.fsl"
+# 66 "DLex.fsl"
                                        entrycmd (Shell [] lexbuf) 
-# 236 "DLex.fs"
+# 240 "DLex.fs"
           )
   | 5 -> ( 
-# 63 "DLex.fsl"
+# 67 "DLex.fsl"
                                        cPath (Path [] lexbuf)  
-# 241 "DLex.fs"
+# 245 "DLex.fs"
           )
   | 6 -> ( 
-# 64 "DLex.fsl"
+# 68 "DLex.fsl"
                                        envVar (Path [] lexbuf) 
-# 246 "DLex.fs"
+# 250 "DLex.fs"
           )
   | 7 -> ( 
-# 65 "DLex.fsl"
+# 69 "DLex.fsl"
                                        runcmd (Shell [] lexbuf) 
-# 251 "DLex.fs"
+# 255 "DLex.fs"
           )
   | 8 -> ( 
-# 66 "DLex.fsl"
+# 70 "DLex.fsl"
                                        wPath (Path [] lexbuf)  
-# 256 "DLex.fs"
+# 260 "DLex.fs"
           )
   | 9 -> ( 
-# 67 "DLex.fsl"
+# 71 "DLex.fsl"
                                        keyword ((lexeme lexbuf).ToLower()) 
-# 261 "DLex.fs"
+# 265 "DLex.fs"
           )
   | 10 -> ( 
-# 68 "DLex.fsl"
+# 72 "DLex.fsl"
                                        COLON 
-# 266 "DLex.fs"
+# 270 "DLex.fs"
           )
   | 11 -> ( 
-# 69 "DLex.fsl"
+# 73 "DLex.fsl"
                                        DOT 
-# 271 "DLex.fs"
+# 275 "DLex.fs"
           )
   | 12 -> ( 
-# 70 "DLex.fsl"
+# 74 "DLex.fsl"
                                        COMMA 
-# 276 "DLex.fs"
+# 280 "DLex.fs"
           )
   | 13 -> ( 
-# 71 "DLex.fsl"
+# 75 "DLex.fsl"
                                        EQ 
-# 281 "DLex.fs"
+# 285 "DLex.fs"
           )
   | 14 -> ( 
-# 72 "DLex.fsl"
+# 76 "DLex.fsl"
                                        DASH 
-# 286 "DLex.fs"
+# 290 "DLex.fs"
           )
   | 15 -> ( 
-# 73 "DLex.fsl"
+# 77 "DLex.fsl"
                                        EndLineComment lexbuf; Token lexbuf 
-# 291 "DLex.fs"
+# 295 "DLex.fs"
           )
   | 16 -> ( 
-# 74 "DLex.fsl"
+# 78 "DLex.fsl"
                                        CSTST (String [] lexbuf) 
-# 296 "DLex.fs"
+# 300 "DLex.fs"
           )
   | 17 -> ( 
-# 75 "DLex.fsl"
+# 79 "DLex.fsl"
                                        EOF 
-# 301 "DLex.fs"
+# 305 "DLex.fs"
           )
   | 18 -> ( 
-# 76 "DLex.fsl"
+# 80 "DLex.fsl"
                                        failwith "Lexer error: illegal symbol" 
-# 306 "DLex.fs"
+# 310 "DLex.fs"
           )
   | _ -> failwith "Token"
 // Rule EndLineComment
 and EndLineComment  lexbuf =
   match _fslex_tables.Interpret(26,lexbuf) with
   | 0 -> ( 
-# 80 "DLex.fsl"
+# 84 "DLex.fsl"
                                        lexbuf.EndPos <- lexbuf.EndPos.NextLine 
-# 315 "DLex.fs"
+# 319 "DLex.fs"
           )
   | 1 -> ( 
-# 81 "DLex.fsl"
+# 85 "DLex.fsl"
                                        () 
-# 320 "DLex.fs"
+# 324 "DLex.fs"
           )
   | 2 -> ( 
-# 82 "DLex.fsl"
+# 86 "DLex.fsl"
                                        EndLineComment lexbuf 
-# 325 "DLex.fs"
+# 329 "DLex.fs"
           )
   | _ -> failwith "EndLineComment"
 // Rule Shell
 and Shell acc lexbuf =
   match _fslex_tables.Interpret(17,lexbuf) with
   | 0 -> ( 
-# 86 "DLex.fsl"
+# 90 "DLex.fsl"
                                        lexbuf.EndPos <- lexbuf.EndPos.NextLine; Shell acc lexbuf 
-# 334 "DLex.fs"
+# 338 "DLex.fs"
           )
   | 1 -> ( 
-# 87 "DLex.fsl"
+# 91 "DLex.fsl"
                                        Microsoft.FSharp.Core.String.concat "" (List.map string (List.rev acc)) 
-# 339 "DLex.fs"
+# 343 "DLex.fs"
           )
   | 2 -> ( 
-# 88 "DLex.fsl"
+# 92 "DLex.fsl"
                                        Shell acc lexbuf 
-# 344 "DLex.fs"
+# 348 "DLex.fs"
           )
   | 3 -> ( 
-# 89 "DLex.fsl"
+# 93 "DLex.fsl"
                                        failwith "Lexer error: unterminated shell cmd" 
-# 349 "DLex.fs"
+# 353 "DLex.fs"
           )
   | 4 -> ( 
-# 90 "DLex.fsl"
+# 94 "DLex.fsl"
                                        Shell (char (lexbuf.LexemeChar 0) :: acc)  lexbuf 
-# 354 "DLex.fs"
+# 358 "DLex.fs"
           )
   | _ -> failwith "Shell"
 // Rule Path
 and Path acc lexbuf =
   match _fslex_tables.Interpret(8,lexbuf) with
   | 0 -> ( 
-# 94 "DLex.fsl"
+# 98 "DLex.fsl"
                                         Microsoft.FSharp.Core.String.concat "" (List.map string (List.rev acc)) 
-# 363 "DLex.fs"
+# 367 "DLex.fs"
           )
   | 1 -> ( 
-# 95 "DLex.fsl"
+# 99 "DLex.fsl"
                                         failwith "Lexer error: unterminated path" 
-# 368 "DLex.fs"
+# 372 "DLex.fs"
           )
   | 2 -> ( 
-# 96 "DLex.fsl"
+# 100 "DLex.fsl"
                                         Path (char (lexbuf.LexemeChar 0) :: acc)  lexbuf 
-# 373 "DLex.fs"
+# 377 "DLex.fs"
           )
   | _ -> failwith "Path"
 // Rule String
 and String chars lexbuf =
   match _fslex_tables.Interpret(0,lexbuf) with
   | 0 -> ( 
-# 100 "DLex.fsl"
+# 104 "DLex.fsl"
                            Microsoft.FSharp.Core.String.concat "" (List.map string (List.rev chars)) 
-# 382 "DLex.fs"
+# 386 "DLex.fs"
           )
   | 1 -> ( 
-# 101 "DLex.fsl"
+# 105 "DLex.fsl"
                             String ('\'' :: chars) lexbuf 
-# 387 "DLex.fs"
+# 391 "DLex.fs"
           )
   | 2 -> ( 
-# 102 "DLex.fsl"
+# 106 "DLex.fsl"
                                       failwith "Lexer error: unterminated string" 
-# 392 "DLex.fs"
+# 396 "DLex.fs"
           )
   | 3 -> ( 
-# 103 "DLex.fsl"
+# 107 "DLex.fsl"
                                                      failwith "Lexer error: invalid character in string" 
-# 397 "DLex.fs"
+# 401 "DLex.fs"
           )
   | 4 -> ( 
-# 104 "DLex.fsl"
+# 108 "DLex.fsl"
                          String (char (lexbuf.LexemeChar 0) :: chars) lexbuf 
-# 402 "DLex.fs"
+# 406 "DLex.fs"
           )
   | _ -> failwith "String"
 

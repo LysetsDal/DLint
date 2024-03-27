@@ -1,26 +1,27 @@
 // =======================================================
-// F# interpreter of the abstract syntax of a Dockerfile.
+//        INTERPRETER FOR LINTING DOCKERFILES
 // =======================================================
 
 module Interp
 
-open System.Diagnostics
-open System.IO
-open Absyn
+open System.Diagnostics  // Threads & Processes
+open System.IO          // File manipulation 
+open Absyn             // Abstract Syntax
 
+
+// Unpacks a dfile to an instruction list
 let unpackDFile (dfile: dockerfile) : instr list =
     match dfile with
     | DFile instruction -> instruction
 
 
-// Environment (store) functions 
+// The store is an in-memory abstraction representation of the
+// docker file. It is used to perform the linters checks on
 type store = (int * instr) list
-
 let emptyStore : (int * instr) list = List.empty 
 
 
-// This function initializes the store that is used 
-// to keep the docker file in memory.
+// Initilize the store
 let initStore (dfile: dockerfile) : store =
     let rec addInstr instructions counter store =
         match instructions with 
@@ -28,13 +29,13 @@ let initStore (dfile: dockerfile) : store =
         | x :: rest -> 
             let newStore = (counter, x) :: store 
             addInstr rest (counter + 1) newStore
-    addInstr (unpackDFile dfile) 0 []
+    addInstr (unpackDFile dfile) 0 emptyStore
     |> List.rev
 
 
-// Print the content of the store (debug function)
+// Print the content in the store
 let printStore (s: store) =
-    printfn "\nSTORE CONTAINS: "
+    printfn "\nNR. -  STORE CONTAINS: "
     let rec aux s =
         match s with
         | [] -> printfn ""
@@ -42,18 +43,8 @@ let printStore (s: store) =
             printfn $"%d{idx} = [ %A{instr} ]; "
             aux rest
     aux s
-    
-let printStringList (lst: string list) =
-    printfn "\nLIST: "
-    let rec aux lst = 
-        match lst with
-        | [] -> printfn ""
-        | x :: rest ->
-            printfn $"[ %s{x} ]"
-            aux rest
-    aux lst
 
-// Debug function
+// Return the instructions in the store
 let returnStore (s: store) : instr list =
     let rec aux s acc =
         match s with
@@ -62,36 +53,18 @@ let returnStore (s: store) : instr list =
     aux s []
 
 
-//  Eval: this function should apply the rules all
-//  the different types in the docker file.
-let rec eval (s: instr) (store:  store) =
-    match s with
-    | BaseImage(name, tag) -> printfn "BaseImg {img: %s:%A}" name tag
-    | Workdir path -> failwith "not implemented"
-    | Copy path -> failwith "not  implemented"
-    | Var v -> failwith "not implemented"
-    | Expose x -> failwith "not implemented"
-    | User(name, uid) -> failwith "not implemented"
-    | Run cmd -> failwith "not implemented"
-    | EntryCmd cmd -> failwith "not implemented"
-    | Env e -> failwith "not implemented"
-    | Add path -> failwith "not implemented"
-
-
 // ===============================================
 //             Shell check handling
 // ===============================================
 
-// Path to shellcheck binary
-let shellcheck = "../shellcheck/shellcheck"    
-
-// Predicate filter
+// A predicate filter
 let isShellCmd (ins: instr) =
     match ins with
     | Run _ -> true
     | _ -> false
     
-// Take an instruction and return a lsit
+    
+// Take an instruction and return a list
 let shellCmdToLst (ins: instr) =
     match ins with
     | Run (Cmd cmd) -> [cmd]
@@ -99,18 +72,20 @@ let shellCmdToLst (ins: instr) =
     | _ -> failwith "Unexpected type"
     
     
-// split at delimiter(s) ;
+// Split at delimiter(s)
 let splitCmdAt (delim: string[]) (cmd: string) =
     List.ofArray (cmd.Split(delim, System.StringSplitOptions.RemoveEmptyEntries))
 
-// standard shell delimiters
+
+// Split with stnadard shell delimiters (See Config.fs)
 let standardSplitCmd (cmd: string)  =
-    let delims = [|"&&"; ";"; "|"; "<<"; ">>"|]
+    let delims = Config.SHELL_CMD_DELIMS
     splitCmdAt delims cmd
     
     
 // Append shebang to each string
-let appendSheBang s = "#!/bin/bash" + "\n" + s
+let appendSheBang s = Config.SHEBANG + s
+
 
 // Appply appendShebang to list of strings
 let appendSheBangs (lst: string list) =
@@ -123,54 +98,64 @@ let appendSheBangs (lst: string list) =
 
 
 // Extract RUN commands from instruction list
-let getShellCmds (lst: instr list) : string list =
+let getRunCmds (lst: instr list) : string list =
     lst
-    |> List.filter isShellCmd                                    // 1. predicate
-    |> List.collect shellCmdToLst                               // 2. unwrap instruction
-    |> List.fold (fun acc x -> (acc @ standardSplitCmd x)) []   // 3. split runcommand
-    |> appendSheBangs                                                   // 4. prepare for tmp-file
+    |> List.filter isShellCmd                                    // 1. Predicate
+    |> List.collect shellCmdToLst                               // 2. Unwrap instruction
+    |> List.fold (fun acc x -> (acc @ standardSplitCmd x)) []   // 3. Split runcommand
+    |> appendSheBangs                                                   // 4. Prepare for tmp-file
     
 
 // Create a temporary shell file (used to to invoke shellcheck on)
 let createShellFile (filepath: string) (cmd: string) =
-    let file = File.WriteAllText(filepath, cmd)
+    File.WriteAllText(filepath, cmd)
     File.Open(filepath, FileMode.OpenOrCreate, FileAccess.ReadWrite)
     
 
+// Close an open file(stream) 
 let closeShellFile (stream: FileStream) =
     stream.Close()
     
-    
-let deleteTmpFile (filePath: string) =
+
+// Delete the tmpfiles created for the shellcheck integration
+let deleteTmpFile (filePath: string) verbose =
     try
         File.Delete(filePath)
-        printfn $"File '%s{filePath}' deleted successfully."
+        if  verbose then
+            printfn $"File '%s{filePath}' deleted successfully."
     with
-    | :? System.IO.DirectoryNotFoundException ->
+    | :? DirectoryNotFoundException ->
         printfn $"File '%s{filePath}' not found."
-    | :? System.IO.IOException ->
+    | :? IOException ->
         printfn $"An error occurred while deleting file '%s{filePath}'."
 
 
-let flushTmpFiles (directoryPath: string) =
+// Delete all  
+let deleteAllFiles (directoryPath: string) =
     let files = Directory.GetFiles(directoryPath)
     for file in files do
-        deleteTmpFile file
+        deleteTmpFile file false
+    printfn $"Files at '%s{directoryPath}' deleted successfully."
 
 
-// Spawn a new shellcheck process that returns the output
-let executeShellCheck (shellcheck: string) (file: string) (input: FileStream) =
-    let processInfo = new ProcessStartInfo(shellcheck, $"-s bash -f gcc %s{file}")
+// Spawn a shellcheck process from a context.
+// Returns the output of shellcheck applied to that context
+let shellCheckFile (shellcheck: string) (file: string) (input: FileStream) =
+    // Define a new context for a shellcheck process
+    let shellcheckStartCmd = $"%s{Config.SHELLCHECK_ARGS} %s{file}"
+    let processInfo = ProcessStartInfo(shellcheck, shellcheckStartCmd)
     processInfo.RedirectStandardInput <- true
     processInfo.RedirectStandardOutput <- true
     processInfo.UseShellExecute <- false
     
+    // Spawn the new thread with the process context
     let thread = Process.Start(processInfo)
     use writer = thread.StandardInput
     use reader = thread.StandardOutput
     writer.WriteLine(input)
     writer.Close()
     
+    // Reirect output back to main-process again
     processInfo.RedirectStandardInput <- false
     processInfo.RedirectStandardOutput <- false
     let output = reader.ReadToEnd()
@@ -178,36 +163,35 @@ let executeShellCheck (shellcheck: string) (file: string) (input: FileStream) =
     thread.Close()
     output
 
-    
-// Run: The entry point function of the interpreter
-let run dfile =
-    let gstore = initStore dfile
-    printStore gstore 
-    let instrs = returnStore gstore
-    
-    let cmds = getShellCmds instrs
-    printStringList cmds  
-    
-
-    let mutable count = 0;
+// Perform the shcellChek on the given commands
+let executeShellCheck cmds =
+    let mutable count = 0
     for cmd in cmds do
-        let fpath = $"./out/cmd_%s{string count}"
-        let tmp_file = createShellFile fpath cmd
-        let res = executeShellCheck shellcheck fpath tmp_file
+        let fpath = $"%s{Config.OUTPUT_DIR}cmd_%s{string count}"
+        let tmp_file = createShellFile fpath cmd                // Create the tmp. file
+        
+        let res = shellCheckFile Config.SHELLCHECK fpath tmp_file  // Spawn a new shellcheck process
         closeShellFile tmp_file
         count <- count + 1
-        printfn $"Output : {res}"
-    done
+        
+        if res <> "" then
+            printfn $"{res}"
+
+    
+// Run: The entry point of the interpreter
+let run dfile =
+    let gstore = initStore dfile  // Load dfile into store
+    if Config.DEBUG then
+        printStore gstore
+    
+    // Transform dfile to instructions
+    let instrs = returnStore gstore
+    let cmds = getRunCmds instrs 
+    Utils.printStringList cmds  
+    
+    
+    // Execute the shellcheck 
+    executeShellCheck cmds
         
     // Delete tmp files
-    // flushTmpFiles "./out/"
-
-
-// Test Purposes:
-let df = DFile [BaseImage ("ubuntu", Tag "latest"); Run (Cmd "apt-get install ");
-                Expose (PortM (80, 8080))]
-
-
-
-
-
+    deleteAllFiles Config.OUTPUT_DIR

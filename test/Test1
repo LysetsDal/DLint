@@ -1,5 +1,5 @@
 # TEST 1
-# Basease img 
+# Base img 
 
 # CASE: string : string
 FROM test1:latest

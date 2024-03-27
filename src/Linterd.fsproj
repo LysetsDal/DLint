@@ -16,6 +16,7 @@
         </FsLex>
         
         <Compile Include="Absyn.fs" />
+        
         <Compile Include="DPar.fsi" />
         <FsYacc Include="DPar.fsy">
           <OtherFlags>--module DPar</OtherFlags>
@@ -23,8 +24,11 @@
         <Compile Include="DPar.fs" />
 
         <Compile Include="DLex.fs" />
+
+        <Compile Include="Config.fs" />
         
         <Compile Include="Interp.fs" />
+        
         <Compile Include="Program.fs" />
         <Folder Include="out\" />
     </ItemGroup>

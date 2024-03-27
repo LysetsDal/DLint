@@ -6,10 +6,11 @@ Prototype for Dockerfile Linter
 
 From the src directory run this command in a shell:
 ````
-fslex --unicode DLex.fsl ;\
-fsyacc --module DPar DPar.fsy ;\
+mono $fslex --unicode DLex.fsl ;\
+mono $fsyacc --module DPar DPar.fsy ;\
 fsharpi -r /etc/fsharp/FsLexYacc.Runtime.dll Absyn.fs Utils.fs DPar.fs \
-DLex.fs Interp.fs Program.fs
+DLex.fs Config.fs Interp.fs Program.fs
+
 ````
 Now open the Program module and run the main function like this:
 ```
@@ -17,7 +18,7 @@ open Program
 Main <args>
 
 //Example: 
-Main Dockerilfe1 Dockerfile2
+Main Dockerfile1 Dockerfile2
 ```
 
 ## Building the project:

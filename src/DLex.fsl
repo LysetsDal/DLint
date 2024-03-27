@@ -1,4 +1,8 @@
 {
+// ================================================
+//          LEXER-GENERATOR SPECIFICATION
+// ================================================
+
 module DLex
 
 open FSharp.Text.Lexing
