@@ -30,7 +30,7 @@
         <Compile Include="Interp.fs" />
         
         <Compile Include="Program.fs" />
-        <Folder Include="out\" />
+        <Folder Include="tmp\" />
     </ItemGroup>
 
     <ItemGroup>

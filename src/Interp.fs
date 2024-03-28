@@ -5,18 +5,18 @@
 module Interp
 
 open System.Diagnostics  // Threads & Processes
-open System.IO          // File manipulation 
-open Absyn             // Abstract Syntax
+open System.IO           // File manipulation 
+open Absyn               // Abstract Syntax
 
 
-// Unpacks a dfile to an instruction list
+// Unpacks a dfile to an instruction list.
 let unpackDFile (dfile: dockerfile) : instr list =
     match dfile with
     | DFile instruction -> instruction
 
 
-// The store is an in-memory abstraction representation of the
-// docker file. It is used to perform the linters checks on
+// The store is an in-memory representation of the dockerfile.
+// It is used to perform the linters checks on.
 type store = (int * instr) list
 let emptyStore : (int * instr) list = List.empty 
 
@@ -58,7 +58,7 @@ let returnStore (s: store) : instr list =
 // ===============================================
 
 // A predicate filter for Run instructions
-let isRunCmd (ins: instr) =
+let isRunInstr (ins: instr) =
     match ins with
     | Run _ -> true
     | _ -> false
@@ -66,14 +66,14 @@ let isRunCmd (ins: instr) =
 
     
 // Take an instruction and return a list
-let shellCmdToLst (ins: instr) =
+let instrToCmdList (ins: instr) =
     match ins with
     | Run (Cmd cmd) -> [cmd]
     | Run (Cmds cmds) -> cmds
     | _ -> []
 
 
-// Is a Run mount command
+// Is a Run '--mount' command
 let  isRunMountCmd (lst: string list) =
     let mount_prefix = "--mount"
     
@@ -99,15 +99,15 @@ let standardSplitCmd (cmd: string)  =
     
     
 // Append shebang to each string
-let appendSheBang s = Config.SHEBANG + s
+let prependSheBang s = Config.SHEBANG + s
 
 
 // Appply appendShebang to list of strings
-let appendSheBangs (lst: string list) =
+let prependSheBangs (lst: string list) =
     let rec aux lst acc =
         match lst with  
         | [] -> acc 
-        | x :: rest -> aux rest (appendSheBang x :: acc)
+        | x :: rest -> aux rest (prependSheBang x :: acc)
     aux (List.rev lst) []
 
 
@@ -115,23 +115,14 @@ let appendSheBangs (lst: string list) =
 // Extract RUN commands from instruction list
 let getRunCmds (lst: instr list) : string list =
     lst
-    |> List.filter isRunCmd                                     // 1. Predicate
-    |> List.collect shellCmdToLst                              // 2. Unwrap instruction
-    |> List.fold (fun acc x -> (acc @ standardSplitCmd x)) []  // 3. Split runcommand
-    |> appendSheBangs                                                  // 4. Prepare for tmp-file
+    |> List.filter isRunInstr                                     // 1. Predicate
+    |> List.collect instrToCmdList                               // 2. Unwrap instruction
+    |> List.fold (fun acc x -> (acc @ standardSplitCmd x)) []    // 3. Split runcommand
+    |> prependSheBangs                                                   // 4. Prepare for tmp-file
     
 
-// Get RUN mount commands from instruction list
-let getRunMountCmds (lst: instr list) : string list =
-    lst
-    |> List.filter isRunCmd                                     // 1. Predicate
-    |> List.collect shellCmdToLst                              // 2. Unwrap instruction
-    |> List.fold (fun acc x -> (acc @ standardSplitCmd x)) []          // 3. Split runcommand
-    |> isRunMountCmd
-
-
 // Create a temporary shell file (used to to invoke shellcheck on)
-let createShellFile (filepath: string) (cmd: string) =
+let openOrCreateRWFile (filepath: string) (cmd: string) =
     File.WriteAllText(filepath, cmd)
     File.Open(filepath, FileMode.OpenOrCreate, FileAccess.ReadWrite)
     
@@ -192,7 +183,7 @@ let executeShellCheck cmds =
     let mutable count = 0
     for cmd in cmds do
         let fpath = $"%s{Config.OUTPUT_DIR}cmd_%s{string count}"
-        let tmp_file = createShellFile fpath cmd                   // Create the tmp. file
+        let tmp_file = openOrCreateRWFile fpath cmd                   // Create the tmp. file
         
         let res = shellCheckFile Config.SHELLCHECK fpath tmp_file  // Spawn a new shellcheck process
         closeFile tmp_file
@@ -220,19 +211,34 @@ let volumeToList (ins: instr) =
 
     
 // Extract RUN commands from instruction list
-let getVolumes (lst: instr list) : string list =
+let getVolumeMounts (lst: instr list) : string list =
     lst
     |> List.filter isVolume                     // 1. Predicate
     |> List.collect volumeToList                       // 2. Unwrap instruction
    
+   
+// Check docker.sock && proc/[0-9]/mem
+    
 
+
+// A check for mounts against a db of sensitive mounts
 let rec checkMountpoints (db: StreamReader) (target: string) =
     let line = db.ReadLine()
+    // insert the line check 
     match line with
     | null -> false 
     | _ -> if target.Contains(line) then true
            else checkMountpoints db target
-            
+    
+
+// Get RUN mount commands from instruction list
+let getRunMounts (lst: instr list) : string list =
+    lst
+    |> List.filter isRunInstr                                    // 1. Predicate
+    |> List.collect instrToCmdList                              // 2. Unwrap instruction
+    |> List.fold (fun acc x -> (acc @ standardSplitCmd x)) []   // 3. Split runcommand
+    |> isRunMountCmd
+
 
 let executeMountScan mounts =
     use sensitiveMounts = File.OpenText(Config.MNTS_DB)
@@ -263,20 +269,20 @@ let run dfile =
     executeShellCheck cmds
     deleteAllFiles Config.OUTPUT_DIR
     
+    //@TODO
+    
+    
     
     // 2. Execute mount check
-    let mnts = getVolumes instrs
-    let rmnts = getRunMountCmds instrs
-    Utils.printStringList mnts
+    let vmnts = getVolumeMounts instrs
+    let rmnts = getRunMounts instrs
+    
+    //run mounts should per default give a warning to not use that
+    Utils.printStringList vmnts
     Utils.printStringList rmnts
     
-    executeMountScan mnts
+    executeMountScan vmnts
     executeMountScan rmnts
-    
-    
-    
-    
-    
     
     
     
