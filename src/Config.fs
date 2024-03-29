@@ -18,4 +18,4 @@ let OUTPUT_DIR = "./tmp/"
 
 
 // VULNERABLE MOUNTS
-let MNTS_DB = "./resources/sensitive_mounts"
+let RULE_DIR = "./Rules"

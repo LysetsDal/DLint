@@ -217,18 +217,41 @@ let getVolumeMounts (lst: instr list) : string list =
     |> List.collect volumeToList                       // 2. Unwrap instruction
    
    
-// Check docker.sock && proc/[0-9]/mem
+open Rules.MountWarn
+open System.Text.RegularExpressions
+
+let isNullOrWhiteSpace (str: string) =
+    str = null || str.Trim() = ""
+
+// 
+let extractSensitiveMountsFromFile (filePath: string) =
+    let fileContents = File.ReadAllText(filePath)
+    let mountRegex = Regex(@"MountPoint\s*=\s*""([^""]+)""")
+    let mountMatches = mountRegex.Matches(fileContents) |> Seq.map (_.Groups[1].Value)
+    let codeRegex = Regex(@"Code\s*=\s*""([^""]+)""")
+    let msgRegex = Regex(@"Msg\s*=\s*""([^""]+)""")
     
 
+    let code = 
+        match codeRegex.Match(fileContents).Groups[1].Value with
+        | code when not (isNullOrWhiteSpace code) -> code
+        | _ -> ""
+    
+    let msg =
+        match msgRegex.Match(fileContents).Groups[1].Value with
+        | msg when not (isNullOrWhiteSpace msg) -> msg
+        | _ -> ""
 
-// A check for mounts against a db of sensitive mounts
-let rec checkMountpoints (db: StreamReader) (target: string) =
-    let line = db.ReadLine()
-    // insert the line check 
-    match line with
-    | null -> false 
-    | _ -> if target.Contains(line) then true
-           else checkMountpoints db target
+    [ for mount in mountMatches -> { Code = code; MountPoint = mount; Msg = msg } ]
+
+
+// Sequence of all SensitiveMount objects 
+let compareStringWithMountPoints (directoryPath: string) =
+    let sensitiveMounts =
+        Directory.GetFiles(directoryPath)
+        |> Seq.collect extractSensitiveMountsFromFile
+    sensitiveMounts
+
     
 
 // Get RUN mount commands from instruction list
@@ -240,16 +263,21 @@ let getRunMounts (lst: instr list) : string list =
     |> isRunMountCmd
 
 
+// Loops through the provided mounts and looks for matches.
+// with known sensitive mounts.
 let executeMountScan mounts =
-    use sensitiveMounts = File.OpenText(Config.MNTS_DB)
-
+    let sensitiveMountsSeq = compareStringWithMountPoints Config.RULE_DIR
+    
     for mnt in mounts do
-        let vulnerable = checkMountpoints sensitiveMounts mnt
-        if Config.VERBOSE then
-            if vulnerable then
-                printfn $"Mnt: [ %s{mnt} - isVulnerable %b{vulnerable} ]"
-            else
-                printfn $"Mnt: [ %s{mnt} - isVulnerable %b{vulnerable} ]"
+        Seq.iter (fun x ->
+            match x with
+            | _ when x.MountPoint = mnt ->
+                printfn $"%s{x.Code}:\nSensetive Mount:%s{x.MountPoint}\nInfo message: %s{x.Msg}\n"
+                //@TODO
+                // Do soemthing other than printing
+            | _ -> printf ""
+        ) sensitiveMountsSeq
+        
         
         
 

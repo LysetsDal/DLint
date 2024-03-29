@@ -8,8 +8,13 @@
     </PropertyGroup>
 
     <ItemGroup>
+    <!-- Ordering Precedence IMPORTANT -->
+        
+        <!-- The Mount-scanning rule files -->
+        <Compile Include="Rules\SensitiveMnt.fs" />
+        <Compile Include="Rules\Mnt*.fs" />
+        
         <PackageReference Include="FsLexYacc" Version="11.2.0" />
-        <!-- Ordering Precedence IMPORTANT -->
         <Compile Include="Utils.fs" />
         <FsLex Include="DLex.fsl">
             <OtherFlags>--module DLex --unicode</OtherFlags>
@@ -24,12 +29,14 @@
         <Compile Include="DPar.fs" />
 
         <Compile Include="DLex.fs" />
-
+        
+        <!-- Static congifuration variables -->
         <Compile Include="Config.fs" />
         
         <Compile Include="Interp.fs" />
         
         <Compile Include="Program.fs" />
+        <!-- Shellcheck tmp file location -->
         <Folder Include="tmp\" />
     </ItemGroup>
 
