@@ -2,7 +2,7 @@
 //        INTERPRETER FOR LINTING DOCKERFILES
 // =======================================================
 
-module Interp
+module Core.Interp
 
 open System.Diagnostics  // Threads & Processes
 open System.IO           // File manipulation 

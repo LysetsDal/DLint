@@ -10,7 +10,7 @@ type instr =
     | Workdir of wpath            (* Working directory <path>     *)
     | Copy of cpath               (* Copy from:<path> to:<path>   *)
     | Var of string               (* No Use so far                *)
-    | Volume of mnt_pt             (* Volume mounts <mount_point>  *)
+    | Volume of mnt_pt            (* Volume mounts <mount_point>  *)
     | Expose of expose            (* Expose a port of int         *)
     | User of string option * int option (* Name, GUID or both    *)
     | Run of cmd                  (* Run parses shell cmds        *)

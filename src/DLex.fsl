@@ -3,8 +3,6 @@
 //          LEXER-GENERATOR SPECIFICATION
 // ================================================
 
-module DLex
-
 open FSharp.Text.Lexing
 open System
 open DPar

@@ -3,12 +3,12 @@ module DPar
 #nowarn "64";; // turn off warnings that type variables used in production annotations are instantiated to concrete type
 open FSharp.Text.Lexing
 open FSharp.Text.Parsing.ParseHelpers
-# 4 "DPar.fsy"
+# 4 "Parser/DPar.fsy"
 
 open Absyn
 
 
-# 11 "DPar.fs"
+# 11 "Parser/DPar.fs"
 // This type is the type of tokens accepted by the parser
 type token = 
   | EOF
@@ -223,542 +223,542 @@ let _fsyacc_dataOfToken (t:token) =
   | WPATH _fsyacc_x -> Microsoft.FSharp.Core.Operators.box _fsyacc_x 
   | RCMD _fsyacc_x -> Microsoft.FSharp.Core.Operators.box _fsyacc_x 
   | ECMD _fsyacc_x -> Microsoft.FSharp.Core.Operators.box _fsyacc_x 
-let _fsyacc_gotos = [| 0us; 65535us; 1us; 65535us; 0us; 1us; 1us; 65535us; 0us; 2us; 1us; 65535us; 0us; 4us; 2us; 65535us; 4us; 5us; 10us; 11us; 2us; 65535us; 4us; 10us; 10us; 10us; 2us; 65535us; 4us; 27us; 10us; 27us; 2us; 65535us; 4us; 17us; 10us; 17us; 2us; 65535us; 4us; 18us; 10us; 18us; 2us; 65535us; 4us; 23us; 10us; 23us; 2us; 65535us; 4us; 26us; 10us; 26us; 2us; 65535us; 4us; 24us; 10us; 24us; 2us; 65535us; 4us; 25us; 10us; 25us; 1us; 65535us; 19us; 20us; 2us; 65535us; 38us; 39us; 41us; 42us; 1us; 65535us; 21us; 22us; 2us; 65535us; 8us; 9us; 15us; 16us; 4us; 65535us; 46us; 50us; 47us; 48us; 54us; 55us; 58us; 59us; 4us; 65535us; 46us; 51us; 47us; 49us; 48us; 52us; 57us; 60us; |]
-let _fsyacc_sparseGotoTableRowOffsets = [|0us; 1us; 3us; 5us; 7us; 10us; 13us; 16us; 19us; 22us; 25us; 28us; 31us; 34us; 36us; 39us; 41us; 44us; 49us; |]
-let _fsyacc_stateToProdIdxsTableElements = [| 1us; 0us; 1us; 0us; 1us; 1us; 1us; 1us; 2us; 2us; 3us; 1us; 3us; 1us; 4us; 1us; 4us; 1us; 4us; 1us; 4us; 2us; 5us; 6us; 1us; 6us; 1us; 7us; 1us; 8us; 1us; 8us; 1us; 8us; 1us; 8us; 1us; 9us; 1us; 10us; 1us; 11us; 1us; 11us; 1us; 12us; 1us; 12us; 1us; 13us; 1us; 14us; 1us; 15us; 1us; 16us; 1us; 17us; 1us; 18us; 1us; 19us; 1us; 20us; 1us; 21us; 1us; 22us; 1us; 23us; 1us; 24us; 3us; 25us; 26us; 27us; 1us; 26us; 1us; 26us; 1us; 27us; 1us; 27us; 2us; 28us; 29us; 1us; 29us; 1us; 29us; 2us; 30us; 32us; 1us; 31us; 1us; 32us; 3us; 33us; 37us; 38us; 4us; 34us; 35us; 36us; 39us; 2us; 35us; 39us; 1us; 36us; 1us; 37us; 1us; 38us; 1us; 39us; 2us; 40us; 41us; 2us; 40us; 41us; 1us; 41us; 4us; 42us; 43us; 44us; 45us; 2us; 42us; 45us; 2us; 43us; 44us; 1us; 44us; 1us; 45us; |]
-let _fsyacc_stateToProdIdxsTableRowOffsets = [|0us; 2us; 4us; 6us; 8us; 11us; 13us; 15us; 17us; 19us; 21us; 24us; 26us; 28us; 30us; 32us; 34us; 36us; 38us; 40us; 42us; 44us; 46us; 48us; 50us; 52us; 54us; 56us; 58us; 60us; 62us; 64us; 66us; 68us; 70us; 72us; 76us; 78us; 80us; 82us; 84us; 87us; 89us; 91us; 94us; 96us; 98us; 102us; 107us; 110us; 112us; 114us; 116us; 118us; 121us; 124us; 126us; 131us; 134us; 137us; 139us; |]
+let _fsyacc_gotos = [| 0us;65535us;1us;65535us;0us;1us;1us;65535us;0us;2us;1us;65535us;0us;4us;2us;65535us;4us;5us;10us;11us;2us;65535us;4us;10us;10us;10us;2us;65535us;4us;27us;10us;27us;2us;65535us;4us;17us;10us;17us;2us;65535us;4us;18us;10us;18us;2us;65535us;4us;23us;10us;23us;2us;65535us;4us;26us;10us;26us;2us;65535us;4us;24us;10us;24us;2us;65535us;4us;25us;10us;25us;1us;65535us;19us;20us;2us;65535us;38us;39us;41us;42us;1us;65535us;21us;22us;2us;65535us;8us;9us;15us;16us;4us;65535us;46us;50us;47us;48us;54us;55us;58us;59us;4us;65535us;46us;51us;47us;49us;48us;52us;57us;60us;|]
+let _fsyacc_sparseGotoTableRowOffsets = [|0us;1us;3us;5us;7us;10us;13us;16us;19us;22us;25us;28us;31us;34us;36us;39us;41us;44us;49us;|]
+let _fsyacc_stateToProdIdxsTableElements = [| 1us;0us;1us;0us;1us;1us;1us;1us;2us;2us;3us;1us;3us;1us;4us;1us;4us;1us;4us;1us;4us;2us;5us;6us;1us;6us;1us;7us;1us;8us;1us;8us;1us;8us;1us;8us;1us;9us;1us;10us;1us;11us;1us;11us;1us;12us;1us;12us;1us;13us;1us;14us;1us;15us;1us;16us;1us;17us;1us;18us;1us;19us;1us;20us;1us;21us;1us;22us;1us;23us;1us;24us;3us;25us;26us;27us;1us;26us;1us;26us;1us;27us;1us;27us;2us;28us;29us;1us;29us;1us;29us;2us;30us;32us;1us;31us;1us;32us;3us;33us;37us;38us;4us;34us;35us;36us;39us;2us;35us;39us;1us;36us;1us;37us;1us;38us;1us;39us;2us;40us;41us;2us;40us;41us;1us;41us;4us;42us;43us;44us;45us;2us;42us;45us;2us;43us;44us;1us;44us;1us;45us;|]
+let _fsyacc_stateToProdIdxsTableRowOffsets = [|0us;2us;4us;6us;8us;11us;13us;15us;17us;19us;21us;24us;26us;28us;30us;32us;34us;36us;38us;40us;42us;44us;46us;48us;50us;52us;54us;56us;58us;60us;62us;64us;66us;68us;70us;72us;76us;78us;80us;82us;84us;87us;89us;91us;94us;96us;98us;102us;107us;110us;112us;114us;116us;118us;121us;124us;126us;131us;134us;137us;139us;|]
 let _fsyacc_action_rows = 61
-let _fsyacc_actionTableElements = [|1us; 32768us; 7us; 6us; 0us; 49152us; 1us; 32768us; 0us; 3us; 0us; 16385us; 11us; 16386us; 3us; 19us; 7us; 13us; 8us; 21us; 10us; 31us; 11us; 32us; 12us; 28us; 14us; 12us; 15us; 29us; 16us; 30us; 17us; 33us; 18us; 34us; 0us; 16387us; 1us; 32768us; 14us; 7us; 1us; 32768us; 1us; 8us; 2us; 32768us; 9us; 47us; 14us; 46us; 0us; 16388us; 11us; 16389us; 3us; 19us; 7us; 13us; 8us; 21us; 10us; 31us; 11us; 32us; 12us; 28us; 14us; 12us; 15us; 29us; 16us; 30us; 17us; 33us; 18us; 34us; 0us; 16390us; 0us; 16391us; 1us; 32768us; 14us; 14us; 1us; 32768us; 1us; 15us; 2us; 32768us; 9us; 47us; 14us; 46us; 0us; 16392us; 0us; 16393us; 0us; 16394us; 1us; 32768us; 9us; 35us; 0us; 16395us; 2us; 32768us; 9us; 44us; 14us; 43us; 0us; 16396us; 0us; 16397us; 0us; 16398us; 0us; 16399us; 0us; 16400us; 0us; 16401us; 0us; 16402us; 0us; 16403us; 0us; 16404us; 0us; 16405us; 0us; 16406us; 0us; 16407us; 0us; 16408us; 2us; 16409us; 1us; 36us; 5us; 38us; 1us; 32768us; 9us; 37us; 0us; 16410us; 1us; 32768us; 9us; 40us; 0us; 16411us; 1us; 16412us; 5us; 41us; 1us; 32768us; 9us; 40us; 0us; 16413us; 1us; 16414us; 9us; 45us; 0us; 16415us; 0us; 16416us; 2us; 16417us; 2us; 53us; 4us; 56us; 2us; 16418us; 2us; 53us; 4us; 56us; 1us; 16419us; 4us; 56us; 0us; 16420us; 0us; 16421us; 0us; 16422us; 0us; 16423us; 1us; 32768us; 9us; 54us; 1us; 16424us; 2us; 53us; 0us; 16425us; 2us; 32768us; 9us; 58us; 14us; 57us; 1us; 16426us; 4us; 56us; 1us; 16427us; 2us; 53us; 0us; 16428us; 0us; 16429us; |]
-let _fsyacc_actionTableRowOffsets = [|0us; 2us; 3us; 5us; 6us; 18us; 19us; 21us; 23us; 26us; 27us; 39us; 40us; 41us; 43us; 45us; 48us; 49us; 50us; 51us; 53us; 54us; 57us; 58us; 59us; 60us; 61us; 62us; 63us; 64us; 65us; 66us; 67us; 68us; 69us; 70us; 73us; 75us; 76us; 78us; 79us; 81us; 83us; 84us; 86us; 87us; 88us; 91us; 94us; 96us; 97us; 98us; 99us; 100us; 102us; 104us; 105us; 108us; 110us; 112us; 113us; |]
-let _fsyacc_reductionSymbolCounts = [|1us; 2us; 1us; 2us; 4us; 1us; 2us; 1us; 4us; 1us; 1us; 2us; 2us; 1us; 1us; 1us; 1us; 1us; 1us; 1us; 1us; 1us; 1us; 1us; 1us; 1us; 3us; 3us; 1us; 3us; 1us; 1us; 2us; 1us; 1us; 2us; 2us; 2us; 2us; 3us; 2us; 3us; 2us; 2us; 3us; 3us; |]
-let _fsyacc_productionToNonTerminalTable = [|0us; 1us; 2us; 2us; 3us; 4us; 4us; 5us; 5us; 5us; 5us; 5us; 5us; 5us; 5us; 5us; 5us; 5us; 6us; 7us; 8us; 9us; 10us; 11us; 12us; 13us; 13us; 13us; 14us; 14us; 15us; 15us; 15us; 16us; 16us; 16us; 16us; 16us; 16us; 16us; 17us; 17us; 18us; 18us; 18us; 18us; |]
-let _fsyacc_immediateActions = [|65535us; 49152us; 65535us; 16385us; 65535us; 16387us; 65535us; 65535us; 65535us; 16388us; 65535us; 16390us; 16391us; 65535us; 65535us; 65535us; 16392us; 16393us; 16394us; 65535us; 16395us; 65535us; 16396us; 16397us; 16398us; 16399us; 16400us; 16401us; 16402us; 16403us; 16404us; 16405us; 16406us; 16407us; 16408us; 65535us; 65535us; 16410us; 65535us; 16411us; 65535us; 65535us; 16413us; 65535us; 16415us; 16416us; 65535us; 65535us; 65535us; 16420us; 16421us; 16422us; 16423us; 65535us; 65535us; 16425us; 65535us; 65535us; 65535us; 16428us; 16429us; |]
-let _fsyacc_reductions ()  =    [| 
-# 237 "DPar.fs"
+let _fsyacc_actionTableElements = [|1us;32768us;7us;6us;0us;49152us;1us;32768us;0us;3us;0us;16385us;11us;16386us;3us;19us;7us;13us;8us;21us;10us;31us;11us;32us;12us;28us;14us;12us;15us;29us;16us;30us;17us;33us;18us;34us;0us;16387us;1us;32768us;14us;7us;1us;32768us;1us;8us;2us;32768us;9us;47us;14us;46us;0us;16388us;11us;16389us;3us;19us;7us;13us;8us;21us;10us;31us;11us;32us;12us;28us;14us;12us;15us;29us;16us;30us;17us;33us;18us;34us;0us;16390us;0us;16391us;1us;32768us;14us;14us;1us;32768us;1us;15us;2us;32768us;9us;47us;14us;46us;0us;16392us;0us;16393us;0us;16394us;1us;32768us;9us;35us;0us;16395us;2us;32768us;9us;44us;14us;43us;0us;16396us;0us;16397us;0us;16398us;0us;16399us;0us;16400us;0us;16401us;0us;16402us;0us;16403us;0us;16404us;0us;16405us;0us;16406us;0us;16407us;0us;16408us;2us;16409us;1us;36us;5us;38us;1us;32768us;9us;37us;0us;16410us;1us;32768us;9us;40us;0us;16411us;1us;16412us;5us;41us;1us;32768us;9us;40us;0us;16413us;1us;16414us;9us;45us;0us;16415us;0us;16416us;2us;16417us;2us;53us;4us;56us;2us;16418us;2us;53us;4us;56us;1us;16419us;4us;56us;0us;16420us;0us;16421us;0us;16422us;0us;16423us;1us;32768us;9us;54us;1us;16424us;2us;53us;0us;16425us;2us;32768us;9us;58us;14us;57us;1us;16426us;4us;56us;1us;16427us;2us;53us;0us;16428us;0us;16429us;|]
+let _fsyacc_actionTableRowOffsets = [|0us;2us;3us;5us;6us;18us;19us;21us;23us;26us;27us;39us;40us;41us;43us;45us;48us;49us;50us;51us;53us;54us;57us;58us;59us;60us;61us;62us;63us;64us;65us;66us;67us;68us;69us;70us;73us;75us;76us;78us;79us;81us;83us;84us;86us;87us;88us;91us;94us;96us;97us;98us;99us;100us;102us;104us;105us;108us;110us;112us;113us;|]
+let _fsyacc_reductionSymbolCounts = [|1us;2us;1us;2us;4us;1us;2us;1us;4us;1us;1us;2us;2us;1us;1us;1us;1us;1us;1us;1us;1us;1us;1us;1us;1us;1us;3us;3us;1us;3us;1us;1us;2us;1us;1us;2us;2us;2us;2us;3us;2us;3us;2us;2us;3us;3us;|]
+let _fsyacc_productionToNonTerminalTable = [|0us;1us;2us;2us;3us;4us;4us;5us;5us;5us;5us;5us;5us;5us;5us;5us;5us;5us;6us;7us;8us;9us;10us;11us;12us;13us;13us;13us;14us;14us;15us;15us;15us;16us;16us;16us;16us;16us;16us;16us;17us;17us;18us;18us;18us;18us;|]
+let _fsyacc_immediateActions = [|65535us;49152us;65535us;16385us;65535us;16387us;65535us;65535us;65535us;16388us;65535us;16390us;16391us;65535us;65535us;65535us;16392us;16393us;16394us;65535us;16395us;65535us;16396us;16397us;16398us;16399us;16400us;16401us;16402us;16403us;16404us;16405us;16406us;16407us;16408us;65535us;65535us;16410us;65535us;16411us;65535us;65535us;16413us;65535us;16415us;16416us;65535us;65535us;65535us;16420us;16421us;16422us;16423us;65535us;65535us;16425us;65535us;65535us;65535us;16428us;16429us;|]
+let _fsyacc_reductions = lazy [|
+# 237 "Parser/DPar.fs"
         (fun (parseState : FSharp.Text.Parsing.IParseState) ->
-            let _1 = (let data = parseState.GetInput(1) in (Microsoft.FSharp.Core.Operators.unbox data : Absyn.dockerfile)) in
+            let _1 = parseState.GetInput(1) :?> Absyn.dockerfile in
             Microsoft.FSharp.Core.Operators.box
                 (
                    (
                       raise (FSharp.Text.Parsing.Accept(Microsoft.FSharp.Core.Operators.box _1))
                    )
-                 : '_startMain));
-# 246 "DPar.fs"
+                 : 'gentype__startMain));
+# 246 "Parser/DPar.fs"
         (fun (parseState : FSharp.Text.Parsing.IParseState) ->
-            let _1 = (let data = parseState.GetInput(1) in (Microsoft.FSharp.Core.Operators.unbox data : 'File)) in
+            let _1 = parseState.GetInput(1) :?> 'gentype_File in
             Microsoft.FSharp.Core.Operators.box
                 (
                    (
-# 36 "DPar.fsy"
+# 36 "Parser/DPar.fsy"
                                                          DFile _1 
                    )
-# 36 "DPar.fsy"
+# 36 "Parser/DPar.fsy"
                  : Absyn.dockerfile));
-# 257 "DPar.fs"
+# 257 "Parser/DPar.fs"
         (fun (parseState : FSharp.Text.Parsing.IParseState) ->
-            let _1 = (let data = parseState.GetInput(1) in (Microsoft.FSharp.Core.Operators.unbox data : 'BaseImg)) in
+            let _1 = parseState.GetInput(1) :?> 'gentype_BaseImg in
             Microsoft.FSharp.Core.Operators.box
                 (
                    (
-# 43 "DPar.fsy"
+# 43 "Parser/DPar.fsy"
                                                          [_1]      
                    )
-# 43 "DPar.fsy"
-                 : 'File));
-# 268 "DPar.fs"
+# 43 "Parser/DPar.fsy"
+                 : 'gentype_File));
+# 268 "Parser/DPar.fs"
         (fun (parseState : FSharp.Text.Parsing.IParseState) ->
-            let _1 = (let data = parseState.GetInput(1) in (Microsoft.FSharp.Core.Operators.unbox data : 'BaseImg)) in
-            let _2 = (let data = parseState.GetInput(2) in (Microsoft.FSharp.Core.Operators.unbox data : 'Instrs)) in
+            let _1 = parseState.GetInput(1) :?> 'gentype_BaseImg in
+            let _2 = parseState.GetInput(2) :?> 'gentype_Instrs in
             Microsoft.FSharp.Core.Operators.box
                 (
                    (
-# 44 "DPar.fsy"
+# 44 "Parser/DPar.fsy"
                                                          _1 :: _2  
                    )
-# 44 "DPar.fsy"
-                 : 'File));
-# 280 "DPar.fs"
+# 44 "Parser/DPar.fsy"
+                 : 'gentype_File));
+# 280 "Parser/DPar.fs"
         (fun (parseState : FSharp.Text.Parsing.IParseState) ->
-            let _2 = (let data = parseState.GetInput(2) in (Microsoft.FSharp.Core.Operators.unbox data : string)) in
-            let _4 = (let data = parseState.GetInput(4) in (Microsoft.FSharp.Core.Operators.unbox data : 'Version)) in
+            let _2 = parseState.GetInput(2) :?> string in
+            let _4 = parseState.GetInput(4) :?> 'gentype_Version in
             Microsoft.FSharp.Core.Operators.box
                 (
                    (
-# 51 "DPar.fsy"
+# 51 "Parser/DPar.fsy"
                                                          BaseImage(_2, Tag _4)     
                    )
-# 51 "DPar.fsy"
-                 : 'BaseImg));
-# 292 "DPar.fs"
+# 51 "Parser/DPar.fsy"
+                 : 'gentype_BaseImg));
+# 292 "Parser/DPar.fs"
         (fun (parseState : FSharp.Text.Parsing.IParseState) ->
-            let _1 = (let data = parseState.GetInput(1) in (Microsoft.FSharp.Core.Operators.unbox data : 'Instr)) in
+            let _1 = parseState.GetInput(1) :?> 'gentype_Instr in
             Microsoft.FSharp.Core.Operators.box
                 (
                    (
-# 58 "DPar.fsy"
+# 58 "Parser/DPar.fsy"
                                                          [_1]        
                    )
-# 58 "DPar.fsy"
-                 : 'Instrs));
-# 303 "DPar.fs"
+# 58 "Parser/DPar.fsy"
+                 : 'gentype_Instrs));
+# 303 "Parser/DPar.fs"
         (fun (parseState : FSharp.Text.Parsing.IParseState) ->
-            let _1 = (let data = parseState.GetInput(1) in (Microsoft.FSharp.Core.Operators.unbox data : 'Instr)) in
-            let _2 = (let data = parseState.GetInput(2) in (Microsoft.FSharp.Core.Operators.unbox data : 'Instrs)) in
+            let _1 = parseState.GetInput(1) :?> 'gentype_Instr in
+            let _2 = parseState.GetInput(2) :?> 'gentype_Instrs in
             Microsoft.FSharp.Core.Operators.box
                 (
                    (
-# 59 "DPar.fsy"
+# 59 "Parser/DPar.fsy"
                                                          _1 :: _2    
                    )
-# 59 "DPar.fsy"
-                 : 'Instrs));
-# 315 "DPar.fs"
+# 59 "Parser/DPar.fsy"
+                 : 'gentype_Instrs));
+# 315 "Parser/DPar.fs"
         (fun (parseState : FSharp.Text.Parsing.IParseState) ->
-            let _1 = (let data = parseState.GetInput(1) in (Microsoft.FSharp.Core.Operators.unbox data : string)) in
+            let _1 = parseState.GetInput(1) :?> string in
             Microsoft.FSharp.Core.Operators.box
                 (
                    (
-# 66 "DPar.fsy"
+# 66 "Parser/DPar.fsy"
                                                          Var _1                    
                    )
-# 66 "DPar.fsy"
-                 : 'Instr));
-# 326 "DPar.fs"
+# 66 "Parser/DPar.fsy"
+                 : 'gentype_Instr));
+# 326 "Parser/DPar.fs"
         (fun (parseState : FSharp.Text.Parsing.IParseState) ->
-            let _2 = (let data = parseState.GetInput(2) in (Microsoft.FSharp.Core.Operators.unbox data : string)) in
-            let _4 = (let data = parseState.GetInput(4) in (Microsoft.FSharp.Core.Operators.unbox data : 'Version)) in
+            let _2 = parseState.GetInput(2) :?> string in
+            let _4 = parseState.GetInput(4) :?> 'gentype_Version in
             Microsoft.FSharp.Core.Operators.box
                 (
                    (
-# 67 "DPar.fsy"
+# 67 "Parser/DPar.fsy"
                                                          BaseImage(_2, Tag _4)     
                    )
-# 67 "DPar.fsy"
-                 : 'Instr));
-# 338 "DPar.fs"
+# 67 "Parser/DPar.fsy"
+                 : 'gentype_Instr));
+# 338 "Parser/DPar.fs"
         (fun (parseState : FSharp.Text.Parsing.IParseState) ->
-            let _1 = (let data = parseState.GetInput(1) in (Microsoft.FSharp.Core.Operators.unbox data : 'MntPt)) in
+            let _1 = parseState.GetInput(1) :?> 'gentype_MntPt in
             Microsoft.FSharp.Core.Operators.box
                 (
                    (
-# 68 "DPar.fsy"
+# 68 "Parser/DPar.fsy"
                                                          Volume _1                 
                    )
-# 68 "DPar.fsy"
-                 : 'Instr));
-# 349 "DPar.fs"
+# 68 "Parser/DPar.fsy"
+                 : 'gentype_Instr));
+# 349 "Parser/DPar.fs"
         (fun (parseState : FSharp.Text.Parsing.IParseState) ->
-            let _1 = (let data = parseState.GetInput(1) in (Microsoft.FSharp.Core.Operators.unbox data : 'WPath)) in
+            let _1 = parseState.GetInput(1) :?> 'gentype_WPath in
             Microsoft.FSharp.Core.Operators.box
                 (
                    (
-# 69 "DPar.fsy"
+# 69 "Parser/DPar.fsy"
                                                          Workdir _1                
                    )
-# 69 "DPar.fsy"
-                 : 'Instr));
-# 360 "DPar.fs"
+# 69 "Parser/DPar.fsy"
+                 : 'gentype_Instr));
+# 360 "Parser/DPar.fs"
         (fun (parseState : FSharp.Text.Parsing.IParseState) ->
-            let _2 = (let data = parseState.GetInput(2) in (Microsoft.FSharp.Core.Operators.unbox data : 'Expose)) in
+            let _2 = parseState.GetInput(2) :?> 'gentype_Expose in
             Microsoft.FSharp.Core.Operators.box
                 (
                    (
-# 70 "DPar.fsy"
+# 70 "Parser/DPar.fsy"
                                                          Expose _2                 
                    )
-# 70 "DPar.fsy"
-                 : 'Instr));
-# 371 "DPar.fs"
+# 70 "Parser/DPar.fsy"
+                 : 'gentype_Instr));
+# 371 "Parser/DPar.fs"
         (fun (parseState : FSharp.Text.Parsing.IParseState) ->
-            let _2 = (let data = parseState.GetInput(2) in (Microsoft.FSharp.Core.Operators.unbox data : 'User)) in
+            let _2 = parseState.GetInput(2) :?> 'gentype_User in
             Microsoft.FSharp.Core.Operators.box
                 (
                    (
-# 71 "DPar.fsy"
+# 71 "Parser/DPar.fsy"
                                                          User _2                   
                    )
-# 71 "DPar.fsy"
-                 : 'Instr));
-# 382 "DPar.fs"
+# 71 "Parser/DPar.fsy"
+                 : 'gentype_Instr));
+# 382 "Parser/DPar.fs"
         (fun (parseState : FSharp.Text.Parsing.IParseState) ->
-            let _1 = (let data = parseState.GetInput(1) in (Microsoft.FSharp.Core.Operators.unbox data : 'CPath)) in
+            let _1 = parseState.GetInput(1) :?> 'gentype_CPath in
             Microsoft.FSharp.Core.Operators.box
                 (
                    (
-# 72 "DPar.fsy"
+# 72 "Parser/DPar.fsy"
                                                          Copy _1                   
                    )
-# 72 "DPar.fsy"
-                 : 'Instr));
-# 393 "DPar.fs"
+# 72 "Parser/DPar.fsy"
+                 : 'gentype_Instr));
+# 393 "Parser/DPar.fs"
         (fun (parseState : FSharp.Text.Parsing.IParseState) ->
-            let _1 = (let data = parseState.GetInput(1) in (Microsoft.FSharp.Core.Operators.unbox data : 'Runcmd)) in
+            let _1 = parseState.GetInput(1) :?> 'gentype_Runcmd in
             Microsoft.FSharp.Core.Operators.box
                 (
                    (
-# 73 "DPar.fsy"
+# 73 "Parser/DPar.fsy"
                                                          Run _1                    
                    )
-# 73 "DPar.fsy"
-                 : 'Instr));
-# 404 "DPar.fs"
+# 73 "Parser/DPar.fsy"
+                 : 'gentype_Instr));
+# 404 "Parser/DPar.fs"
         (fun (parseState : FSharp.Text.Parsing.IParseState) ->
-            let _1 = (let data = parseState.GetInput(1) in (Microsoft.FSharp.Core.Operators.unbox data : 'Entrycmd)) in
+            let _1 = parseState.GetInput(1) :?> 'gentype_Entrycmd in
             Microsoft.FSharp.Core.Operators.box
                 (
                    (
-# 74 "DPar.fsy"
+# 74 "Parser/DPar.fsy"
                                                          EntryCmd _1               
                    )
-# 74 "DPar.fsy"
-                 : 'Instr));
-# 415 "DPar.fs"
+# 74 "Parser/DPar.fsy"
+                 : 'gentype_Instr));
+# 415 "Parser/DPar.fs"
         (fun (parseState : FSharp.Text.Parsing.IParseState) ->
-            let _1 = (let data = parseState.GetInput(1) in (Microsoft.FSharp.Core.Operators.unbox data : 'AddPath)) in
+            let _1 = parseState.GetInput(1) :?> 'gentype_AddPath in
             Microsoft.FSharp.Core.Operators.box
                 (
                    (
-# 75 "DPar.fsy"
+# 75 "Parser/DPar.fsy"
                                                          Add _1                    
                    )
-# 75 "DPar.fsy"
-                 : 'Instr));
-# 426 "DPar.fs"
+# 75 "Parser/DPar.fsy"
+                 : 'gentype_Instr));
+# 426 "Parser/DPar.fs"
         (fun (parseState : FSharp.Text.Parsing.IParseState) ->
-            let _1 = (let data = parseState.GetInput(1) in (Microsoft.FSharp.Core.Operators.unbox data : 'EnvVar)) in
+            let _1 = parseState.GetInput(1) :?> 'gentype_EnvVar in
             Microsoft.FSharp.Core.Operators.box
                 (
                    (
-# 76 "DPar.fsy"
+# 76 "Parser/DPar.fsy"
                                                          Env _1                    
                    )
-# 76 "DPar.fsy"
-                 : 'Instr));
-# 437 "DPar.fs"
+# 76 "Parser/DPar.fsy"
+                 : 'gentype_Instr));
+# 437 "Parser/DPar.fs"
         (fun (parseState : FSharp.Text.Parsing.IParseState) ->
-            let _1 = (let data = parseState.GetInput(1) in (Microsoft.FSharp.Core.Operators.unbox data : string * string)) in
+            let _1 = parseState.GetInput(1) :?> string * string in
             Microsoft.FSharp.Core.Operators.box
                 (
                    (
-# 83 "DPar.fsy"
+# 83 "Parser/DPar.fsy"
                                                          EnvVar(_1) 
                    )
-# 83 "DPar.fsy"
-                 : 'EnvVar));
-# 448 "DPar.fs"
+# 83 "Parser/DPar.fsy"
+                 : 'gentype_EnvVar));
+# 448 "Parser/DPar.fs"
         (fun (parseState : FSharp.Text.Parsing.IParseState) ->
-            let _1 = (let data = parseState.GetInput(1) in (Microsoft.FSharp.Core.Operators.unbox data : string)) in
+            let _1 = parseState.GetInput(1) :?> string in
             Microsoft.FSharp.Core.Operators.box
                 (
                    (
-# 90 "DPar.fsy"
+# 90 "Parser/DPar.fsy"
                                                          Mnt_pt _1 
                    )
-# 90 "DPar.fsy"
-                 : 'MntPt));
-# 459 "DPar.fs"
+# 90 "Parser/DPar.fsy"
+                 : 'gentype_MntPt));
+# 459 "Parser/DPar.fs"
         (fun (parseState : FSharp.Text.Parsing.IParseState) ->
-            let _1 = (let data = parseState.GetInput(1) in (Microsoft.FSharp.Core.Operators.unbox data : string)) in
+            let _1 = parseState.GetInput(1) :?> string in
             Microsoft.FSharp.Core.Operators.box
                 (
                    (
-# 97 "DPar.fsy"
+# 97 "Parser/DPar.fsy"
                                                          WPath _1 
                    )
-# 97 "DPar.fsy"
-                 : 'WPath));
-# 470 "DPar.fs"
+# 97 "Parser/DPar.fsy"
+                 : 'gentype_WPath));
+# 470 "Parser/DPar.fs"
         (fun (parseState : FSharp.Text.Parsing.IParseState) ->
-            let _1 = (let data = parseState.GetInput(1) in (Microsoft.FSharp.Core.Operators.unbox data : string * string)) in
+            let _1 = parseState.GetInput(1) :?> string * string in
             Microsoft.FSharp.Core.Operators.box
                 (
                    (
-# 104 "DPar.fsy"
+# 104 "Parser/DPar.fsy"
                                                          CPath _1 
                    )
-# 104 "DPar.fsy"
-                 : 'CPath));
-# 481 "DPar.fs"
+# 104 "Parser/DPar.fsy"
+                 : 'gentype_CPath));
+# 481 "Parser/DPar.fs"
         (fun (parseState : FSharp.Text.Parsing.IParseState) ->
-            let _1 = (let data = parseState.GetInput(1) in (Microsoft.FSharp.Core.Operators.unbox data : string * string)) in
+            let _1 = parseState.GetInput(1) :?> string * string in
             Microsoft.FSharp.Core.Operators.box
                 (
                    (
-# 111 "DPar.fsy"
+# 111 "Parser/DPar.fsy"
                                                          APath _1 
                    )
-# 111 "DPar.fsy"
-                 : 'AddPath));
-# 492 "DPar.fs"
+# 111 "Parser/DPar.fsy"
+                 : 'gentype_AddPath));
+# 492 "Parser/DPar.fs"
         (fun (parseState : FSharp.Text.Parsing.IParseState) ->
-            let _1 = (let data = parseState.GetInput(1) in (Microsoft.FSharp.Core.Operators.unbox data : string)) in
+            let _1 = parseState.GetInput(1) :?> string in
             Microsoft.FSharp.Core.Operators.box
                 (
                    (
-# 118 "DPar.fsy"
+# 118 "Parser/DPar.fsy"
                                                          Cmd _1 
                    )
-# 118 "DPar.fsy"
-                 : 'Runcmd));
-# 503 "DPar.fs"
+# 118 "Parser/DPar.fsy"
+                 : 'gentype_Runcmd));
+# 503 "Parser/DPar.fs"
         (fun (parseState : FSharp.Text.Parsing.IParseState) ->
-            let _1 = (let data = parseState.GetInput(1) in (Microsoft.FSharp.Core.Operators.unbox data : string)) in
+            let _1 = parseState.GetInput(1) :?> string in
             Microsoft.FSharp.Core.Operators.box
                 (
                    (
-# 124 "DPar.fsy"
+# 124 "Parser/DPar.fsy"
                                                          Cmd _1 
                    )
-# 124 "DPar.fsy"
-                 : 'Entrycmd));
-# 514 "DPar.fs"
+# 124 "Parser/DPar.fsy"
+                 : 'gentype_Entrycmd));
+# 514 "Parser/DPar.fs"
         (fun (parseState : FSharp.Text.Parsing.IParseState) ->
-            let _1 = (let data = parseState.GetInput(1) in (Microsoft.FSharp.Core.Operators.unbox data : int)) in
+            let _1 = parseState.GetInput(1) :?> int in
             Microsoft.FSharp.Core.Operators.box
                 (
                    (
-# 131 "DPar.fsy"
+# 131 "Parser/DPar.fsy"
                                                          Port _1                    
                    )
-# 131 "DPar.fsy"
-                 : 'Expose));
-# 525 "DPar.fs"
+# 131 "Parser/DPar.fsy"
+                 : 'gentype_Expose));
+# 525 "Parser/DPar.fs"
         (fun (parseState : FSharp.Text.Parsing.IParseState) ->
-            let _1 = (let data = parseState.GetInput(1) in (Microsoft.FSharp.Core.Operators.unbox data : int)) in
-            let _3 = (let data = parseState.GetInput(3) in (Microsoft.FSharp.Core.Operators.unbox data : int)) in
+            let _1 = parseState.GetInput(1) :?> int in
+            let _3 = parseState.GetInput(3) :?> int in
             Microsoft.FSharp.Core.Operators.box
                 (
                    (
-# 132 "DPar.fsy"
+# 132 "Parser/DPar.fsy"
                                                          PortM (_1, _3)             
                    )
-# 132 "DPar.fsy"
-                 : 'Expose));
-# 537 "DPar.fs"
+# 132 "Parser/DPar.fsy"
+                 : 'gentype_Expose));
+# 537 "Parser/DPar.fs"
         (fun (parseState : FSharp.Text.Parsing.IParseState) ->
-            let _1 = (let data = parseState.GetInput(1) in (Microsoft.FSharp.Core.Operators.unbox data : int)) in
-            let _3 = (let data = parseState.GetInput(3) in (Microsoft.FSharp.Core.Operators.unbox data : 'Ports)) in
+            let _1 = parseState.GetInput(1) :?> int in
+            let _3 = parseState.GetInput(3) :?> 'gentype_Ports in
             Microsoft.FSharp.Core.Operators.box
                 (
                    (
-# 133 "DPar.fsy"
+# 133 "Parser/DPar.fsy"
                                                          Ports (_1 :: _3)           
                    )
-# 133 "DPar.fsy"
-                 : 'Expose));
-# 549 "DPar.fs"
+# 133 "Parser/DPar.fsy"
+                 : 'gentype_Expose));
+# 549 "Parser/DPar.fs"
         (fun (parseState : FSharp.Text.Parsing.IParseState) ->
-            let _1 = (let data = parseState.GetInput(1) in (Microsoft.FSharp.Core.Operators.unbox data : int)) in
+            let _1 = parseState.GetInput(1) :?> int in
             Microsoft.FSharp.Core.Operators.box
                 (
                    (
-# 140 "DPar.fsy"
+# 140 "Parser/DPar.fsy"
                                                          [_1]     
                    )
-# 140 "DPar.fsy"
-                 : 'Ports));
-# 560 "DPar.fs"
+# 140 "Parser/DPar.fsy"
+                 : 'gentype_Ports));
+# 560 "Parser/DPar.fs"
         (fun (parseState : FSharp.Text.Parsing.IParseState) ->
-            let _1 = (let data = parseState.GetInput(1) in (Microsoft.FSharp.Core.Operators.unbox data : int)) in
-            let _3 = (let data = parseState.GetInput(3) in (Microsoft.FSharp.Core.Operators.unbox data : 'Ports)) in
+            let _1 = parseState.GetInput(1) :?> int in
+            let _3 = parseState.GetInput(3) :?> 'gentype_Ports in
             Microsoft.FSharp.Core.Operators.box
                 (
                    (
-# 141 "DPar.fsy"
+# 141 "Parser/DPar.fsy"
                                                          _1 :: _3 
                    )
-# 141 "DPar.fsy"
-                 : 'Ports));
-# 572 "DPar.fs"
+# 141 "Parser/DPar.fsy"
+                 : 'gentype_Ports));
+# 572 "Parser/DPar.fs"
         (fun (parseState : FSharp.Text.Parsing.IParseState) ->
-            let _1 = (let data = parseState.GetInput(1) in (Microsoft.FSharp.Core.Operators.unbox data : string)) in
+            let _1 = parseState.GetInput(1) :?> string in
             Microsoft.FSharp.Core.Operators.box
                 (
                    (
-# 148 "DPar.fsy"
+# 148 "Parser/DPar.fsy"
                                                          (Some _1, None)          
                    )
-# 148 "DPar.fsy"
-                 : 'User));
-# 583 "DPar.fs"
+# 148 "Parser/DPar.fsy"
+                 : 'gentype_User));
+# 583 "Parser/DPar.fs"
         (fun (parseState : FSharp.Text.Parsing.IParseState) ->
-            let _1 = (let data = parseState.GetInput(1) in (Microsoft.FSharp.Core.Operators.unbox data : int)) in
+            let _1 = parseState.GetInput(1) :?> int in
             Microsoft.FSharp.Core.Operators.box
                 (
                    (
-# 149 "DPar.fsy"
+# 149 "Parser/DPar.fsy"
                                                          (None, Some _1)          
                    )
-# 149 "DPar.fsy"
-                 : 'User));
-# 594 "DPar.fs"
+# 149 "Parser/DPar.fsy"
+                 : 'gentype_User));
+# 594 "Parser/DPar.fs"
         (fun (parseState : FSharp.Text.Parsing.IParseState) ->
-            let _1 = (let data = parseState.GetInput(1) in (Microsoft.FSharp.Core.Operators.unbox data : string)) in
-            let _2 = (let data = parseState.GetInput(2) in (Microsoft.FSharp.Core.Operators.unbox data : int)) in
+            let _1 = parseState.GetInput(1) :?> string in
+            let _2 = parseState.GetInput(2) :?> int in
             Microsoft.FSharp.Core.Operators.box
                 (
                    (
-# 150 "DPar.fsy"
+# 150 "Parser/DPar.fsy"
                                                          (Some _1, Some _2)      
                    )
-# 150 "DPar.fsy"
-                 : 'User));
-# 606 "DPar.fs"
+# 150 "Parser/DPar.fsy"
+                 : 'gentype_User));
+# 606 "Parser/DPar.fs"
         (fun (parseState : FSharp.Text.Parsing.IParseState) ->
-            let _1 = (let data = parseState.GetInput(1) in (Microsoft.FSharp.Core.Operators.unbox data : string)) in
+            let _1 = parseState.GetInput(1) :?> string in
             Microsoft.FSharp.Core.Operators.box
                 (
                    (
-# 157 "DPar.fsy"
+# 157 "Parser/DPar.fsy"
                                                          _1                              
                    )
-# 157 "DPar.fsy"
-                 : 'Version));
-# 617 "DPar.fs"
+# 157 "Parser/DPar.fsy"
+                 : 'gentype_Version));
+# 617 "Parser/DPar.fs"
         (fun (parseState : FSharp.Text.Parsing.IParseState) ->
-            let _1 = (let data = parseState.GetInput(1) in (Microsoft.FSharp.Core.Operators.unbox data : int)) in
+            let _1 = parseState.GetInput(1) :?> int in
             Microsoft.FSharp.Core.Operators.box
                 (
                    (
-# 158 "DPar.fsy"
+# 158 "Parser/DPar.fsy"
                                                          string _1                       
                    )
-# 158 "DPar.fsy"
-                 : 'Version));
-# 628 "DPar.fs"
+# 158 "Parser/DPar.fsy"
+                 : 'gentype_Version));
+# 628 "Parser/DPar.fs"
         (fun (parseState : FSharp.Text.Parsing.IParseState) ->
-            let _1 = (let data = parseState.GetInput(1) in (Microsoft.FSharp.Core.Operators.unbox data : int)) in
-            let _2 = (let data = parseState.GetInput(2) in (Microsoft.FSharp.Core.Operators.unbox data : 'DottedName)) in
+            let _1 = parseState.GetInput(1) :?> int in
+            let _2 = parseState.GetInput(2) :?> 'gentype_DottedName in
             Microsoft.FSharp.Core.Operators.box
                 (
                    (
-# 159 "DPar.fsy"
+# 159 "Parser/DPar.fsy"
                                                          string _1 + "." + _2            
                    )
-# 159 "DPar.fsy"
-                 : 'Version));
-# 640 "DPar.fs"
+# 159 "Parser/DPar.fsy"
+                 : 'gentype_Version));
+# 640 "Parser/DPar.fs"
         (fun (parseState : FSharp.Text.Parsing.IParseState) ->
-            let _1 = (let data = parseState.GetInput(1) in (Microsoft.FSharp.Core.Operators.unbox data : int)) in
-            let _2 = (let data = parseState.GetInput(2) in (Microsoft.FSharp.Core.Operators.unbox data : 'DashedName)) in
+            let _1 = parseState.GetInput(1) :?> int in
+            let _2 = parseState.GetInput(2) :?> 'gentype_DashedName in
             Microsoft.FSharp.Core.Operators.box
                 (
                    (
-# 160 "DPar.fsy"
+# 160 "Parser/DPar.fsy"
                                                          string _1 + "-" + _2            
                    )
-# 160 "DPar.fsy"
-                 : 'Version));
-# 652 "DPar.fs"
+# 160 "Parser/DPar.fsy"
+                 : 'gentype_Version));
+# 652 "Parser/DPar.fs"
         (fun (parseState : FSharp.Text.Parsing.IParseState) ->
-            let _1 = (let data = parseState.GetInput(1) in (Microsoft.FSharp.Core.Operators.unbox data : string)) in
-            let _2 = (let data = parseState.GetInput(2) in (Microsoft.FSharp.Core.Operators.unbox data : 'DottedName)) in
+            let _1 = parseState.GetInput(1) :?> string in
+            let _2 = parseState.GetInput(2) :?> 'gentype_DottedName in
             Microsoft.FSharp.Core.Operators.box
                 (
                    (
-# 161 "DPar.fsy"
+# 161 "Parser/DPar.fsy"
                                                          string _1 + "." + _2            
                    )
-# 161 "DPar.fsy"
-                 : 'Version));
-# 664 "DPar.fs"
+# 161 "Parser/DPar.fsy"
+                 : 'gentype_Version));
+# 664 "Parser/DPar.fs"
         (fun (parseState : FSharp.Text.Parsing.IParseState) ->
-            let _1 = (let data = parseState.GetInput(1) in (Microsoft.FSharp.Core.Operators.unbox data : string)) in
-            let _2 = (let data = parseState.GetInput(2) in (Microsoft.FSharp.Core.Operators.unbox data : 'DashedName)) in
+            let _1 = parseState.GetInput(1) :?> string in
+            let _2 = parseState.GetInput(2) :?> 'gentype_DashedName in
             Microsoft.FSharp.Core.Operators.box
                 (
                    (
-# 162 "DPar.fsy"
+# 162 "Parser/DPar.fsy"
                                                          string _1 + "-" + _2            
                    )
-# 162 "DPar.fsy"
-                 : 'Version));
-# 676 "DPar.fs"
+# 162 "Parser/DPar.fsy"
+                 : 'gentype_Version));
+# 676 "Parser/DPar.fs"
         (fun (parseState : FSharp.Text.Parsing.IParseState) ->
-            let _1 = (let data = parseState.GetInput(1) in (Microsoft.FSharp.Core.Operators.unbox data : int)) in
-            let _2 = (let data = parseState.GetInput(2) in (Microsoft.FSharp.Core.Operators.unbox data : 'DottedName)) in
-            let _3 = (let data = parseState.GetInput(3) in (Microsoft.FSharp.Core.Operators.unbox data : 'DashedName)) in
+            let _1 = parseState.GetInput(1) :?> int in
+            let _2 = parseState.GetInput(2) :?> 'gentype_DottedName in
+            let _3 = parseState.GetInput(3) :?> 'gentype_DashedName in
             Microsoft.FSharp.Core.Operators.box
                 (
                    (
-# 163 "DPar.fsy"
+# 163 "Parser/DPar.fsy"
                                                          string _1 + "." + _2 + "-" + _3 
                    )
-# 163 "DPar.fsy"
-                 : 'Version));
-# 689 "DPar.fs"
+# 163 "Parser/DPar.fsy"
+                 : 'gentype_Version));
+# 689 "Parser/DPar.fs"
         (fun (parseState : FSharp.Text.Parsing.IParseState) ->
-            let _2 = (let data = parseState.GetInput(2) in (Microsoft.FSharp.Core.Operators.unbox data : int)) in
+            let _2 = parseState.GetInput(2) :?> int in
             Microsoft.FSharp.Core.Operators.box
                 (
                    (
-# 170 "DPar.fsy"
+# 170 "Parser/DPar.fsy"
                                                          string _2               
                    )
-# 170 "DPar.fsy"
-                 : 'DottedName));
-# 700 "DPar.fs"
+# 170 "Parser/DPar.fsy"
+                 : 'gentype_DottedName));
+# 700 "Parser/DPar.fs"
         (fun (parseState : FSharp.Text.Parsing.IParseState) ->
-            let _2 = (let data = parseState.GetInput(2) in (Microsoft.FSharp.Core.Operators.unbox data : int)) in
-            let _3 = (let data = parseState.GetInput(3) in (Microsoft.FSharp.Core.Operators.unbox data : 'DottedName)) in
+            let _2 = parseState.GetInput(2) :?> int in
+            let _3 = parseState.GetInput(3) :?> 'gentype_DottedName in
             Microsoft.FSharp.Core.Operators.box
                 (
                    (
-# 171 "DPar.fsy"
+# 171 "Parser/DPar.fsy"
                                                          string _2 + "." + _3    
                    )
-# 171 "DPar.fsy"
-                 : 'DottedName));
-# 712 "DPar.fs"
+# 171 "Parser/DPar.fsy"
+                 : 'gentype_DottedName));
+# 712 "Parser/DPar.fs"
         (fun (parseState : FSharp.Text.Parsing.IParseState) ->
-            let _2 = (let data = parseState.GetInput(2) in (Microsoft.FSharp.Core.Operators.unbox data : string)) in
+            let _2 = parseState.GetInput(2) :?> string in
             Microsoft.FSharp.Core.Operators.box
                 (
                    (
-# 178 "DPar.fsy"
+# 178 "Parser/DPar.fsy"
                                                          string _2               
                    )
-# 178 "DPar.fsy"
-                 : 'DashedName));
-# 723 "DPar.fs"
+# 178 "Parser/DPar.fsy"
+                 : 'gentype_DashedName));
+# 723 "Parser/DPar.fs"
         (fun (parseState : FSharp.Text.Parsing.IParseState) ->
-            let _2 = (let data = parseState.GetInput(2) in (Microsoft.FSharp.Core.Operators.unbox data : int)) in
+            let _2 = parseState.GetInput(2) :?> int in
             Microsoft.FSharp.Core.Operators.box
                 (
                    (
-# 179 "DPar.fsy"
+# 179 "Parser/DPar.fsy"
                                                          string _2               
                    )
-# 179 "DPar.fsy"
-                 : 'DashedName));
-# 734 "DPar.fs"
+# 179 "Parser/DPar.fsy"
+                 : 'gentype_DashedName));
+# 734 "Parser/DPar.fs"
         (fun (parseState : FSharp.Text.Parsing.IParseState) ->
-            let _2 = (let data = parseState.GetInput(2) in (Microsoft.FSharp.Core.Operators.unbox data : int)) in
-            let _3 = (let data = parseState.GetInput(3) in (Microsoft.FSharp.Core.Operators.unbox data : 'DottedName)) in
+            let _2 = parseState.GetInput(2) :?> int in
+            let _3 = parseState.GetInput(3) :?> 'gentype_DottedName in
             Microsoft.FSharp.Core.Operators.box
                 (
                    (
-# 180 "DPar.fsy"
+# 180 "Parser/DPar.fsy"
                                                          string _2 + "." + _3    
                    )
-# 180 "DPar.fsy"
-                 : 'DashedName));
-# 746 "DPar.fs"
+# 180 "Parser/DPar.fsy"
+                 : 'gentype_DashedName));
+# 746 "Parser/DPar.fs"
         (fun (parseState : FSharp.Text.Parsing.IParseState) ->
-            let _2 = (let data = parseState.GetInput(2) in (Microsoft.FSharp.Core.Operators.unbox data : string)) in
-            let _3 = (let data = parseState.GetInput(3) in (Microsoft.FSharp.Core.Operators.unbox data : 'DashedName)) in
+            let _2 = parseState.GetInput(2) :?> string in
+            let _3 = parseState.GetInput(3) :?> 'gentype_DashedName in
             Microsoft.FSharp.Core.Operators.box
                 (
                    (
-# 181 "DPar.fsy"
+# 181 "Parser/DPar.fsy"
                                                          string _2 + "-" + _3    
                    )
-# 181 "DPar.fsy"
-                 : 'DashedName));
+# 181 "Parser/DPar.fsy"
+                 : 'gentype_DashedName));
 |]
-# 759 "DPar.fs"
-let tables () : FSharp.Text.Parsing.Tables<_> = 
-  { reductions= _fsyacc_reductions ();
+# 759 "Parser/DPar.fs"
+let tables : FSharp.Text.Parsing.Tables<_> = 
+  { reductions = _fsyacc_reductions.Value;
     endOfInputTag = _fsyacc_endOfInputTag;
     tagOfToken = tagOfToken;
     dataOfToken = _fsyacc_dataOfToken; 
@@ -777,6 +777,6 @@ let tables () : FSharp.Text.Parsing.Tables<_> =
                               | None -> parse_error ctxt.Message);
     numTerminals = 22;
     productionToNonTerminalTable = _fsyacc_productionToNonTerminalTable  }
-let engine lexer lexbuf startState = (tables ()).Interpret(lexer, lexbuf, startState)
+let engine lexer lexbuf startState = tables.Interpret(lexer, lexbuf, startState)
 let Main lexer lexbuf : Absyn.dockerfile =
-    Microsoft.FSharp.Core.Operators.unbox ((tables ()).Interpret(lexer, lexbuf, 0))
+    engine lexer lexbuf 0 :?> _

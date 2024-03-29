@@ -13,31 +13,43 @@
         <!-- The Mount-scanning rule files -->
         <Compile Include="Rules\SensitiveMnt.fs" />
         <Compile Include="Rules\Mnt*.fs" />
-        
+
+        <!-- FsLexYacc Pkg ref -->
         <PackageReference Include="FsLexYacc" Version="11.2.0" />
+        
+        <!-- Utils -->
         <Compile Include="Utils.fs" />
+
+        <!-- FsLex Dlex.fsl -->
         <FsLex Include="DLex.fsl">
             <OtherFlags>--module DLex --unicode</OtherFlags>
         </FsLex>
-        
+
+        <!-- Absyn -->
         <Compile Include="Absyn.fs" />
         
-        <Compile Include="DPar.fsi" />
-        <FsYacc Include="DPar.fsy">
-          <OtherFlags>--module DPar</OtherFlags>
+        
+        <!-- DPar.fsi -->
+        <Compile Include="Parser\DPar.fsi" />
+        <!-- FsYacc DPar.fsy -->
+        <FsYacc Include="Parser\DPar.fsy">
+            <OtherFlags>-o Parser/DPar.fs --module DPar</OtherFlags>
         </FsYacc>
-        <Compile Include="DPar.fs" />
+        <!-- DPar.fs -->
+        <Compile Include="Parser\DPar.fs" />
 
+        <!-- Dlex.fs -->
         <Compile Include="DLex.fs" />
         
         <!-- Static congifuration variables -->
         <Compile Include="Config.fs" />
-        
-        <Compile Include="Interp.fs" />
-        
+
+        <!-- Interp, then Program -->
+        <Compile Include="Core\Interp.fs" />
         <Compile Include="Program.fs" />
         <!-- Shellcheck tmp file location -->
         <Folder Include="tmp\" />
+
     </ItemGroup>
 
     <ItemGroup>
