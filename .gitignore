@@ -6,6 +6,7 @@
 **/obj
 **/bin
 **/.idea
+**/.vscode
 nupkg/
 
 # Files and types
@@ -17,7 +18,7 @@ project.lock.json
 **/Dockerfile
 
 # Visual Studio Code
-.vscode/
+
 
 # Rider
 .idea/
