@@ -1,9 +1,9 @@
-module Linterd.Rules.ShellWarn
+module Rules.ShellWarn
 
 open System.Runtime.CompilerServices
 
 [<IsReadOnly; Struct>]
-type Binaries =
+type ShellWarn =
     {
       Code: string
       Bin: string
