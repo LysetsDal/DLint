@@ -1,4 +1,4 @@
-module Linterd.Rules.Mounts.Mnt119
+module Rules.Mounts.Mnt119
 
 open Rules.MountWarn
 // Needs sources...

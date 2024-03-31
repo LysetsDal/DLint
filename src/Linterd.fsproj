@@ -17,8 +17,7 @@
         <Compile Include="Rules\Misc\*.fs" />
         <Compile Include="Rules\ShellWarn.fs" />
         <Compile Include="Rules\Bash\*.fs" />
-
-
+        
         <!-- FsLexYacc Pkg ref -->
         <PackageReference Include="FsLexYacc" Version="11.2.0" />
         
@@ -32,7 +31,6 @@
 
         <!-- Absyn -->
         <Compile Include="Absyn.fs" />
-        
         
         <!-- DPar.fsi -->
         <Compile Include="Parser\DPar.fsi" />
@@ -64,6 +62,10 @@
 
     <ItemGroup>
       <EmbeddedResource Remove="obj\**" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Content Include="Rules\Bash\BashWarnings.md" />
     </ItemGroup>
 
 </Project>

@@ -1,4 +1,4 @@
-module Linterd.Rules.Mounts.Mnt126
+module Rules.Mounts.Mnt126
 
 open Rules.MountWarn
 

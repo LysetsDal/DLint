@@ -83,10 +83,11 @@ open StoreInternals
 open RunCommands
 
 
+// Operate on run cmds list
+let binariesScan (lst: string list) =
+    lst
 
-let binariesScan (lst: string list) = 
-    
-
+// 
 
 
 
@@ -131,7 +132,6 @@ let run dfile =
     
     Mounts.scan vmnts
     Mounts.scan rmnts
-    
     
     
     
