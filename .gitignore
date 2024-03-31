@@ -1,5 +1,6 @@
 # Exclude reources
 **/resources/
+**/Rules/Bash/*.md
 
 # Exlude build files
 **/obj
