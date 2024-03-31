@@ -2,10 +2,11 @@
 //            SET CONFIGS FOR LINTERD 
 // ================================================
 
+[<RequireQualifiedAccess>]
 module Config
 
 // LOGGING MODES
-let DEBUG = true
+let DEBUG = false
 let VERBOSE = true
 
 
@@ -17,4 +18,5 @@ let OUTPUT_DIR = "./tmp/"
 
 
 // VULNERABLE MOUNTS
-let RULE_DIR = "./Rules/Mounts"
+let MNT_RULE_DIR = "./Rules/Mounts"
+let MISC_RULE_DIR = "./Rules/Misc"

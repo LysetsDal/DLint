@@ -1,11 +1,11 @@
-module Rules.MiscWarning
+module Linterd.Rules.ShellWarn
 
 open System.Runtime.CompilerServices
 
 [<IsReadOnly; Struct>]
-type MiscWarn =
+type Binaries =
     {
       Code: string
-      Problem: string
+      Bin: string
       Msg: string
     }

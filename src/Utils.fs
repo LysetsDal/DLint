@@ -1,13 +1,14 @@
 // ================================================
 //        UTILITY FUNCTIONS FOR LIMNTERD 
 // ================================================
+
 module Utils
 
 open System.Text.RegularExpressions
 
 // Print a list 
-let printStringList lst =
-    printfn "\nLIST CONTENT: "
+let printStringList lst (prefix: string) =
+    printfn $"\n%s{prefix.ToUpper()} CONTENT: "
     let rec aux lst = 
         match lst with
         | [] -> printfn ""
@@ -64,7 +65,12 @@ let stringToEnvPair str =
     splitEnvVar str
     |> returnPair
     
-    
+
+// Checks if a string is null or whitespace
+let isNullOrWhiteSpace (str: string) =
+    str = null || str.Trim() = ""
+
+
 // Split at delimiter(s)
 let splitCmdAt (delim: string[]) (cmd: string) =
     List.ofArray (cmd.Split(delim, System.StringSplitOptions.RemoveEmptyEntries))
