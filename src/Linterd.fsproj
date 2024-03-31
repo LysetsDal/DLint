@@ -11,8 +11,11 @@
     <!-- Ordering Precedence IMPORTANT -->
         
         <!-- The Mount-scanning rule files -->
-        <Compile Include="Rules\SensitiveMnt.fs" />
-        <Compile Include="Rules\Mnt*.fs" />
+        <Compile Include="Rules\MountWarn.fs" />
+        <Compile Include="Rules\Mounts\*.fs" />
+        <Compile Include="Rules\MiscWarning.fs" />
+        <Compile Include="Rules\Misc\*.fs" />
+
 
         <!-- FsLexYacc Pkg ref -->
         <PackageReference Include="FsLexYacc" Version="11.2.0" />
@@ -45,11 +48,13 @@
         <Compile Include="Config.fs" />
 
         <!-- Interp, then Program -->
-        <Compile Include="Core\Interp.fs" />
+        <Compile Include="Engine\Shellcheck.fs" />
+        <Compile Include="Engine\Mounts.fs" />
+        <Compile Include="Engine\Interp.fs" />
+        
         <Compile Include="Program.fs" />
         <!-- Shellcheck tmp file location -->
         <Folder Include="tmp\" />
-
     </ItemGroup>
 
     <ItemGroup>

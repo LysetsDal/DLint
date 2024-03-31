@@ -63,3 +63,26 @@ let stringToPath str =
 let stringToEnvPair str =
     splitEnvVar str
     |> returnPair
+    
+    
+// Split at delimiter(s)
+let splitCmdAt (delim: string[]) (cmd: string) =
+    List.ofArray (cmd.Split(delim, System.StringSplitOptions.RemoveEmptyEntries))
+
+
+// Split with stnadard shell delimiters (See Config.fs)
+let split (cmd: string)  =
+    let delims = [|"&&"; ";"; "|"; "<<"; ">>"|]
+    splitCmdAt delims cmd
+
+
+// Gat a command by a prefix
+let  getCmdByPrefix (lst: string list) (prefix: string) =    
+    let rec aux (lst: string list) acc =
+        match lst with
+        | [] -> acc
+        | x :: rest ->
+            match x.StartsWith prefix with
+            | true ->  aux rest (x :: acc)
+            | _ ->  aux rest acc
+    aux (List.rev lst) []

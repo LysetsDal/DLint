@@ -7,7 +7,8 @@ module Program
 open FSharp.Text.Lexing
 open System.IO
 open System
-open Core.Interp
+open Linterd
+open Engine.Interp
 
 let parseDockerfile file =
     let filename = string file

@@ -5,7 +5,7 @@
 module Config
 
 // LOGGING MODES
-let DEBUG = false
+let DEBUG = true
 let VERBOSE = true
 
 
@@ -13,9 +13,8 @@ let VERBOSE = true
 let SHELLCHECK = "../shellcheck/shellcheck"
 let SHELLCHECK_ARGS = "-s bash -f gcc"
 let SHEBANG = "#!/bin/bash \n"
-let SHELL_CMD_DELIMS = [|"&&"; ";"; "|"; "<<"; ">>"|]
 let OUTPUT_DIR = "./tmp/"
 
 
 // VULNERABLE MOUNTS
-let RULE_DIR = "./Rules"
+let RULE_DIR = "./Rules/Mounts"
