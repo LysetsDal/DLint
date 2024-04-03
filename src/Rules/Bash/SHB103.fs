@@ -2,7 +2,7 @@ module Rules.Bash.SHB103
 
 open Rules.ShellWarn
 
-let shb103 : ShellWarn = {
+let shb103 : binWarn = {
     Code = "SHB103"
     Bin = "free"
     Msg = "free displays the total amount of free and used physical and swap m-

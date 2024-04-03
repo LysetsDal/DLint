@@ -2,10 +2,19 @@ module Rules.ShellWarn
 
 open System.Runtime.CompilerServices
 
+
 [<IsReadOnly; Struct>]
-type ShellWarn =
+type binWarn =
     {
-      Code: string
-      Bin: string
-      Msg: string
+        Code: string
+        Bin: string
+        Msg: string
+    }
+
+[<IsReadOnly; Struct>]
+type aptWarn =
+    {
+        Code: string
+        Problem: string
+        Msg: string
     }

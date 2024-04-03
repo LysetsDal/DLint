@@ -2,7 +2,7 @@ module Linterd.Rules.Bash.SHB105
 
 open Rules.ShellWarn
 
-let shb105 : ShellWarn = {
+let shb105 : binWarn = {
     Code = "SHB105"
     Bin = "ifconfig"
     Msg = "ifconfig is used to display information about the network interfaces.

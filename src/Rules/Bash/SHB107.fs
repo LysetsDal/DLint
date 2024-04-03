@@ -2,7 +2,7 @@ module Linterd.Rules.Bash.SHB107
 
 open Rules.ShellWarn
 
-let shb107 : ShellWarn = {
+let shb107 : binWarn = {
     Code = "SHB107"
     Bin = "su"
     Msg = "Using 'su' to switch user identity is discouraged within containers.
