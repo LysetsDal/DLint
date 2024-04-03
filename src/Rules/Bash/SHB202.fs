@@ -1,4 +1,4 @@
-module Linterd.Rules.Bash.SHB202
+module Rules.Bash.SHB202
 
 open Rules.ShellWarn
 let shb202 : aptWarn = {

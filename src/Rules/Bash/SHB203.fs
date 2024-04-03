@@ -1,4 +1,4 @@
-module Linterd.Rules.Bash.SHB203
+module Rules.Bash.SHB203
 
 open Rules.ShellWarn
 
