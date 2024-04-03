@@ -4,7 +4,7 @@
 
 module Linterd.Engine.Interp
 
-open Absyn   // Abstract Syntax               
+open Absyn             
 
 module private StoreInternals =
     // The store is an in-memory representation of the dockerfile.
@@ -76,24 +76,12 @@ module private RunCommands =
         |> List.fold (fun acc x -> (acc @ Utils.split x)) []         // 3. Split runcommand
 
 
+
 // =======================================================
 //                   Exposed Functions
 // =======================================================
 open StoreInternals
 open RunCommands
-
-
-// Operate on run cmds list
-let binariesScan (lst: string list) =
-    lst
-
-// 
-
-
-
-
-
-
 
 // Run: The 'main' logic of the interpreter
 let run dfile =
@@ -112,15 +100,16 @@ let run dfile =
     
 
     // 2. Scan other commands and binaries
-    
-    
-    
+    Binaries.scan rcmds
     
     
     // 3. Scan network interface
     let netcmds = Network.runNetworkCheck rcmds
     if Config.VERBOSE then Utils.printStringList netcmds "NETCMDS LIST"
     Network.scan netcmds
+    
+    //@TODO:
+    // Insert port scan
     
     
     // 4. Execute mount check
@@ -132,6 +121,5 @@ let run dfile =
     
     Mounts.scan vmnts
     Mounts.scan rmnts
-    
-    
+
     

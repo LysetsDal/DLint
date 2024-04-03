@@ -13,7 +13,7 @@ let printStringList lst (prefix: string) =
         match lst with
         | [] -> printfn ""
         | x :: rest ->
-            printfn $"[ %s{ string x} ]"
+            printfn $"[ %s{string x} ]"
             aux rest
     aux lst
 

@@ -6,7 +6,7 @@
 module Config
 
 // LOGGING MODES
-let DEBUG = false
+let DEBUG = true
 let VERBOSE = true
 
 
@@ -19,4 +19,9 @@ let OUTPUT_DIR = "./tmp/"
 
 // VULNERABLE MOUNTS
 let MNT_RULE_DIR = "./Rules/Mounts"
+
+// VULNERABLE NETWORK 
 let MISC_RULE_DIR = "./Rules/Misc"
+
+// PROBLEMATIC BINARIES
+let BASH_RULE_DIR = "./Rules/Bash" 
