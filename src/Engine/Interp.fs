@@ -6,6 +6,7 @@ module Linterd.Engine.Interp
 
 open Absyn             
 
+
 module private StoreInternals =
     // The store is an in-memory representation of the dockerfile.
     // It is used to perform the linters checks on.
@@ -47,7 +48,7 @@ module private StoreInternals =
     let returnStore (s: store) : instr list =
         let rec aux s acc =
             match s with
-            | [] -> acc
+            | [] -> List.rev acc
             | (_, instr) :: rest -> aux rest (instr :: acc)
         aux s []
 
@@ -85,41 +86,41 @@ open RunCommands
 
 // Run: The 'main' logic of the interpreter
 let run dfile =
-    let gstore = initStore dfile  // Load dfile into store
+    let gstore = initStore <| dfile  // Load dfile into store
     if Config.DEBUG then printStore gstore
     
     // Transform dfile to instructions
-    let instrs = returnStore gstore
+    let instrs = returnStore <| gstore
+    printfn "INSTRUCTIONS:"
+    printfn $"%A{instrs}\n"
+    
     // Extract run cmds from instructions
-    let rcmds = getRunCmds instrs  
+    let rcmds = getRunCmds <| instrs  
     
     // 1. Execute shellcheck
-    if Config.VERBOSE then Utils.printStringList rcmds "RUNCMDS LIST"     
-    Shellcheck.execute <| Shellcheck.prependSheBangs rcmds
-    Shellcheck.flush Config.OUTPUT_DIR
+    if Config.VERBOSE then Utils.printStringList rcmds "RUNCMDS LIST" 
+    Shellcheck.scan <| rcmds
+    // Shellcheck.flush Config.OUTPUT_DIR
     
 
     // 2. Scan other commands and binaries
-    Binaries.scan rcmds
+    Binaries.scan <| rcmds
     
     
-    // 3. Scan network interface
-    let netcmds = Network.runNetworkCheck rcmds
+    // 3. Scan network interface + ports
+    let netcmds = Network.runNetworkCheck <| rcmds
     if Config.VERBOSE then Utils.printStringList netcmds "NETCMDS LIST"
-    Network.scan netcmds
+    Network.scan <| netcmds <| instrs 
     
-    //@TODO:
-    // Insert port scan
+
     
     
     // 4. Execute mount check
-    let vmnts = Mounts.getVolumeMounts instrs
-    let rmnts = Mounts.getRunMounts rcmds
+    let vmnts = Mounts.getVolumeMounts <| instrs
+    let rmnts = Mounts.getRunMounts <| rcmds
     
     if Config.VERBOSE then Utils.printStringList vmnts "VOLMOUNTS LIST"
     if Config.VERBOSE then Utils.printStringList rmnts "RUNMOUNTS LIST"
     
     Mounts.scan vmnts
     Mounts.scan rmnts
-
-    

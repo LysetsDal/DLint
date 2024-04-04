@@ -39,7 +39,6 @@ module private Helpers =
         List.zip basecmds srcmds 
  
 
-        
 
 module private BinariesInternals =
     // This function Uses regexes to parse the Bash rules.
@@ -51,7 +50,6 @@ module private BinariesInternals =
         let codeRegex = Regex(@"Code\s*=\s*""([^""]+)""")
         let msgRegex = Regex(@"Msg\s*=\s*""([^""]+)""")
         
-
         let code = 
             match codeRegex.Match(fileContents).Groups[1].Value with
             | code when not (Utils.isNullOrWhiteSpace code) -> code
@@ -65,35 +63,39 @@ module private BinariesInternals =
         [ for bin in binariesMatches -> { Code = code; Bin = bin; Msg = msg } ]
 
 
-    // Sequence of all ShellWarn objects 
+    // Sequence of all binWarnings  
     let compareWithShellWarnings (directoryPath: string) =
         Directory.GetFiles(directoryPath)
         |> Seq.collect extractShellWarningsFromFile
    
      
-    // Print the sensitive binary info
+    // Print the binary warnings to stdout
     let printShellWarnings (bin: binWarn) =
         printfn $"%s{bin.Code}:\nProblematic Binary: %s{bin.Bin}\nInfo message: %s{bin.Msg}\n"
 
 
+
 module private AptHelpers =
     
+    // Predicate filter for apt-get update command    
     let isAptUpdate lst =
         List.exists (fun x -> x = "update") lst
-
+    
+    // Predicate for apt-get install flag
     let aptHasDashY lst =
         List.contains "-y" lst
                 
+    // Predicate for apt-get install flag
     let aptHasNoInstallRec lst =
         List.contains "--no-install-recommends" lst
 
-    
-    // unsplit a runcommand 
+    // unsplit a runcommand  
     let unSplitRunCommands (rcmds: string list) =
         List.fold(fun acc x -> acc + x + " ") "" rcmds |> Utils.trimWhitespace
     
-    // Extracts the commands with apt-get as base from the dict 
-    // Orders them like a LL top down parser would 
+    
+    // Extracts commands with apt-get as base cmd from the dict .
+    // List is in order of occurance in the dockerfile.
     let getAptCommands (dict: dict) =
         let rec aux dict acc =
             match dict with
@@ -103,7 +105,8 @@ module private AptHelpers =
         aux dict []
 
     
-    //
+    // Predicate that pattern matches the apt-get command to see if it contains
+    // the two recommended flags for dockerfiles.
     let checkAptInstall lst =
         match lst with
         | _ :: "install" :: "-y" :: "--no-install-recommends" :: _ 
@@ -112,8 +115,7 @@ module private AptHelpers =
         | _ :: "install" :: _ :: "--no-install-recommends" :: [ "-y" ] -> true
         | _ -> false
     
-    
-
+    // The print function for apt-get install.
     let printAptWarnings hasY hasNoInstall cmd =
 
         let aptWarn =
@@ -140,7 +142,7 @@ module private AptHelpers =
 
         
 
-    // Checks the format 
+    // Checks the format of apt-get install and log warnings
     let checkAptOk (entry: dictEntry) = 
         match entry with
         | _, lst ->
@@ -155,6 +157,7 @@ module private AptHelpers =
                 printAptWarnings hasY hasNoInstall lst
         
         
+    // Scan through the apt-get commands 
     let scanApt dict =
         let mutable count = 0
         let rec aux (dict: dict) count =
@@ -184,27 +187,20 @@ let scan rcmds =
     if Config.DEBUG then printfn $"FIRST FROM LST: \n%A{base_cmds}\n"
 
     let dict = binariesToDictLst base_cmds rcmds_split
-    if Config.DEBUG then printfn $"DICT FROM LSTS: \n%A{dict}\n"
+    if Config.VERBOSE then printfn $"DICT FROM LSTS: \n%A{dict}\n"
 
-    
+    //@TODO:
+    // Line numbers 
     // cheks the base commands:
     for cmd in base_cmds do
         Seq.iter (fun shellWarn ->
             match shellWarn with
-            | _ when cmd = Utils.trimWhitespace shellWarn.Bin  -> 
+            | _ when cmd = shellWarn.Bin  -> 
                 if Config.VERBOSE then (printShellWarnings shellWarn)
             | _ -> printf ""
         ) (compareWithShellWarnings Config.BASH_RULE_DIR)
         
-    //@TODO:
-    // change format of scanApt to be like the mount scans
     // check apt command:
-    let aptCmds = getAptCommands dict
     printf "APT-SCAN CHECK:\n"
-    scanApt aptCmds
-        
-        
-        
-        
-        
+    scanApt (getAptCommands <| dict)
         

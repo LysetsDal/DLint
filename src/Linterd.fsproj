@@ -22,7 +22,7 @@
         <PackageReference Include="FsLexYacc" Version="11.2.0" />
         
         <!-- Utils -->
-        <Compile Include="Utils.fs" />
+        <Compile Include="Utils\Utils.fs" />
 
         <!-- FsLex Dlex.fsl -->
         <FsLex Include="DLex.fsl">

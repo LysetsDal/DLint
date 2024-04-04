@@ -76,7 +76,7 @@ let splitCmdAt (delim: string[]) (cmd: string) =
     List.ofArray (cmd.Split(delim, System.StringSplitOptions.RemoveEmptyEntries))
 
 
-// Split with stnadard shell delimiters (See Config.fs)
+// Split with standard shell delimiters
 let split (cmd: string)  =
     let delims = [|"&&"; ";"; "|"; "<<"; ">>"|]
     splitCmdAt delims cmd

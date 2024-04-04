@@ -63,17 +63,17 @@ Instrs:
  * Docker instructions that are supported
  */
 Instr:
-    NAME                          { Var $1                    }
-  | FROM NAME COLON Version       { BaseImage($2, Tag $4)     }
-  | MntPt                         { Volume $1                 } 
-  | WPath                         { Workdir $1                }
-  | EXPOSE Expose                 { Expose $2                 }
-  | USER User                     { User $2                   }
-  | CPath                         { Copy $1                   }
-  | Runcmd                        { Run $1                    }
-  | Entrycmd                      { EntryCmd $1               }
-  | AddPath                       { Add $1                    }
-  | EnvVar                        { Env $1                    }
+    NAME                          { Var $1                }
+  | FROM NAME COLON Version       { BaseImage($2, Tag $4) }
+  | MntPt                         { Volume $1             } 
+  | WPath                         { Workdir $1            }
+  | EXPOSE Expose                 { Expose $2             }
+  | USER User                     { User $2               }
+  | CPath                         { Copy $1               }
+  | Runcmd                        { Run $1                }
+  | Entrycmd                      { EntryCmd $1           }
+  | AddPath                       { Add $1                }
+  | EnvVar                        { Env $1                }
 ;
 
 /*

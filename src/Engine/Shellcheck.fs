@@ -1,5 +1,5 @@
 // ===============================================
-//             Shell check handling
+//             SHELL CHECK INTEGRATION 
 // ===============================================
 [<RequireQualifiedAccess>]
 module Linterd.Engine.Shellcheck
@@ -11,6 +11,14 @@ open System.Diagnostics  // Threads & Processes
 module private Helpers =
     // Append shebang to each string
     let prependSheBang s = Config.SHEBANG + s
+    
+    // Appply appendShebang to list of strings
+    let prependSheBangs (lst: string list) =
+        let rec aux lst acc =
+            match lst with  
+            | [] -> acc 
+            | x :: rest -> aux rest (prependSheBang x :: acc)
+        aux (List.rev lst) []
         
         
 module private InputOutput =
@@ -20,12 +28,11 @@ module private InputOutput =
         File.Open(filepath, FileMode.OpenOrCreate, FileAccess.ReadWrite)
         
 
-    // Close an open file(stream) 
     let closeFile (stream: FileStream) =
         stream.Close()
         
         
-    // Delete the tmpfiles created for the shellcheck integration
+    // Delete the tmpfiles created for the shellcheck scan
     let deleteTmpFile (filePath: string) verbose =
         try
             File.Delete(filePath)
@@ -39,7 +46,7 @@ module private InputOutput =
 
 
 module private ShellChekInternals =
-    // Spawn a shellcheck process from a context.
+    // Spawn a shellcheck process and redirect stdin + stdout.
     // Returns the output of shellcheck applied to that context
     let shellcheck (shellcheck: string) (file: string) (input: FileStream) =
         // Define a new context for a shellcheck process
@@ -73,14 +80,6 @@ open ShellChekInternals
 open InputOutput
 open Helpers
 
-// Appply appendShebang to list of strings
-let prependSheBangs (lst: string list) =
-    let rec aux lst acc =
-        match lst with  
-        | [] -> acc 
-        | x :: rest -> aux rest (prependSheBang x :: acc)
-    aux (List.rev lst) []
-
 
 // Delete all tmp files
 let flush (directoryPath: string) =
@@ -91,11 +90,18 @@ let flush (directoryPath: string) =
 
 
 // Perform the shcellChek on the given commands
-let execute (cmds: string list) =
+let scan (cmds: string list) =
     let mutable count = 0
-    for cmd in cmds do
+    
+    // the --mount is a docker specific cmd. Hence shellcheck discards it.
+    let filter_cmds =
+        cmds
+        |> List.except (Utils.getCmdByPrefix cmds "--mount")
+        |> prependSheBangs
+    
+    for cmd in filter_cmds do
         let fpath = $"%s{Config.OUTPUT_DIR}cmd_%s{string count}"
-        let tmp_file = openOrCreateRWFile fpath cmd                   // Create the tmp. file
+        let tmp_file = openOrCreateRWFile fpath cmd               // Create the tmp. file
         
         let res = shellcheck Config.SHELLCHECK fpath tmp_file    // Spawn a new shellcheck process
         closeFile tmp_file

@@ -24,4 +24,7 @@ let MNT_RULE_DIR = "./Rules/Mounts"
 let MISC_RULE_DIR = "./Rules/Misc"
 
 // PROBLEMATIC BINARIES
-let BASH_RULE_DIR = "./Rules/Bash" 
+let BASH_RULE_DIR = "./Rules/Bash"
+
+let UNIX_MAX_PORT = 65535
+let UNIX_MIN_PORT = 0

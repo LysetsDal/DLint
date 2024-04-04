@@ -319,7 +319,7 @@ let _fsyacc_reductions = lazy [|
                 (
                    (
 # 66 "Parser/DPar.fsy"
-                                                         Var _1                    
+                                                         Var _1                
                    )
 # 66 "Parser/DPar.fsy"
                  : 'gentype_Instr));
@@ -331,7 +331,7 @@ let _fsyacc_reductions = lazy [|
                 (
                    (
 # 67 "Parser/DPar.fsy"
-                                                         BaseImage(_2, Tag _4)     
+                                                         BaseImage(_2, Tag _4) 
                    )
 # 67 "Parser/DPar.fsy"
                  : 'gentype_Instr));
@@ -342,7 +342,7 @@ let _fsyacc_reductions = lazy [|
                 (
                    (
 # 68 "Parser/DPar.fsy"
-                                                         Volume _1                 
+                                                         Volume _1             
                    )
 # 68 "Parser/DPar.fsy"
                  : 'gentype_Instr));
@@ -353,7 +353,7 @@ let _fsyacc_reductions = lazy [|
                 (
                    (
 # 69 "Parser/DPar.fsy"
-                                                         Workdir _1                
+                                                         Workdir _1            
                    )
 # 69 "Parser/DPar.fsy"
                  : 'gentype_Instr));
@@ -364,7 +364,7 @@ let _fsyacc_reductions = lazy [|
                 (
                    (
 # 70 "Parser/DPar.fsy"
-                                                         Expose _2                 
+                                                         Expose _2             
                    )
 # 70 "Parser/DPar.fsy"
                  : 'gentype_Instr));
@@ -375,7 +375,7 @@ let _fsyacc_reductions = lazy [|
                 (
                    (
 # 71 "Parser/DPar.fsy"
-                                                         User _2                   
+                                                         User _2               
                    )
 # 71 "Parser/DPar.fsy"
                  : 'gentype_Instr));
@@ -386,7 +386,7 @@ let _fsyacc_reductions = lazy [|
                 (
                    (
 # 72 "Parser/DPar.fsy"
-                                                         Copy _1                   
+                                                         Copy _1               
                    )
 # 72 "Parser/DPar.fsy"
                  : 'gentype_Instr));
@@ -397,7 +397,7 @@ let _fsyacc_reductions = lazy [|
                 (
                    (
 # 73 "Parser/DPar.fsy"
-                                                         Run _1                    
+                                                         Run _1                
                    )
 # 73 "Parser/DPar.fsy"
                  : 'gentype_Instr));
@@ -408,7 +408,7 @@ let _fsyacc_reductions = lazy [|
                 (
                    (
 # 74 "Parser/DPar.fsy"
-                                                         EntryCmd _1               
+                                                         EntryCmd _1           
                    )
 # 74 "Parser/DPar.fsy"
                  : 'gentype_Instr));
@@ -419,7 +419,7 @@ let _fsyacc_reductions = lazy [|
                 (
                    (
 # 75 "Parser/DPar.fsy"
-                                                         Add _1                    
+                                                         Add _1                
                    )
 # 75 "Parser/DPar.fsy"
                  : 'gentype_Instr));
@@ -430,7 +430,7 @@ let _fsyacc_reductions = lazy [|
                 (
                    (
 # 76 "Parser/DPar.fsy"
-                                                         Env _1                    
+                                                         Env _1                
                    )
 # 76 "Parser/DPar.fsy"
                  : 'gentype_Instr));
