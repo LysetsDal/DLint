@@ -4,22 +4,22 @@ type token =
   | EOF
   | COLON
   | DOT
-  | EXPOSE
+  | EXPOSE of (int)
   | DASH
   | COMMA
   | EQ
-  | FROM
-  | USER
+  | FROM of (int)
+  | USER of (int)
   | INT of (int)
-  | CPATH of (string * string)
-  | APATH of (string * string)
-  | ENVVAR of (string * string)
-  | CSTST of (string)
-  | NAME of (string)
-  | MNTPT of (string)
-  | WPATH of (string)
-  | RCMD of (string)
-  | ECMD of (string)
+  | CPATH of (int * (string * string))
+  | APATH of (int * (string * string))
+  | ENVVAR of (int * (string * string))
+  | NAME of (int * string)
+  | MNTPT of (int * string)
+  | WPATH of (int * string)
+  | RCMD of (int * string)
+  | ECMD of (int * string)
+  | CSTST of (int * string)
 type tokenId = 
     | TOKEN_EOF
     | TOKEN_COLON
@@ -34,12 +34,12 @@ type tokenId =
     | TOKEN_CPATH
     | TOKEN_APATH
     | TOKEN_ENVVAR
-    | TOKEN_CSTST
     | TOKEN_NAME
     | TOKEN_MNTPT
     | TOKEN_WPATH
     | TOKEN_RCMD
     | TOKEN_ECMD
+    | TOKEN_CSTST
     | TOKEN_end_of_input
     | TOKEN_error
 type nonTerminalId = 
@@ -50,12 +50,12 @@ type nonTerminalId =
     | NONTERM_Instrs
     | NONTERM_Instr
     | NONTERM_EnvVar
-    | NONTERM_MntPt
-    | NONTERM_WPath
     | NONTERM_CPath
     | NONTERM_AddPath
     | NONTERM_Runcmd
     | NONTERM_Entrycmd
+    | NONTERM_MntPt
+    | NONTERM_WPath
     | NONTERM_Expose
     | NONTERM_Ports
     | NONTERM_User

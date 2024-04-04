@@ -18,13 +18,19 @@ module private StoreInternals =
     let unpackDFile (dfile: dockerfile) : instr list =
         match dfile with
         | DFile instruction -> instruction
-
+    
+    // let purgeVars (lst: instr list) =
+    //     let rec aux lst =
+    //         match lst with
+    //         | Var x -> 
 
     // Initilize the store
     let initStore (dfile: dockerfile) : store =
         let rec addInstr instructions counter store =
             match instructions with 
             | [] -> store
+            | Var _ :: rest ->
+                addInstr rest counter store  // <- Discarding the vars type
             | x :: rest -> 
                 let newStore = (counter, x) :: store 
                 addInstr rest (counter + 1) newStore
@@ -64,8 +70,7 @@ module private RunCommands =
     // Take an instruction and return a list
     let instrToCmdList (ins: instr) =
         match ins with
-        | Run (Cmd cmd) -> [cmd]
-        | Run (Cmds cmds) -> cmds
+        | Run (idx, Cmd cmd) -> [cmd]
         | _ -> []
      
 
@@ -75,7 +80,6 @@ module private RunCommands =
         |> List.filter isRunInstr                             // 1. Predicate
         |> List.collect instrToCmdList                       // 2. Unwrap instruction
         |> List.fold (fun acc x -> (acc @ Utils.split x)) []         // 3. Split runcommand
-
 
 
 // =======================================================

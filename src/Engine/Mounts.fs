@@ -20,13 +20,13 @@ module private Helpers =
     // Unpack a Volume to an instruction
     let volumeToList (ins: instr) =
         match ins with
-        | Volume (Mnt_pt cmd) -> [cmd]
+        | Volume (idx, Mnt_pt cmd) -> [cmd]
         | _ -> failwith "Unexpected type"
 
         
     let RunMountToList (ins: instr) =
         match ins with
-        | Run cmd -> [cmd]
+        | Run (idx, cmd) -> [cmd]
         | _ -> failwith "Unexpected type"
 
 

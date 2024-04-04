@@ -6,17 +6,17 @@ module Absyn
 
 // Supported Dockerfile instructions
 type instr =
-    | BaseImage of string * tag   (* Build Image <name>:<tag>     *)
-    | Workdir of wpath            (* Working directory <path>     *)
-    | Copy of cpath               (* Copy from:<path> to:<path>   *)
-    | Var of string               (* No Use so far                *)
-    | Volume of mnt_pt            (* Volume mounts <mount_point>  *)
-    | Expose of expose            (* Expose a port of int         *)
-    | User of string option * int option (* Name, GUID or both    *)
-    | Run of cmd                  (* Run parses shell cmds        *)
-    | EntryCmd of cmd             (* Entry shell cmd of container *)
-    | Env of env                  (* Key=value pairs of string    *)
-    | Add of apath                (* Add files from path, to path *)
+    | BaseImage of int * string * tag  (* Build Image <name>:<tag>     *)
+    | Workdir of int * wpath           (* Working directory <path>     *)
+    | Copy of int * cpath
+    | Var of int * string              (* Type used to discard non-docker instructions *)
+    | Volume of int * mnt_pt            (* Volume mounts <mount_point>  *)
+    | Expose of int * expose  
+    | User of int * (string option * int option) (* Name, GUID or both    *)
+    | EntryCmd of int * cmd             (* Entry shell cmd of container *)
+    | Run of int * cmd
+    | Env of int * env
+    | Add of int * apath                (* Add files from path, to path *)
 
 // A WORKDIR path (single)
 and wpath = 
@@ -25,7 +25,7 @@ and wpath =
 // A Volume mountpoint (single)
 and mnt_pt = 
     | Mnt_pt of string
-    
+
 // A COPY path (double)
 and cpath = 
     | CPath of string * string
@@ -34,10 +34,9 @@ and cpath =
 and apath =
     | APath of string * string
 
-// A Shell command (one or more)
-and cmd = 
-    | Cmd of string
-    | Cmds of string list
+// A Shell command 
+and cmd =
+    | Cmd of string 
 
 // Environment Variables. A <Key>=<Value> pair of strings
 and env = EnvVar of string * string

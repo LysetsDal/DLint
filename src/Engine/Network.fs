@@ -25,7 +25,7 @@ module private PortInternal =
     // 'Converts' an instruction to type expose
     let instrToExpose (ins: instr) =
         match ins with
-        | Expose e -> Some e
+        | Expose (idx, e) -> Some e
         | _ -> None
 
     // Determines if a single port is in range
