@@ -10,13 +10,13 @@ type instr =
     | Workdir of int * wpath           (* Working directory <path>     *)
     | Copy of int * cpath
     | Var of int * string              (* Type used to discard non-docker instructions *)
-    | Volume of int * mnt_pt            (* Volume mounts <mount_point>  *)
+    | Volume of int * mnt_pt           (* Volume mounts <mount_point>  *)
     | Expose of int * expose  
     | User of int * (string option * int option) (* Name, GUID or both    *)
-    | EntryCmd of int * cmd             (* Entry shell cmd of container *)
-    | Run of int * cmd
+    | EntryCmd of int * shellcmd            (* Entry shell cmd of container *)
+    | Run of int * shellcmd
     | Env of int * env
-    | Add of int * apath                (* Add files from path, to path *)
+    | Add of int * apath               (* Add files from path, to path *)
 
 // A WORKDIR path (single)
 and wpath = 
@@ -35,8 +35,8 @@ and apath =
     | APath of string * string
 
 // A Shell command 
-and cmd =
-    | Cmd of string 
+and shellcmd =
+    | ShellCmd of string 
 
 // Environment Variables. A <Key>=<Value> pair of strings
 and env = EnvVar of string * string

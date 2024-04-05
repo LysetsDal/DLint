@@ -487,7 +487,7 @@ let _fsyacc_reductions = lazy [|
                 (
                    (
 # 113 "Parser/DPar.fsy"
-                                                         extrl _1 (fun x -> Cmd x) 
+                                                         extrl _1 (fun x -> ShellCmd x) 
                    )
 # 113 "Parser/DPar.fsy"
                  : 'gentype_Runcmd));
@@ -498,7 +498,7 @@ let _fsyacc_reductions = lazy [|
                 (
                    (
 # 120 "Parser/DPar.fsy"
-                                                         extrl _1 (fun x -> Cmd x) 
+                                                         extrl _1 (fun x -> ShellCmd x) 
                    )
 # 120 "Parser/DPar.fsy"
                  : 'gentype_Entrycmd));

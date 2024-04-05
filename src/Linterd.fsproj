@@ -31,6 +31,7 @@
 
         <!-- Absyn -->
         <Compile Include="Absyn.fs" />
+        <Compile Include="Infrastructure.fs" />
         
         <!-- DPar.fsi -->
         <Compile Include="Parser\DPar.fsi" />
@@ -47,6 +48,8 @@
         <!-- Static congifuration variables -->
         <Compile Include="Config.fs" />
 
+
+        
         <!-- Engine -->
         <Compile Include="Engine\Shellcheck.fs" />
         <Compile Include="Engine\Mounts.fs" />

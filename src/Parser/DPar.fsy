@@ -110,14 +110,14 @@ AddPath:
  * Parsing shell commands as a string
  */
 Runcmd:
-    RCMD                          { extrl $1 (fun x -> Cmd x) }
+    RCMD                          { extrl $1 (fun x -> ShellCmd x) }
 ;
 
 /*
  * Parsing the CMD command (string)
  */
 Entrycmd:
-    ECMD                          { extrl $1 (fun x -> Cmd x) }
+    ECMD                          { extrl $1 (fun x -> ShellCmd x) }
 ;
 
 

@@ -4,7 +4,7 @@
 
 module Utils
 
-open System.Text.RegularExpressions
+
 
 // Print a list 
 let printStringList lst (prefix: string) =
@@ -31,8 +31,12 @@ let trimWhitespace str =
     |> List.map string
     |> String.concat ""
 
+let reconstructToString (lst: string list) =
+    (String.concat " " lst).Trim()
+
 
 // Used to split a string (envVar) at the '=' (equal)
+open System.Text.RegularExpressions
 let splitEnvVar input =
     let pattern = @"(?<!\\)=" // match un-escaped '=' sign
     Regex.Split(input, pattern)
@@ -45,6 +49,26 @@ let splitAtSpaces input =
     Regex.Split(input, pattern)
     |> List.ofArray
 
+// Split list of strings at spaces
+let splitListAtSpaces (input: string list) : string list list =
+    List.fold (fun acc x -> splitAtSpaces x :: acc) [] input
+
+// Split at delimiter(s)
+let splitCmdAt (delim: string[]) (cmd: string) =
+    List.ofArray (cmd.Split(delim, System.StringSplitOptions.RemoveEmptyEntries))
+
+
+// Split with standard shell delimiters
+let split (cmd: string)  =
+    let delims = [|"&&"; ";"; "|"; "<<"; ">>"|]
+    splitCmdAt delims cmd
+    |> List.map (fun (x:string) -> x.Trim(' '))
+
+
+let splitList (input: string list) =
+    let first_split = List.map (fun (s:string) -> s.Trim('[', ']')) input
+    List.rev (splitListAtSpaces first_split)
+        
 
 // Construct a tuple of the first two elements of a list 
 let returnPair lst = 
@@ -71,19 +95,10 @@ let isNullOrWhiteSpace (str: string) =
     str = null || str.Trim() = ""
 
 
-// Split at delimiter(s)
-let splitCmdAt (delim: string[]) (cmd: string) =
-    List.ofArray (cmd.Split(delim, System.StringSplitOptions.RemoveEmptyEntries))
 
 
-// Split with standard shell delimiters
-let split (cmd: string)  =
-    let delims = [|"&&"; ";"; "|"; "<<"; ">>"|]
-    splitCmdAt delims cmd
-
-
-// Gat a command by a prefix
-let  getCmdByPrefix (lst: string list) (prefix: string) =    
+// Gat a command by a prefix (returns a list of mathces)
+let getCmdByPrefix (lst: string list) (prefix: string) =    
     let rec aux (lst: string list) acc =
         match lst with
         | [] -> acc
@@ -92,3 +107,10 @@ let  getCmdByPrefix (lst: string list) (prefix: string) =
             | true ->  aux rest (x :: acc)
             | _ ->  aux rest acc
     aux (List.rev lst) []
+    
+    
+let getLineCmdByPrefix (lst: int * string list) (prefix: string) =    
+    let idx, xs = lst
+    (idx, getCmdByPrefix xs prefix)
+
+              
