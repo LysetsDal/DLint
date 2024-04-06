@@ -134,7 +134,6 @@ open ShellChekInternals
 open InputOutput
 open Helpers
 
-
 // Delete all tmp files
 let flushTmpFiles  =
     let files = Directory.GetFiles(Config.OUTPUT_DIR)
@@ -142,7 +141,6 @@ let flushTmpFiles  =
         deleteTmpFile file false
     printfn $"Files at '%s{Config.OUTPUT_DIR}' deleted successfully."
 
-    
 
 // Perform the shcellChek on the given commands
 let scan (cmds: Cmds) =
