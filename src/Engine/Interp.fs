@@ -89,28 +89,26 @@ let run dfile =
     
     // Extract run cmds from instructions
     let rcmds = getRunCmds <| instrs
-    printfn "(INTERP) RCMDS:"
-    printfn $"%A{Cmds.cmdsToString rcmds}\n"
     
     // 1. Execute shellcheck
-    // if Config.VERBOSE then Utils.printStringList rcmds "RUNCMDS LIST"
-        
+    // printfn "(INTERP @ SHELLCHK) RCMDS:"
+    // printfn $"%A{Cmds.cmdsToString rcmds}\n"
     Shellcheck.scan <| rcmds
     // Shellcheck.flushTmpFiles
     
     
     // 2. Scan other commands and binaries
-    // Binaries.scan <| rcmds
+    Binaries.scan <| rcmds
     
-    //
     // // 3. Scan network interface + ports
-    // let netcmds = Network.runNetworkCheck <| rcmds
-    // if Config.VERBOSE then Utils.printStringList netcmds "NETCMDS LIST"
-    // Network.scan <| netcmds <| instrs 
-    //
-    //
-    //
-    //
+    printfn "(INTERP) NETWORK:\n"
+    Network.scan rcmds instrs 
+    
+
+    
+    
+    
+    
     // // 4. Execute mount check
     // let vmnts = Mounts.getVolumeMounts <| instrs
     // let rmnts = Mounts.getRunMounts <| rcmds

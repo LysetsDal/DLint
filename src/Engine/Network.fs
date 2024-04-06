@@ -6,8 +6,9 @@
 module Linterd.Engine.Network
 
 open System.Text.RegularExpressions
-open System.IO
+open Infrastructure
 open Rules.MiscWarn
+open System.IO
 open Absyn
 
 module private PortInternal =
@@ -25,7 +26,7 @@ module private PortInternal =
     // 'Converts' an instruction to type expose
     let instrToExpose (ins: instr) =
         match ins with
-        | Expose (idx, e) -> Some e
+        | Expose (line, e) -> Some (line, e)
         | _ -> None
 
     // Determines if a single port is in range
@@ -49,32 +50,33 @@ module private PortInternal =
         let out_range = List.fold (fun acc x -> if (portInRange x) then acc else x :: acc) [] lst
         if List.length in_range <> len then out_range else []
         
+        
     //@TODO:
     // Handle logging 'nicer'
     // Logs a port warning if its outside UNIX range
-    let logPortWarning (e: expose) =
+    let logPortWarning (e: int * expose) =
+        
         match e with
-        | Port p ->
+        | l, Port p ->
             if portInRange p then printf ""
-            else printfn $"Port %i{p} outside UNIX Range (0 - 65535)\n"
-        | PortM (p1, p2) ->
+            else printfn $"Around Line %i{l}: Port %i{p} outside UNIX Range (0 - 65535)\n"
+        | l, PortM (p1, p2) ->
             if portTupleInRange (p1, p2) then printf ""
-            elif portInRange p1 then printfn $"Port %i{p2} outside UNIX Range (0 - 65535)\n"
-            elif portInRange p2 then printfn $"Port %i{p1} outside UNIX Range (0 - 65535)\n"
-            else printfn $"Port %i{p1} and %i{p2} outside UNIX Range (0 - 65535)\n"
-        | Ports lst ->
+            elif portInRange p1 then printfn $"Around Line %i{l}: Port %i{p2} outside UNIX Range (0 - 65535)\n"
+            elif portInRange p2 then printfn $"Around Line %i{l}: Port %i{p1} outside UNIX Range (0 - 65535)\n"
+            else printfn $"Around Line %i{l}: Port %i{p1} and %i{p2} outside UNIX Range (0 - 65535)\n"
+        | l, Ports lst ->
             let out = portsNotInRange lst
             if List.length out = 0 then
                 printf ""
             else
-                printfn $"Port(s) %A{out} outside UNIX Range (0 - 65535)\n"
+                printfn $"Around Line %i{l}: Port(s) %A{out} outside UNIX Range (0 - 65535)\n"
 
     // Logs all port warnings to std out 
     let logAllPortWarnings (instrs: instr list) =
-        printfn "INVALID PORTS:"
-        (instrs
+        instrs
         |> List.choose instrToExpose  // Filter and convert to expose instances
-        |> List.map logPortWarning) |> ignore  // Log warnings
+        |> List.map logPortWarning |> ignore    // Log warnings
     
     let scanPorts instrs =
         let expCmds = getExposeInstrs instrs 
@@ -107,14 +109,15 @@ module private NetworkInternals =
 
 
     // Sequence of all netwarning objects 
-    let compareWithNetWarnings (directoryPath: string) =
-        Directory.GetFiles(directoryPath)
+    let loadNetWarningsIntoMemory  =
+        Directory.GetFiles(Config.MISC_RULE_DIR)
         |> Seq.collect extractNetWarnFromFile
     
     
     // Print the network warning
-    let printNetWarnings (err: MiscWarn) =
-        printfn $"%s{err.Code}:\nNetwork Warning: %s{err.Problem}\nInfo message: %s{err.Msg}\n"
+    let printNetWarnings (line: int) (err: MiscWarn) =
+        printfn $"Around Line: %i{line}\n%s{err.Code} Network Warning: %s{err.Problem}\n\nInfo message: %s{err.Msg}\n"
+        
 
 
 // =======================================================
@@ -122,20 +125,51 @@ module private NetworkInternals =
 // =======================================================
 open NetworkInternals
 open PortInternal
+
+// Matches a cmd_list with the known network warnings sequence
+let processNetworkWarning (warnings: MiscWarn seq) (line: int) (cmd_list: string list) =
+    let rec aux lst = 
+        match lst with
+        | [] -> ()
+        | x :: xs -> 
+            Seq.iter (fun w ->
+                match w with
+                | _ when x = w.Problem || x.Contains w.Problem ->
+                    if Config.VERBOSE then
+                        printNetWarnings line w
+                | _ ->  ()
+                
+            ) warnings
+            aux xs
+    aux cmd_list
+
 // Check if there are any --network=host run commands  
-let runNetworkCheck (lst: string list) =
-    lst |> Utils.getCmdByPrefix <| "--network=host"
-    
+let runNetworkScan (cmds: Cmd list) (networkWarnings:MiscWarn seq) =
+    cmds
+    |> List.iter (fun c ->
+        let line, base_cmds = c.LineNum, Cmd.getSplit c
+        
+        base_cmds
+        |> List.iter (fun lst ->
+            processNetworkWarning networkWarnings <| line <| lst
+        )
+    )
+        
+        
 
 // Loops through the provided network cmds to
 // looks for matches with known problems.
-let scan cmds instr =    
-    for c in cmds do
-        Seq.iter (fun x ->
-            match x with
-            | _ when c = x.Problem || c.Contains x.Problem ->
-                if Config.VERBOSE then (printNetWarnings x)
-            | _ -> printf ""
-        ) (compareWithNetWarnings Config.MISC_RULE_DIR)
-        
+let scan (cmds: Cmds) (instr: instr list)=
+    let filtered_cmds = Cmds.filterPrefixInCmds cmds "--network"
+       
+    let cmds_list = Cmd.removeEmptyEntries <| filtered_cmds
+    printfn $"FILTERED NETCMDS AFTER AUX: %A{cmds_list}\n"
+    
+    let networkWarnings = loadNetWarningsIntoMemory
+
+    runNetworkScan cmds_list networkWarnings
+    
+
     scanPorts <| instr
+        
+        

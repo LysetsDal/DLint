@@ -106,7 +106,6 @@ module private AptHelpers =
             | [] -> List.rev acc   
             | ("apt-get", lst) :: rest -> aux rest (("apt-get", lst) :: acc)
             | (_, _) :: rest -> aux rest acc
-        
         aux dict []
 
     
@@ -187,14 +186,14 @@ open Helpers
 let scan (cmds: Cmds) =
     
     let split_cmds = splitCommandsInternalLists cmds
-    if Config.DEBUG then printfn $"SPLITTED RUNCMDS: \n%A{split_cmds}\n"
+    // if Config.DEBUG then printfn $"SPLITTED RUNCMDS: \n%A{split_cmds}\n"
     
    
     let base_cmds = List.concat <| getBaseCommands split_cmds
-    if Config.DEBUG then printfn $"BASECMDS LST: \n%A{base_cmds}\n"
-
+    // if Config.DEBUG then printfn $"BASECMDS LST: \n%A{base_cmds}\n"
     
-    let binarieWarnings = loadBinaryWarningsIntoMemmory 
+    
+    let binaryWarnings = loadBinaryWarningsIntoMemmory 
     
     // cheks the base commands:
     for cmd in base_cmds do
@@ -203,14 +202,13 @@ let scan (cmds: Cmds) =
             | _ when cmd = shellWarn.Bin  -> 
                 if Config.VERBOSE then (printShellWarnings shellWarn)
             | _ -> printf ""
-        ) binarieWarnings
+        ) binaryWarnings
         
     // check apt command:
     printfn "APT-SCAN CHECK:\n"
-    Cmds.collectSplitRcmds split_cmds // 1. Concat each cmds 'split' list into one list
+    Cmds.collectSplitRcmds split_cmds  // 1. Concat each cmds 'split' list into one list
     |> List.zip base_cmds       // 2. Zip to list of (base_cmd, split_command_lst)
     |> getAptCommands           // 3. Extract apt-get commands
     |> scanApt                                    // 4. Run scan 
 
 
-        

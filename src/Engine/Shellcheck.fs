@@ -32,19 +32,16 @@ module private Helpers =
         
         
     // Filters each instructions associated list of splitted commands
-    let filterInstructionByPrefix (cmd: Cmd) (prefix: string) =
-        let filterList = Cmd.filterList prefix cmd
-        let transformedCmd = (Utils.reconstructToString filterList).Trim('[', ']')
-        Cmd.createCmd cmd.LineNum transformedCmd (Cmd.split transformedCmd)
+
 
                 
     // Filter a list of instructions by the specified prefix 
-    let filterInstructionsByPrefix (cmds: Cmds) (prefix: string) =
-        let cmd_lst = cmds.List
-        // printfn $"\n FILTER INSTR BEFORE :%A{cmd_lst}\n"
-        let res = List.map (fun cmd -> filterInstructionByPrefix cmd prefix) cmd_lst
-        // printfn $"\n FILTER INSTR AFTER %A{res}\n"
-        res
+    // let filterCmdsByPrefix (cmds: Cmds) (prefix: string) =
+    //     let cmd_lst = cmds.List
+    //     // printfn $"\n FILTER INSTR BEFORE :%A{cmd_lst}\n"
+    //     let res = List.map (fun cmd -> Cmd.filterCmdByPrefix cmd prefix) cmd_lst
+    //     // printfn $"\n FILTER INSTR AFTER %A{res}\n"
+    //     res
         
 module private InputOutput =
     // Create a temporary shell file (used to to invoke shellcheck on)
@@ -97,9 +94,6 @@ module private ShellChekInternals =
         output
         
         
-    //@TODO: SPLIT SHELLCHECK OUTPUT
-    // current output: ./tmp/cmd_0:2:29: note: Double quote to prevent globbing and word splitting. [SC2086]
-    // desired: Double quote to prevent globbing and word splitting. [SC2086] (lst: int * string list)
     let runShellCheck (cmds : Cmds) =
         let mutable count = 0
         
@@ -145,8 +139,12 @@ let flushTmpFiles  =
 // Perform the shcellChek on the given commands
 let scan (cmds: Cmds) =
     // the RUN --mount is a docker specific cmd. Hence we discardd it before shellcheck.
-    let filtered_cmds = filterInstructionsByPrefix cmds "--mount"
-    printfn $"(SCAN) FILTERED CMDS: %A{filtered_cmds}\n"
+    //@TODO: REFACTOR FLOW HERE:
+    let exlude_mount = Cmds.filterPrefixOutOfCmds cmds "--mount"
+    let tmp_cmds = Cmds.createCmds exlude_mount
+    let filtered_cmds = Cmds.filterPrefixOutOfCmds tmp_cmds "--network"
+    
+    // printfn $"(SCAN) FILTERED CMDS: %A{filtered_cmds}\n"
     
     let shebang_cmds =
         filtered_cmds
