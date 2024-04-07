@@ -31,18 +31,6 @@ module private Helpers =
         
         
         
-    // Filters each instructions associated list of splitted commands
-
-
-                
-    // Filter a list of instructions by the specified prefix 
-    // let filterCmdsByPrefix (cmds: Cmds) (prefix: string) =
-    //     let cmd_lst = cmds.List
-    //     // printfn $"\n FILTER INSTR BEFORE :%A{cmd_lst}\n"
-    //     let res = List.map (fun cmd -> Cmd.filterCmdByPrefix cmd prefix) cmd_lst
-    //     // printfn $"\n FILTER INSTR AFTER %A{res}\n"
-    //     res
-        
 module private InputOutput =
     // Create a temporary shell file (used to to invoke shellcheck on)
     let openOrCreateRWFile (filepath: string) (cmd: string) =

@@ -91,8 +91,8 @@ let run dfile =
     let rcmds = getRunCmds <| instrs
     
     // 1. Execute shellcheck
-    // printfn "(INTERP @ SHELLCHK) RCMDS:"
-    // printfn $"%A{Cmds.cmdsToString rcmds}\n"
+    printfn "(INTERP @ SHELLCHK) RCMDS:"
+    printfn $"%A{Cmds.cmdsToString rcmds}\n"
     Shellcheck.scan <| rcmds
     // Shellcheck.flushTmpFiles
     
@@ -104,17 +104,21 @@ let run dfile =
     printfn "(INTERP) NETWORK:\n"
     Network.scan rcmds instrs 
     
+    
+    // 4. Execute mount check
+    Mounts.scan rcmds instrs
 
     
     
     
     
-    // // 4. Execute mount check
-    // let vmnts = Mounts.getVolumeMounts <| instrs
-    // let rmnts = Mounts.getRunMounts <| rcmds
-    //
-    // if Config.VERBOSE then Utils.printStringList vmnts "VOLMOUNTS LIST"
-    // if Config.VERBOSE then Utils.printStringList rmnts "RUNMOUNTS LIST"
-    //
-    // Mounts.scan vmnts
-    // Mounts.scan rmnts
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    

@@ -78,8 +78,8 @@ module Cmd =
             List.filter (fun (str:string) -> (str.StartsWith prefix)) lst
             |> List.rev
             
-    let split(cmd: string) =
-        Some (Utils.split cmd)
+    let split(str: string) =
+        Some (Utils.split str)
         
     let removeEmptyEntries (cmds:Cmd list) =
        let rec aux (cmds:Cmd list) acc =
@@ -144,6 +144,14 @@ module Cmds =
         { List = lst
           Length = List.length lst }
 
+
+    let mergeCmds (c1:Cmds) (c2:Cmds) =
+        let merged = c1.List @ c2.List
+        { List = merged
+          Length = List.length merged
+        }
+        
+    
     let cmdsToString cmds =
         let mutable result = ""
         let cmdsList = cmds.List

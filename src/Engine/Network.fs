@@ -143,9 +143,10 @@ let processNetworkWarning (warnings: MiscWarn seq) (line: int) (cmd_list: string
             aux xs
     aux cmd_list
 
+
 // Check if there are any --network=host run commands  
-let runNetworkScan (cmds: Cmd list) (networkWarnings:MiscWarn seq) =
-    cmds
+let runNetworkScan (cmd_list: Cmd list) (networkWarnings:MiscWarn seq) =
+    cmd_list
     |> List.iter (fun c ->
         let line, base_cmds = c.LineNum, Cmd.getSplit c
         
@@ -154,8 +155,7 @@ let runNetworkScan (cmds: Cmd list) (networkWarnings:MiscWarn seq) =
             processNetworkWarning networkWarnings <| line <| lst
         )
     )
-        
-        
+            
 
 // Loops through the provided network cmds to
 // looks for matches with known problems.
@@ -165,11 +165,8 @@ let scan (cmds: Cmds) (instr: instr list)=
     let cmds_list = Cmd.removeEmptyEntries <| filtered_cmds
     printfn $"FILTERED NETCMDS AFTER AUX: %A{cmds_list}\n"
     
-    let networkWarnings = loadNetWarningsIntoMemory
-
-    runNetworkScan cmds_list networkWarnings
+    loadNetWarningsIntoMemory
+    |> runNetworkScan cmds_list 
     
-
-    scanPorts <| instr
-        
-        
+    instr
+    |> scanPorts 
