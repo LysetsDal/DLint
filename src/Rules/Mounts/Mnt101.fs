@@ -3,8 +3,8 @@ module Rules.Mounts.Mnt101
 open Rules.MountWarn
 
 let mnt101 : SensitiveMount = {
-    Code = "Warning 101"
+    ErrorCode = "MNTW101"
     MountPoint = "/dev/disk"
-    Msg = "If /dev is visible privileges might be too high. Risk exposing host
+    ErrorMsg = "If /dev is visible privileges might be too high. Risk exposing host
 system."
 }

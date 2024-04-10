@@ -4,13 +4,10 @@
 %{
 open Absyn
 
-let extr tup =
+let extract tup =
     (fst tup, snd tup)
 
-let extrf tup p = 
-    (p (fst tup), snd tup)
-
-let extrl tup p = 
+let extract_last tup p = 
     (fst tup, p(snd tup))
 
 %}
@@ -89,35 +86,35 @@ Instr:
  * ENV: parsed as a key-value pair of strings
  */
 EnvVar:
-    ENVVAR                        { extrl $1 (fun x -> EnvVar x)  }
+    ENVVAR                        { extract_last $1 (fun x -> EnvVar x)  }
 ;
 
 /*
  * Copy Path: parsed as a tuple (string * string)
  */
 CPath:
-    CPATH                         { extrl $1 (fun x -> CPath x) }  
+    CPATH                         { extract_last $1 (fun x -> CPath x) }  
 ;
 
 /*
  * Add Path: parsed as a tuple (string * string)
  */
 AddPath:
-    APATH                         { extrl $1 (fun x -> APath x) }  
+    APATH                         { extract_last $1 (fun x -> APath x) }  
 ;
 
 /*
  * Parsing shell commands as a string
  */
 Runcmd:
-    RCMD                          { extrl $1 (fun x -> ShellCmd x) }
+    RCMD                          { extract_last $1 (fun x -> ShellCmd x) }
 ;
 
 /*
  * Parsing the CMD command (string)
  */
 Entrycmd:
-    ECMD                          { extrl $1 (fun x -> ShellCmd x) }
+    ECMD                          { extract_last $1 (fun x -> ShellCmd x) }
 ;
 
 
@@ -125,14 +122,14 @@ Entrycmd:
  * Volume Mount point: parsed as a string 
  */
 MntPt:
-    MNTPT                         { extrl $1 (fun x -> Mnt_pt x) }  
+    MNTPT                         { extract_last $1 (fun x -> Mnt_pt x) }  
 ;
 
 /*
  * Workdir Path: parsed as a string 
  */
 WPath:
-    WPATH                         { extrl $1 (fun x -> WPath x) }  
+    WPATH                         { extract_last $1 (fun x -> WPath x) }  
 ;
 
 
@@ -154,12 +151,13 @@ Ports:
 ;
 
 /*
- * User instr (Name || GUID || both) inside the container  
+ * User instr (Name || GUID) inside the container  
  */
 User:
     NAME                          { (Some (snd $1), None)    }
   | INT                           { (None, Some $1)          }
   | NAME INT                      { (Some (snd $1), Some $2) }
+  | NAME COLON INT                { (Some (snd $1), Some $3) }
 ;
 
 /* 

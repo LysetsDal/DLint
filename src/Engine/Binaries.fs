@@ -5,9 +5,10 @@
 module Linterd.Engine.Binaries
 
 open System.Text.RegularExpressions
+open Rules.Misc.AptWarn
 open Rules.ShellWarn
-open System.IO
 open Infrastructure
+open System.IO
 
 module private Helpers =
     
@@ -26,46 +27,59 @@ module private Helpers =
    
     
     // Split a cmd and update the cmd's internal 'split' list        
-    let splitCmd (cmd: Cmd) =
-        match Cmd.getList cmd with
+    let splitCmd (cmd: RunCommand) =
+        match RunCommand.getAsList cmd with
         | [] -> failwith "No cmds to split" 
         | x ->
             let split = splitCommands x
-            Cmd.setSplit cmd split
+            RunCommand.setAsSplitCmd cmd split
       
         
     // Splits a list of commands and updates the internal field 'split' of each cmd 
-    let splitCommandsInternalLists (cmds: Cmds) : Cmd list =
+    let splitCommandsInternalLists (cmds: RunCommandList) : RunCommand list =
         cmds.List |> List.map splitCmd
     
     
+    // Update line num according to multiline run cmds
+    let updateLineNum (lst: (int * string) list) =
+        let rec aux lst acc idx =
+            match lst with
+            | [] ->
+                List.rev acc
+            | (line, cmd_name) :: rest ->
+                let new_line = line + idx
+                aux rest ((new_line, cmd_name) :: acc) (idx+1)
+        aux lst [] 0
+    
+    
     // Extracts base commands from cmd list
-    let getBaseCommands (rcmds: Cmd list) = 
-        rcmds |> List.fold (fun acc (x:Cmd) -> (Cmd.getBaseCommand x)::acc) []
+    let getBaseCommands (rcmds: RunCommand list) = 
+        rcmds |> List.fold (fun acc (x:RunCommand) -> (RunCommand.getBaseCommand x)::acc) []
         |> List.rev
+        |> List.collect updateLineNum
 
 
 module private BinariesInternals =
     // This function Uses regexes to parse the Bash rules.
     // Returns a BashWarn(struct) list
-    let extractShellWarningsFromFile (filePath: string) =
-        let fileContents = File.ReadAllText(filePath)
-        let binRegex = Regex(@"Bin\s*=\s*""([^""]+)""")
-        let binariesMatches = binRegex.Matches(fileContents) |> Seq.map (_.Groups[1].Value)
-        let codeRegex = Regex(@"Code\s*=\s*""([^""]+)""")
-        let msgRegex = Regex(@"Msg\s*=\s*""([^""]+)""")
+    let extractShellWarningsFromFile (file_path: string) =
+        let file_contents = File.ReadAllText(file_path)
+        let bin_regex = Regex(@"Binary\s*=\s*""([^""]+)""")
+        let matches = bin_regex.Matches(file_contents) |> Seq.map (_.Groups[1].Value)
+        let code_regex = Regex(@"ErrorCode\s*=\s*""([^""]+)""")
+        let msg_regex = Regex(@"ErrorMsg\s*=\s*""([^""]+)""")
         
         let code = 
-            match codeRegex.Match(fileContents).Groups[1].Value with
+            match code_regex.Match(file_contents).Groups[1].Value with
             | code when not (Utils.isNullOrWhiteSpace code) -> code
             | _ -> ""
         
         let msg =
-            match msgRegex.Match(fileContents).Groups[1].Value with
+            match msg_regex.Match(file_contents).Groups[1].Value with
             | msg when not (Utils.isNullOrWhiteSpace msg) -> msg
             | _ -> ""
 
-        [ for bin in binariesMatches -> { Code = code; Bin = bin; Msg = msg } ]
+        [ for bin in matches -> { ErrorCode = code; Binary = bin; ErrorMsg = msg } ]
 
 
     // Sequence of all binWarnings  
@@ -75,8 +89,8 @@ module private BinariesInternals =
    
      
     // Print the binary warnings to stdout
-    let printShellWarnings (bin: binWarn) =
-        printfn $"%s{bin.Code}:\nProblematic Binary: %s{bin.Bin}\nInfo message: %s{bin.Msg}\n"
+    let printShellWarnings (bin: binWarn) line =
+        printfn $"Around line: %d{line} \n%s{bin.ErrorCode}:\nProblematic Binary: %s{bin.Binary}\nInfo message: %s{bin.ErrorMsg}\n"
 
 
 module private AptHelpers =
@@ -100,11 +114,11 @@ module private AptHelpers =
     
     // Extracts commands with apt-get as base cmd from the dict .
     // List is in order of occurance in the dockerfile.
-    let getAptCommands (dict: (string * string list) list) =
+    let getAptCommands (dict: ((int * string) * string list) list) =
         let rec aux lst acc =
             match lst with
             | [] -> List.rev acc   
-            | ("apt-get", lst) :: rest -> aux rest (("apt-get", lst) :: acc)
+            | ((line, "apt-get"), lst) :: rest -> aux rest (((line, "apt-get"), lst) :: acc)
             | (_, _) :: rest -> aux rest acc
         aux dict []
 
@@ -121,57 +135,58 @@ module private AptHelpers =
         | _ -> false
     
     // The print function for apt-get install.
-    let printAptWarnings hasY hasNoInstall cmd =
-    
-        let aptWarn =
-            if hasY then
+    let printAptWarnings hasY hasNoInstall cmd line =
+        let apt_warn =
+            if hasNoInstall then
+                let warn = shb201
                 {
-                    Code = "SHB115"
+                    ErrorCode = warn.ErrorCode
                     Problem = $"%s{unSplitRunCommands cmd}"
-                    Msg = "Missing: --no-install-recommends. Use this flag to avoid unnecessary packages being installed on your image."
+                    ErrorMsg = warn.ErrorMsg
                 }
-            elif hasNoInstall then
+            elif hasY then
+                let warn = shb202
                 {
-                    Code = "SHB114"
+                    ErrorCode = warn.ErrorCode
                     Problem = $"%s{unSplitRunCommands cmd}"
-                    Msg = "Missing: -y. Use this flag to avoid the build requiring the user to input 'y', which breaks the image build."
+                    ErrorMsg = warn.ErrorMsg
                 }
             else
+                let warn = shb203
                 {
-                    Code = "SHB116"
+                    ErrorCode = warn.ErrorCode
                     Problem = $"%s{unSplitRunCommands cmd}"
-                    Msg = "Missing: --no-install-recommends && -y. Use these flags to avoid SHB114 and SHB115."
+                    ErrorMsg = warn.ErrorMsg
                 }
     
-        printfn $"%s{aptWarn.Code}:\nProblem: %s{aptWarn.Problem}\nInfo message: %s{aptWarn.Msg}\n"
+        printfn $"Around line: %d{line} \n%s{apt_warn.ErrorCode}:\nProblem: %s{apt_warn.Problem}\nInfo message: %s{apt_warn.ErrorMsg}\n"
     
         
     
     // Checks the format of apt-get install and log warnings
-    let checkAptOk (entry: string * string list) = 
+    let checkAptOk (entry: (int * string) * string list) = 
         match entry with
-        | _, lst ->
-            let isAptUpdate = isAptUpdate lst
-            let aptInstallOk = checkAptInstall lst
+        | (line, _), lst ->
+            let is_update = isAptUpdate lst
+            let is_install = checkAptInstall lst
             
-            match (isAptUpdate, aptInstallOk) with
-            | true, _ | _, true -> printfn "apt-get: ok\n"  
+            match (is_update, is_install) with
+            | true, _ | _, true -> () 
             | false, _ ->
-                let hasY = aptHasDashY lst
-                let hasNoInstall = aptHasNoInstallRec lst
-                printAptWarnings hasY hasNoInstall lst
+                let has_y = aptHasDashY lst
+                let has_no_install = aptHasNoInstallRec lst
+                printAptWarnings has_y has_no_install lst line
         
         
     // Scan through the apt-get commands 
     let scanApt dict =
         let mutable count = 0
-        let rec aux (dict: (string * string list) list) count =
+        let rec aux (dict: ((int * string) * string list) list) count =
             
             match dict with
             | [] -> ()
-            | x :: rest ->
-                printf $"%d{count} "
-                checkAptOk x
+            | (cmd, lst) :: rest ->
+                checkAptOk (cmd, lst)
                 aux rest (count + 1)
         aux dict count
 
@@ -183,32 +198,32 @@ open BinariesInternals
 open AptHelpers
 open Helpers
 
-let scan (cmds: Cmds) =
+let scan (cmds: RunCommandList) =
     
     let split_cmds = splitCommandsInternalLists cmds
-    // if Config.DEBUG then printfn $"SPLITTED RUNCMDS: \n%A{split_cmds}\n"
+    if Config.DEBUG then printfn $"SPLITTED RUNCMDS: \n%A{split_cmds}\n"
     
-   
-    let base_cmds = List.concat <| getBaseCommands split_cmds
-    // if Config.DEBUG then printfn $"BASECMDS LST: \n%A{base_cmds}\n"
+    let base_cmds =
+        split_cmds
+        |> getBaseCommands
+
     
+    if Config.DEBUG then printfn $"BASECMDS LST: \n%A{base_cmds}\n"
     
     let binaryWarnings = loadBinaryWarningsIntoMemmory 
     
     // cheks the base commands:
-    for cmd in base_cmds do
+    for line, cmd in base_cmds do
         Seq.iter (fun shellWarn ->
             match shellWarn with
-            | _ when cmd = shellWarn.Bin  -> 
-                if Config.VERBOSE then (printShellWarnings shellWarn)
-            | _ -> printf ""
+            | _ when cmd = shellWarn.Binary  -> 
+                printShellWarnings shellWarn line
+            | _ -> ()
         ) binaryWarnings
         
     // check apt command:
-    printfn "APT-SCAN CHECK:\n"
-    Cmds.collectSplitRcmds split_cmds  // 1. Concat each cmds 'split' list into one list
-    |> List.zip base_cmds       // 2. Zip to list of (base_cmd, split_command_lst)
-    |> getAptCommands           // 3. Extract apt-get commands
-    |> scanApt                                    // 4. Run scan 
-
-
+    if Config.DEBUG then Utils.printHeaderMsg "APT-SCAN CHECK:"
+    RunCommandList.collectSplitRuncommandList split_cmds  // 1. Concat each cmds 'split' list into one list
+    |> List.zip base_cmds                     // 2. Zip to list of (base_cmd, split_command_lst)
+    |> getAptCommands                         // 3. Extract apt-get commands
+    |> scanApt                                                      // 4. Run scan 

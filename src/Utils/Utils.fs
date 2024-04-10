@@ -34,6 +34,9 @@ let trimWhitespace str =
 let reconstructToString (lst: string list) =
     (String.concat " " lst).Trim()
 
+let reconstructToShellCmd (lst: string list) =
+    (String.concat " && " lst).Trim()
+    
 
 // Used to split a string (envVar) at the '=' (equal)
 open System.Text.RegularExpressions
@@ -58,7 +61,9 @@ let splitCmdAt (delim: string[]) (cmd: string) =
     List.ofArray (cmd.Split(delim, System.StringSplitOptions.RemoveEmptyEntries))
 
 
-// Split with standard shell delimiters
+// Split a string with standard shell delimiters
+// Used to split a multiline or '&& separate'
+// shellcommand into single shellcommands
 let split (cmd: string)  =
     let delims = [|"&&"; ";"; "|"; "<<"; ">>"|]
     splitCmdAt delims cmd
@@ -96,7 +101,6 @@ let isNullOrWhiteSpace (str: string) =
 
 
 
-
 // Gat a command by a prefix (returns a list of mathces)
 let getCmdByPrefix (lst: string list) (prefix: string) =    
     let rec aux (lst: string list) acc =
@@ -108,9 +112,15 @@ let getCmdByPrefix (lst: string list) (prefix: string) =
             | _ ->  aux rest acc
     aux (List.rev lst) []
     
-    
-let getLineCmdByPrefix (lst: int * string list) (prefix: string) =    
-    let idx, xs = lst
-    (idx, getCmdByPrefix xs prefix)
 
-              
+// Debugging header print function      
+let printHeaderMsg msg =
+    let msgLength = String.length msg
+    let paddingLength = (70 - msgLength) / 2  // Assuming the total width is 70 characters
+    
+    let paddedMsg = 
+        sprintf "%*s%s%*s" paddingLength " " msg paddingLength " "
+    
+    printfn "======================================================================"
+    printfn "%s" paddedMsg
+    printfn "======================================================================"

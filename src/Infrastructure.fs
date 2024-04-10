@@ -1,181 +1,179 @@
 module Infrastructure
 
-type Cmd = {
+type RunCommand = {
     LineNum: int
-    Raw: string
-    List: string list option
-    mutable Split: string list list option
+    AsString: string
+    AsList: string list option
+    mutable AsSplitCmd: string list list option
 }
 
-module Cmd = 
+module RunCommand =
+    // Constructor
     let createCmd line (raw:string) lst =
         { LineNum = line
-          Raw = raw.Trim(' ')
-          List = Some (Utils.split raw)
-          Split = 
+          AsString = raw.Trim(' ')
+          AsList = Some (Utils.split raw)
+          AsSplitCmd = 
               match lst with
               | Some lst -> Some (Utils.splitList lst)
               | None -> None }
     
-    let createCmdWithLst line (raw:string) (lst: string list option) =
+    
+    // Constructor (takes an additonal list)
+    let createCmdWithList line (raw:string) (lst: string list option) =
         { LineNum = line
-          Raw = raw.Trim(' ')
-          List = lst
-          Split = 
+          AsString = raw.Trim(' ')
+          AsList = lst
+          AsSplitCmd = 
               match lst with
               | Some lst -> Some (Utils.splitList lst)
               | None -> None } 
     
     
-    let getRaw (cmd: Cmd) =
-        cmd.Raw.ToString()
-
-    let setRaw(cmd: Cmd) (str: string) =
-        {
-            LineNum = cmd.LineNum
-            Raw = str.Trim(' ')
-            List = cmd.List
-            Split = cmd.Split 
-        }
+    // Getters and Setters
+    let getAsString (cmd: RunCommand) =
+        cmd.AsString.ToString()
     
-    let getList cmd =
-        match cmd.List with
+    
+    let getAsList cmd =
+        match cmd.AsList with
         | None -> failwith "None option in List"
         | Some cmd -> cmd
 
-    let setList (cmd:Cmd) list =
-        {
-            LineNum = cmd.LineNum
-            Raw = cmd.Raw
-            List = list
-            Split = cmd.Split
-        }
     
-    let getSplit cmd =
-        match cmd.Split with
+    let getAsSplitCmd cmd =
+        match cmd.AsSplitCmd with
         | None -> failwith "None option in List"
         | Some cmd -> cmd
 
-    let setSplit (cmd:Cmd) split =
+    
+    let setAsSplitCmd (cmd:RunCommand) split =
         {
             LineNum = cmd.LineNum
-            Raw = cmd.Raw
-            List = cmd.List
-            Split = split
+            AsString = cmd.AsString
+            AsList = cmd.AsList
+            AsSplitCmd = split
         }
     
-    let filterList (prefix:string) cmd =
-        match cmd.List with
+    let split(str: string) =
+        Some (Utils.split str)
+        
+        
+    // Used to remove empty entries from the list in Mounts & Network
+    let removeEmptyEntries (cmds:RunCommand list) =
+       let rec aux (cmds:RunCommand list) acc =
+           match cmds with
+           | [] -> List.rev acc
+           | x :: rest ->
+               match x.AsString with
+               | "" -> aux rest acc
+               | _ -> aux rest (x:: acc)
+       aux cmds []
+    
+    
+    // Filter OUT strings that start with the prefix 
+    let excludePrefixedItems (prefix:string) cmd =
+        match cmd.AsList with
         | None -> []
         | Some lst -> 
             List.filter (fun (str:string) -> not (str.StartsWith prefix)) lst
             |> List.rev
-    
-    let filterListNotStart (prefix:string) cmd =
-        match cmd.List with
+
+    // Filter IN strings that start with the prefix
+    let includePrefixedItems (prefix:string) cmd =
+        match cmd.AsList with
         | None -> []
         | Some lst -> 
             List.filter (fun (str:string) -> (str.StartsWith prefix)) lst
             |> List.rev
-            
-    let split(str: string) =
-        Some (Utils.split str)
+             
+               
+    // Filter OUT strings that start with the prefix, return as new command
+    let exlcudePrefixedCmd (prefix: string) (cmd: RunCommand) =
+        let filter_list = excludePrefixedItems prefix cmd
+        let transformed_cmd = (Utils.reconstructToShellCmd filter_list).Trim('[', ']') 
+        createCmd cmd.LineNum transformed_cmd (split transformed_cmd)
         
-    let removeEmptyEntries (cmds:Cmd list) =
-       let rec aux (cmds:Cmd list) acc =
-           match cmds with
-           | [] -> List.rev acc
-           | x :: xs ->
-               match x.Raw with
-               | "" -> aux xs acc
-               | _ -> aux xs (x:: acc)
-       aux cmds []
-       
-       
-    let filterCmdByPrefix (cmd: Cmd) (prefix: string) =
-        let filterList = filterList prefix cmd
-        let transformedCmd = (Utils.reconstructToString filterList).Trim('[', ']')
-        //@TODO: Remove debug
-        // printfn $"TRANSFORMED CMD: %s{transformedCmd}"
-        createCmd cmd.LineNum transformedCmd (split transformedCmd)
-        
-    let filterCmdByNotPrefix (cmd: Cmd) (prefix: string) =
-        let filterList = filterListNotStart prefix cmd
-        let transformedCmd = (Utils.reconstructToString filterList).Trim('[', ']')
-        match transformedCmd with
+    
+    // Filter IN strings that start with the prefix, return as new command
+    let includePrefixedCmd  (prefix: string) (cmd: RunCommand) =
+        let filter_list = includePrefixedItems prefix cmd
+        let transformed_cmd = (Utils.reconstructToString filter_list).Trim('[', ']')
+        match transformed_cmd with
         | "" -> createCmd cmd.LineNum "" None 
-        | _ -> createCmd cmd.LineNum transformedCmd (split transformedCmd)
+        | _ -> createCmd cmd.LineNum transformed_cmd (split transformed_cmd)
 
 
-        // printfn $"TRANSFORMED CMD: %s{transformedCmd}"
-        // createCmd cmd.LineNum transformedCmd (split transformedCmd)
         
     // Used to extract the base commands from the splitted commands list    
-    let getBaseCommand (cmd: Cmd) =
-        let split_cmd = getSplit cmd
-        
+    let getBaseCommand (cmd: RunCommand) =
+        let split_cmd = getAsSplitCmd cmd
+        let line = cmd.LineNum
         let rec aux (lst:string list list) acc =
             match lst with
             | [] -> List.rev acc
             | x :: xs ->
                 let base_cmd = List.head x
-                aux xs (base_cmd :: acc)
+                aux xs ((line, base_cmd) :: acc)
         aux split_cmd []
     
     
+    let runCommandToString cmd =
+        sprintf $"\nLine: %i{cmd.LineNum}\nRaw: %s{cmd.AsString}\nList: %A{cmd.AsList}\nSplit: %A{cmd.AsSplitCmd}\n"
     
-    
-    let cmdToString cmd =
-        sprintf $"\nLine: %i{cmd.LineNum}\nRaw: %s{cmd.Raw}\nList: %A{cmd.List}\nSplit: %A{cmd.Split}\n"
     
     let printList (lst: string list) =
         printfn "[%s]" (String.concat "; " (List.map string lst))
         
         
-        
 
-type Cmds = {
-    List: Cmd list
+type RunCommandList = {
+    List: RunCommand list
     Length: int
 }
 
-module Cmds =
-    let createCmds lst =
+module RunCommandList =
+    let createRunCommandList lst =
         { List = lst
           Length = List.length lst }
 
-
-    let mergeCmds (c1:Cmds) (c2:Cmds) =
+    
+    let mergeTwoRunCommandLists (c1:RunCommandList) (c2:RunCommandList) =
         let merged = c1.List @ c2.List
         { List = merged
           Length = List.length merged
-        }
+        }      
         
-    
-    let cmdsToString cmds =
-        let mutable result = ""
-        let cmdsList = cmds.List
-        for cmd in cmdsList do
-            result <- result + Cmd.cmdToString cmd
-        result
-    
-    let collectSplitRcmds (rcmds: Cmd list) =
-        let rec aux (lst: Cmd list) acc =
+        
+    // Constructs a new collection of all RunCommandLists' AsSplitCmd fields
+    let collectSplitRuncommandList (rcmds: RunCommand list) =
+        let rec aux (lst: RunCommand list) acc =
             match lst with
             | [] -> acc
             | x :: xs ->
-                let split_list = Cmd.getSplit x
+                let split_list = RunCommand.getAsSplitCmd x
                 aux xs (acc @ split_list)
         aux rcmds []
     
-    // Filter a list by a prefix (returns where it holds)
-    let filterPrefixOutOfCmds (cmds: Cmds) (prefix: string) =
+    
+    // Filter away the commands that start with the prefix
+    let exlcudePrefixedCmds (prefix: string) (cmds: RunCommandList) =
         let cmd_list = cmds.List
-        List.map (fun cmd -> Cmd.filterCmdByPrefix cmd prefix) cmd_list
+        List.map (RunCommand.exlcudePrefixedCmd prefix) cmd_list
 
-    // Filter a list by a prefix (returns where it dosn't hold)
-    let filterPrefixInCmds (cmds: Cmds) (prefix: string) =
+    
+    // Filter a list by a prefix (returns a new list of where it holds)
+    let includePrefixedCmds (prefix: string) (cmds: RunCommandList) =
         let cmd_lst = cmds.List
-        let res = List.map (fun cmd -> Cmd.filterCmdByNotPrefix cmd prefix) cmd_lst
+        let res = List.map (RunCommand.includePrefixedCmd prefix) cmd_lst
         res
-
+    
+    
+    // Used for debug prints
+    let runCommandListToString cmds =
+        let mutable result = ""
+        let cmds_list = cmds.List
+        for cmd in cmds_list do
+            result <- result + RunCommand.runCommandToString cmd
+        result
+        

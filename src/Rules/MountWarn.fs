@@ -5,7 +5,7 @@ open System.Runtime.CompilerServices
 [<IsReadOnly; Struct>]
 type SensitiveMount =
     {
-      Code: string
+      ErrorCode: string
       MountPoint: string
-      Msg: string
+      ErrorMsg: string
     }

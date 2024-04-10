@@ -13,20 +13,33 @@ open Absyn
 module private Helpers =
     
     // A predicate filter for Volume instructions
-    let isVolume (ins: instr) =
+    let isVolume (ins: instruction) =
         match ins with
         | Volume _ -> true
         | _ -> false
 
     
     // Unpack a Volume to an tuple (pre-cmd transformation)
-    let volumeToTuple (ins: instr) =
+    let volumeToTuple (ins: instruction) =
         match ins with
-        | Volume (line, Mnt_pt mp) -> Cmd.createCmd line mp (Cmd.split mp)
+        | Volume (line, Mnt_pt mp) -> RunCommand.createCmd line mp (RunCommand.split mp)
         | _ -> failwith "Not a volume"
 
             
+    // Exctracts and transforms volume instructions to a commands type
+    let rec getVolumeMounts (lst: instruction list) =
+        lst
+        |> List.filter isVolume
+        |> List.map volumeToTuple
+        |> RunCommandList.createRunCommandList
 
+    
+    // Extracts --mount=type run commands
+    let getRunMounts (mounts: RunCommandList) =
+        mounts
+        |> RunCommandList.includePrefixedCmds "--mount"  
+        |> RunCommandList.createRunCommandList
+        
 
 module private MountInternals =
     // This function Uses regexes to parse the mount rules from their files.
@@ -35,8 +48,8 @@ module private MountInternals =
         let fileContents = File.ReadAllText(filePath)
         let mountRegex = Regex(@"MountPoint\s*=\s*""([^""]+)""")
         let mountMatches = mountRegex.Matches(fileContents) |> Seq.map (_.Groups[1].Value)
-        let codeRegex = Regex(@"Code\s*=\s*""([^""]+)""")
-        let msgRegex = Regex(@"Msg\s*=\s*""([^""]+)""")
+        let codeRegex = Regex(@"ErrorCode\s*=\s*""([^""]+)""")
+        let msgRegex = Regex(@"ErrorMsg\s*=\s*""([^""]+)""")
         
 
         let code = 
@@ -49,18 +62,49 @@ module private MountInternals =
             | msg when not (Utils.isNullOrWhiteSpace msg) -> msg
             | _ -> ""
 
-        [ for mount in mountMatches -> { Code = code; MountPoint = mount; Msg = msg } ]
+        [ for mount in mountMatches -> { ErrorCode = code; MountPoint = mount; ErrorMsg = msg } ]
 
 
     // Sequence of all SensitiveMount objects 
     let loadMountPointsIntoMemory =
-        Directory.GetFiles(Config.MNT_RULE_DIR)
+        Directory.GetFiles(Config.MOUNT_RULE_DIR)
         |> Seq.collect extractSensitiveMountsFromFile
    
-     
+    
     // Print the sensitive mounts
     let printMountWarnings (line: int) (mnt: SensitiveMount) =
-        printfn $"Around Line: %i{line}\n%s{mnt.Code}:\nSensetive Mount:%s{mnt.MountPoint}\nInfo message: %s{mnt.Msg}\n"
+        printfn $"Around Line: %i{line}\n%s{mnt.ErrorCode}:\nSensetive Mount:%s{mnt.MountPoint}\nInfo message: %s{mnt.ErrorMsg}\n"
+
+    
+    // Control logic for processing mountpoint warnings.
+    let processMountWarning (warnings: SensitiveMount seq) (line: int) (mnt_list: string list) =
+        let rec aux lst = 
+            match lst with
+            | [] -> ()
+            | x :: xs -> 
+                Seq.iter (fun w ->
+                    match w with
+                    | _ when x = w.MountPoint || x.Contains w.MountPoint ->
+                        if Config.VERBOSE then
+                            if Config.VERBOSE then (printMountWarnings line w)
+                    | _ ->  ()
+                ) warnings
+                aux xs
+        aux mnt_list
+        
+        
+    // Execute the scan
+    // Needs a list of commands and sensitive mounts
+    let runMountScan (cmds_list: RunCommand list) (warnings: SensitiveMount seq) =
+        cmds_list
+        |> List.iter (fun c ->
+            let line, mounts = c.LineNum, RunCommand.getAsSplitCmd c
+            
+            mounts
+            |> List.iter (fun lst ->
+                processMountWarning warnings <| line <| lst
+            )
+        )     
 
 
 // =======================================================
@@ -69,52 +113,10 @@ module private MountInternals =
 open MountInternals
 open Helpers
 
-// Exctracts and transforms volume instructions to a commands type
-let rec getVolumeMounts (lst: instr list) =
-    lst
-    |> List.filter isVolume
-    |> List.map volumeToTuple
-    |> Cmds.createCmds
-
-// Extracts --mount=type run commands
-let getRunMounts (mounts: Cmds) =
-    Cmds.filterPrefixInCmds mounts "--mount"
-    |> Cmds.createCmds
-
-
-// Control logic for processing mountpoint warnings.
-let processMountWarning (warnings: SensitiveMount seq) (line: int) (mnt_list: string list) =
-    let rec aux lst = 
-        match lst with
-        | [] -> ()
-        | x :: xs -> 
-            Seq.iter (fun w ->
-                match w with
-                | _ when x = w.MountPoint || x.Contains w.MountPoint ->
-                    if Config.VERBOSE then
-                        if Config.VERBOSE then (printMountWarnings line w)
-                | _ ->  ()
-            ) warnings
-            aux xs
-    aux mnt_list
-
-
-// Execute the scan. Needs a list of commands and sensitive mounts
-let runMountScan (cmds_list: Cmd list) (warnings: SensitiveMount seq) =
-    cmds_list
-    |> List.iter (fun c ->
-        let line, mounts = c.LineNum, Cmd.getSplit c
-        
-        mounts
-        |> List.iter (fun lst ->
-            processMountWarning warnings <| line <| lst
-        )
-    )
-
 
 // Loops through the provided volume mounts and --mount=types to
 // looks for matches with known sensitive mounts.
-let scan (mounts:Cmds) (instructions: instr list) =
+let scan (mounts:RunCommandList) (instructions: instruction list) =
     let volume_mounts = getVolumeMounts instructions
     if Config.DEBUG then printfn $"VOLUME mounts: \n%A{volume_mounts}\n"
     
@@ -122,10 +124,10 @@ let scan (mounts:Cmds) (instructions: instr list) =
     if Config.DEBUG then printfn $"RUN mounts: \n%A{run_mounts}\n"
 
     // put the vloume and --mount mounts into one object
-    let all_Mounts = Cmds.mergeCmds run_mounts volume_mounts
+    let all_Mounts = RunCommandList.mergeTwoRunCommandLists run_mounts volume_mounts
     
     // Remove empty entries from the list of all mounts
-    let cmds_list = Cmd.removeEmptyEntries <| all_Mounts.List
+    let cmds_list = RunCommand.removeEmptyEntries <| all_Mounts.List
     
     loadMountPointsIntoMemory 
     |> runMountScan cmds_list

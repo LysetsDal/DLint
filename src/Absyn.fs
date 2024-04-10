@@ -5,18 +5,18 @@
 module Absyn
 
 // Supported Dockerfile instructions
-type instr =
-    | BaseImage of int * string * tag  (* Build Image <name>:<tag>     *)
-    | Workdir of int * wpath           (* Working directory <path>     *)
+type instruction =
+    | BaseImage of int * string * tag            (* Build Image <name>:<tag>     *)
+    | Workdir of int * wpath                     (* Working directory <path>     *)
     | Copy of int * cpath
-    | Var of int * string              (* Type used to discard non-docker instructions *)
-    | Volume of int * mnt_pt           (* Volume mounts <mount_point>  *)
+    | Var of int * string                        (* Discard invalid docker cmds  *)
+    | Volume of int * mnt_pt                     (* Volume mounts <mount_point>  *)
     | Expose of int * expose  
     | User of int * (string option * int option) (* Name, GUID or both    *)
-    | EntryCmd of int * shellcmd            (* Entry shell cmd of container *)
+    | EntryCmd of int * shellcmd                 (* Entry shell cmd of container *)
     | Run of int * shellcmd
     | Env of int * env
-    | Add of int * apath               (* Add files from path, to path *)
+    | Add of int * apath                         (* Add files from path, to path *)
 
 // A WORKDIR path (single)
 and wpath = 
@@ -53,4 +53,4 @@ and tag =
     | TagV of int * string
 
 // The Abstract representation of a dockerfile
-and dockerfile = DFile of instr list
+and dockerfile = DFile of instruction list

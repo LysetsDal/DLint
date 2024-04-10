@@ -5,7 +5,7 @@ open System.Runtime.CompilerServices
 [<IsReadOnly; Struct>]
 type MiscWarn =
     {
-      Code: string
+      ErrorCode: string
       Problem: string
-      Msg: string
+      ErrorMsg: string
     }

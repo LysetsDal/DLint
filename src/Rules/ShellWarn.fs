@@ -6,15 +6,15 @@ open System.Runtime.CompilerServices
 [<IsReadOnly; Struct>]
 type binWarn =
     {
-        Code: string
-        Bin: string
-        Msg: string
+        ErrorCode: string
+        Binary: string
+        ErrorMsg: string
     }
 
 [<IsReadOnly; Struct>]
 type aptWarn =
     {
-        Code: string
+        ErrorCode: string
         Problem: string
-        Msg: string
+        ErrorMsg: string
     }

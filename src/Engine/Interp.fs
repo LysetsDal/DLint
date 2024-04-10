@@ -4,24 +4,20 @@
 
 module Linterd.Engine.Interp
 
-open Absyn             
 open Infrastructure
+open Absyn             
 
 // The store is an in-memory representation of the dockerfile.
 // It is used to perform the linters checks on.
-type store = (int * instr) list
+type store = (int * instruction) list
 
-let emptyStore : (int * instr) list = List.empty 
+let emptyStore : (int * instruction) list = List.empty 
 
 // Unpacks a dfile to an instruction list.
-let unpackDFile (dfile: dockerfile) : instr list =
+let unpackDFile (dfile: dockerfile) : instruction list =
     match dfile with
     | DFile instruction -> instruction
 
-// let purgeVars (lst: instr list) =
-//     let rec aux lst =
-//         match lst with
-//         | Var x -> 
 
 // Initilize the store
 let initStore (dfile: dockerfile) : store =
@@ -29,7 +25,7 @@ let initStore (dfile: dockerfile) : store =
         match instructions with 
         | [] -> store
         | Var _ :: rest ->
-            addInstr rest counter store  // <- Discarding the vars type
+            addInstr rest counter store  // <- Discarding the var-type
         | x :: rest -> 
             let newStore = (counter, x) :: store 
             addInstr rest (counter + 1) newStore
@@ -39,7 +35,6 @@ let initStore (dfile: dockerfile) : store =
 
 // Print the content in the store
 let printStore (s: store) =
-    printfn "\nNR. -  STORE CONTAINS: "
     let rec aux s =
         match s with
         | [] -> printfn ""
@@ -50,7 +45,7 @@ let printStore (s: store) =
 
 
 // Return the instructions in the store
-let returnStore (s: store) : instr list =
+let returnStore (s: store) : instruction list =
     let rec aux s acc =
         match s with
         | [] -> List.rev acc
@@ -59,66 +54,58 @@ let returnStore (s: store) : instr list =
 
 
 // Take an instruction and return a list
-let instrToCmd (ins: instr) =
+let instrToRunCmd (ins: instruction) =
     match ins with
-    | Run (line, ShellCmd cmd) -> Some (Cmd.createCmd line cmd (Cmd.split cmd))
+    | Run (line, ShellCmd cmd) -> Some (RunCommand.createCmd line cmd (RunCommand.split cmd))
     | _ -> None
         
 
 // Extract RUN commands from instruction list
-let getRunCmds (lst: instr list)  =
+let getRunCmds (lst: instruction list)  =
     lst
-    |> List.map instrToCmd                            // 1. Predicate
+    |> List.map instrToRunCmd
     |> List.choose id
-    |> Cmds.createCmds
+    |> RunCommandList.createRunCommandList
+    
     
 // =======================================================
 //                   Exposed Functions
 // =======================================================
 
-
 // Run: The 'main' logic of the interpreter
 let run dfile =
     let gstore = initStore <| dfile  // Load dfile into store
-    if Config.DEBUG then printStore gstore
+    if Config.DEBUG then
+        Utils.printHeaderMsg "STORE"
+        printStore gstore
     
     // Transform dfile to instructions
     let instrs = returnStore <| gstore
-    printfn "INSTRUCTIONS:"
-    printfn $"%A{instrs}\n"
     
     // Extract run cmds from instructions
-    let rcmds = getRunCmds <| instrs
-    
-    // 1. Execute shellcheck
-    printfn "(INTERP @ SHELLCHK) RCMDS:"
-    printfn $"%A{Cmds.cmdsToString rcmds}\n"
-    Shellcheck.scan <| rcmds
-    // Shellcheck.flushTmpFiles
+    let rcmds = getRunCmds <| instrs   
+    if Config.DEBUG then
+        Utils.printHeaderMsg "INSTRUCTIONS"
+        printfn $"%A{instrs}\n"
     
     
+    // // 1. Execute shellcheck
+    // if Config.DEBUG then
+    //     Utils.printHeaderMsg "(INTERP @ SHELLCHK) RCMDS"
+    //     printfn $"%A{RunCommandList.runCommandListToString rcmds}\n"
+     
+    // Shellcheck.scan <| rcmds
+    // if not Config.DEBUG then Shellcheck.flushTmpFiles  // Delete the tmp files 
+
     // 2. Scan other commands and binaries
-    Binaries.scan <| rcmds
+    // Binaries.scan <| rcmds
     
     // // 3. Scan network interface + ports
-    printfn "(INTERP) NETWORK:\n"
-    Network.scan rcmds instrs 
-    
-    
-    // 4. Execute mount check
+    // Network.scan rcmds instrs 
+
+    // // 4. Execute mount check
     Mounts.scan rcmds instrs
 
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
+    // // 5. Execute syntax check (Users)
+    // Syntax.scan instrs
     
