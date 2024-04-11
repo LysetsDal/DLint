@@ -61,17 +61,17 @@ module private PortScanInternals =
     let logPortWarning (e: int * expose) =
         match e with
         | l, Port p ->
-            if portInRange p then printf ""
+            if portInRange p then ()
             else printfn $"Around Line %i{l}: Port %i{p} outside UNIX Range (0 - 65535)\n"
         | l, PortM (p1, p2) ->
-            if portTupleInRange (p1, p2) then printf ""
+            if portTupleInRange (p1, p2) then ()
             elif portInRange p1 then printfn $"Around Line %i{l}: Port %i{p2} outside UNIX Range (0 - 65535)\n"
             elif portInRange p2 then printfn $"Around Line %i{l}: Port %i{p1} outside UNIX Range (0 - 65535)\n"
             else printfn $"Around Line %i{l}: Port %i{p1} and %i{p2} outside UNIX Range (0 - 65535)\n"
         | l, Ports lst ->
             let bad_ports = portsNotInRange lst
             if List.length bad_ports = 0 then
-                printf ""
+                ()
             else
                 printfn $"Around Line %i{l}: Port(s) %A{bad_ports} outside UNIX Range (0 - 65535)\n"
 
@@ -121,7 +121,7 @@ module private NetworkInternals =
     
     // Print the network warning
     let printNetWarnings (line: int) (err: MiscWarn) =
-        printfn $"Around Line: %i{line}\n%s{err.ErrorCode} Network Warning: '%s{err.Problem}' \nInfo message: %s{err.ErrorMsg}\n"
+        printfn $"\nAround Line: %i{line}\n%s{err.ErrorCode} Network Warning: '%s{err.Problem}' \nInfo message: %s{err.ErrorMsg}\n"
 
     
     // Matches a cmd_list with the known network warnings sequence

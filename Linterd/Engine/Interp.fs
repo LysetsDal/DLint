@@ -98,12 +98,11 @@ let run dfile =
     // 2. Scan other commands and binaries
     Binaries.scan <| rcmds
     
-    // 3. Scan network interface + ports
-    Network.scan rcmds instrs 
-
-    // 4. Execute mount check
+    // 3. Execute mount check
     Mounts.scan rcmds instrs
 
-    // 5. Execute syntax check (Users)
+    // 4. Execute syntax check (Users)
     Syntax.scan instrs
     
+    // 5. Scan network interface + ports
+    Network.scan rcmds instrs 
