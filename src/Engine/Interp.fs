@@ -87,24 +87,23 @@ let run dfile =
         Utils.printHeaderMsg "INSTRUCTIONS"
         printfn $"%A{instrs}\n"
     
-    
-    // // 1. Execute shellcheck
-    // if Config.DEBUG then
-    //     Utils.printHeaderMsg "(INTERP @ SHELLCHK) RCMDS"
-    //     printfn $"%A{RunCommandList.runCommandListToString rcmds}\n"
+    // 1. Execute shellcheck
+    if Config.DEBUG then
+        Utils.printHeaderMsg "(INTERP @ SHELLCHK) RCMDS"
+        printfn $"%A{RunCommandList.runCommandListToString rcmds}\n"
      
-    // Shellcheck.scan <| rcmds
-    // if not Config.DEBUG then Shellcheck.flushTmpFiles  // Delete the tmp files 
+    Shellcheck.scan <| rcmds
+    if not Config.DEBUG then Shellcheck.flushTmpFiles  // Delete the tmp files 
 
     // 2. Scan other commands and binaries
-    // Binaries.scan <| rcmds
+    Binaries.scan <| rcmds
     
-    // // 3. Scan network interface + ports
-    // Network.scan rcmds instrs 
+    // 3. Scan network interface + ports
+    Network.scan rcmds instrs 
 
-    // // 4. Execute mount check
+    // 4. Execute mount check
     Mounts.scan rcmds instrs
 
-    // // 5. Execute syntax check (Users)
-    // Syntax.scan instrs
+    // 5. Execute syntax check (Users)
+    Syntax.scan instrs
     
