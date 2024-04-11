@@ -8,6 +8,7 @@ module Config
 // LOGGING LEVELS
 let DEBUG = false
 let VERBOSE = false
+let LOG_MODE = true
 
 
 // SHELLCHECK CONFIGS

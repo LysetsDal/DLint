@@ -4,7 +4,7 @@ open System.Runtime.CompilerServices
 
 
 [<IsReadOnly; Struct>]
-type binWarn =
+type BinWarn =
     {
         ErrorCode: string
         Binary: string
@@ -12,7 +12,7 @@ type binWarn =
     }
 
 [<IsReadOnly; Struct>]
-type aptWarn =
+type AptWarn =
     {
         ErrorCode: string
         Problem: string

@@ -30,10 +30,10 @@ module private Helpers =
         RunCommand.createCmdWithList line cmd.AsString (Some shebang_list)
     
     
-    // Used for printing the problematic command after shellcheck
+    // Used for striping the shabang off after shellcheck has run
     let stripSheBang (str:string) =
         match str with
-        | _ when str.StartsWith("#!/bin/bash") || str.StartsWith("#!/usr/bin/env") -> 
+        | _ when str.StartsWith("#!/bin/bash") || str.StartsWith("#!/usr/bin/bash") -> 
         str.Substring(str.IndexOf('\n') + 1)
         | _ -> str
         
@@ -99,7 +99,7 @@ module private ShellChekInternals =
             let idx = cmd.LineNum
             
             let cmd_list = RunCommand.getAsList cmd
-            if Config.DEBUG then printfn $"CMD_LIST @ runShellCheck: \n%A{cmd_list}\n"
+            if Config.DEBUG then printfn $"SHELLCHECK @ runShellCheck: \n%A{cmd_list}\n"
                 
             cmd_list
             |> List.iter ( fun unit ->
@@ -108,20 +108,25 @@ module private ShellChekInternals =
                 let tmp_file = openOrCreateRWFile file_path unit    
             
                 // Spawn a new shellcheck process ad split output
-                let shellcheck_output = shellcheck Config.SHELLCHECK file_path tmp_file    
-                let split_output = shellcheck_output.Split(":")    
-
-                closeFile tmp_file
+                
+                
+                let mutable shellcheck_output = ""
+                try
+                    shellcheck_output <- shellcheck Config.SHELLCHECK file_path tmp_file    
+                    closeFile tmp_file
+                with 
+                    | :? IOException as err -> printfn $"%s{err.Message}"
                 
                 // If shellcheck found something
                 if shellcheck_output <> "" then
+                    let split_output = shellcheck_output.Split(":")
                     let line = idx + count
                     let problem = stripSheBang unit
                     let char_pos = split_output[2]
                     let response_msg = split_output[4].Trim()
                     
-                    printfn $"Around Line %i{line}, char %s{char_pos} \nCmd: '%s{problem}' \nShellcheck Warning: %s{response_msg}\n"
-                
+                    Logger.log Config.LOG_MODE <| LogShellcheckWarn(line, char_pos, problem, response_msg)
+
                 count <- count + 1
             )
             count <- 0
@@ -140,13 +145,13 @@ let flushTmpFiles  =
     let files = Directory.GetFiles(Config.OUTPUT_DIR)
     for file in files do
         deleteTmpFile file false
-    if Config.VERBOSE then printfn $"Files at '%s{Config.OUTPUT_DIR}' deleted successfully.\n"
+    if Config.VERBOSE then Logger.log Config.LOG_MODE <| FlushFiles
 
 
 // Perform the shcellChek on the given commands
 let scan (cmds: RunCommandList) =
+    
     // the RUN --mount is a docker specific cmd. Hence we discardd it before shellcheck.
-    //@TODO: REFACTOR FLOW HERE:
     let filtered_cmds =
         cmds
         |> RunCommandList.exlcudePrefixedCmds "--mount"
@@ -154,7 +159,7 @@ let scan (cmds: RunCommandList) =
         |> RunCommandList.exlcudePrefixedCmds "--network"
     
     if Config.DEBUG then
-        Utils.printHeaderMsg "(SCAN) FILTERED CMDS"
+        Logger.log Config.LOG_MODE <| (LogHeader "SHELLCHECK @ scan: FILTERED CMDS")
         printfn $"%A{filtered_cmds}\n"
     
     filtered_cmds

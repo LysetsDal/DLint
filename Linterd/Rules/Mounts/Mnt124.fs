@@ -5,7 +5,5 @@ open Rules.MountWarn
 let mnt124 : SensitiveMount = {
     ErrorCode = "MNTW124"
     MountPoint = "/sys/firmware/efi/vars"
-    ErrorMsg = "exposes interfaces for interacting with EFI variables in NVRAM. Whi-
-le this is not typically relevant for most servers, EFI is becoming more popul-
-ar. Permission weaknesses here can rendered laptops unusable."
+    ErrorMsg = "exposes interfaces for interacting with EFI variables in NVRAM. While this is not typically relevant for most servers, EFI is becoming more popular. Permission weaknesses here can rendered laptops unusable."
 }

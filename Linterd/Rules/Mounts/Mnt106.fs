@@ -5,7 +5,5 @@ open Rules.MountWarn
 let mnt106 : SensitiveMount = {
     ErrorCode = "MNTW106"
     MountPoint = "/docker.sock"
-    ErrorMsg = "Binding the docker.sock inside a container is not advised! A malici-
-ous agent can spawn custom containers on the docker host machine with root pri-
-vileges."
+    ErrorMsg = "Binding the docker.sock inside a container is not advised! A malicious agent can spawn custom containers on the docker host machine with root privileges."
 }

@@ -58,7 +58,8 @@ let whitespace = [' ' '\t' '\r']
 // RegEx for instructions
 let add = "ADD"[' ']+
 let cmd = "CMD"[' ']+
-let cpath = "COPY"[' ']+ 
+let cpath = "COPY"[' ']+
+let entrypoint = "ENTRYPOINT"[' ']+ 
 let env = "ENV"[' ']+
 let run = "RUN"[' ']+ 
 let volume = "VOLUME"[' ']+
@@ -72,6 +73,7 @@ rule Token = parse
     | add             { aPath (currentPos) (Path [] lexbuf)  }
     | cmd             { entrycmd (currentPos) (Shell [] lexbuf) }
     | cpath           { cPath (currentPos) (Path [] lexbuf)  }
+    | entrypoint      { entrycmd (currentPos) (Shell [] lexbuf) }
     | env             { envVar (currentPos) (Path [] lexbuf) }
     | run             { runcmd (currentPos) (Shell [] lexbuf) } 
     | volume          { mntPt (currentPos) (Path [] lexbuf)  }

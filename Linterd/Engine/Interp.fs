@@ -4,11 +4,11 @@
 module Linterd.Engine.Interp
 
 open Types
-open Absyn             
+open Absyn
+
 
 // The store is an in-memory representation of the dockerfile.
 // It is used to perform the linters checks on.
-type store = (int * instruction) list
 
 let emptyStore : (int * instruction) list = List.empty 
 
@@ -75,7 +75,7 @@ let getRunCmds (lst: instruction list)  =
 let run dfile =
     let gstore = initStore <| dfile  // Load dfile into store
     if Config.DEBUG then
-        Utils.printHeaderMsg "STORE"
+        Logger.printHeaderMsg "INTERP @ initStore: STORE"
         printStore gstore
     
     // Transform dfile to instructions
@@ -84,17 +84,17 @@ let run dfile =
     // Extract run cmds from instructions
     let rcmds = getRunCmds <| instrs   
     if Config.DEBUG then
-        Utils.printHeaderMsg "INSTRUCTIONS"
+        Logger.log Config.LOG_MODE (LogHeader "INTERP @ getRunCmds: INSTRUCTIONS") 
         printfn $"%A{instrs}\n"
     
     // 1. Execute shellcheck
     if Config.DEBUG then
-        Utils.printHeaderMsg "(INTERP @ SHELLCHK) RCMDS"
+        Logger.log Config.LOG_MODE (LogHeader "INTERP @ Shellcheck.scan: RCMDS")
         printfn $"%A{RunCommandList.runCommandListToString rcmds}\n"
      
     Shellcheck.scan <| rcmds
     if not Config.DEBUG then Shellcheck.flushTmpFiles  // Delete the tmp files 
-
+    
     // 2. Scan other commands and binaries
     Binaries.scan <| rcmds
     

@@ -1,7 +1,29 @@
 // =======================================================
-//       RUNCOMMAND TYPES FOR DATA MANIPULATION  
+//               TYPES FOR DATA MANIPULATION  
 // =======================================================
 module Types
+
+open Absyn
+open Rules
+
+type store = (int * instruction) list
+
+type LogParams =
+    | LogHeader of string
+    | LogShellcheckWarn of int * string * string * string
+    | LogMiscWarnNoLine of MiscWarn.MiscWarn    // ErrorCode, Problem, ErrorMsg
+    | LogMiscWarn of int * MiscWarn.MiscWarn
+    | LogBinWarn of int * ShellWarn.BinWarn
+    | LogAptWarn of int * ShellWarn.AptWarn
+    | LogMountWarn of int * MountWarn.SensitiveMount
+    | LogNetWarn of int * MiscWarn.MiscWarn
+    | LogPortWarn of int * int
+    | LogPortWarnTuple of int * (int * int)
+    | LogPortsWarnList of int * int list
+    | FlushFiles 
+
+
+
 
 type RunCommand = {
     LineNum: int
@@ -9,6 +31,7 @@ type RunCommand = {
     AsList: string list option
     AsSplitCmd: string list list option
 }
+
 
 module RunCommand =
     // Constructor

@@ -23,7 +23,7 @@ module private Helpers =
     let volumeToTuple (ins: instruction) =
         match ins with
         | Volume (line, Mnt_pt mp) -> RunCommand.createCmd line mp (RunCommand.split mp)
-        | _ -> failwith "Not a volume"
+        | _ -> failwith "Error at Mounts @ volumeToTuple: Instruction is not a volume"
 
             
     // Exctracts and transforms volume instructions to a commands type
@@ -73,7 +73,7 @@ module private MountInternals =
     
     // Print the sensitive mounts
     let printMountWarnings (line: int) (mnt: SensitiveMount) =
-        printfn $"Around Line: %i{line} \n%s{mnt.ErrorCode}: \nSensetive Mount:%s{mnt.MountPoint} \nInfo message: %s{mnt.ErrorMsg}\n"
+        Logger.log Config.LOG_MODE <| LogMountWarn(line, mnt)
 
     
     // Control logic for processing mountpoint warnings.
@@ -84,7 +84,7 @@ module private MountInternals =
             | x :: xs -> 
                 Seq.iter (fun w ->
                     match w with
-                    | _ when x = w.MountPoint || x.Contains w.MountPoint ->
+                    | _ when x = w.MountPoint || x.Equals w.MountPoint ->
                         printMountWarnings line w
                     | _ ->  ()
                 ) warnings
@@ -117,10 +117,16 @@ open Helpers
 // looks for matches with known sensitive mounts.
 let scan (mounts:RunCommandList) (instructions: instruction list) =
     let volume_mounts = getVolumeMounts instructions
-    if Config.DEBUG then printfn $"VOLUME mounts: \n%A{volume_mounts}\n"
+    
+    if Config.DEBUG then
+        Logger.log Config.LOG_MODE <| (LogHeader "MOUNTS @ scan: VOLUME MOUNTS")
+        printfn $"\n%A{volume_mounts}\n"
     
     let run_mounts = getRunMounts mounts
-    if Config.DEBUG then printfn $"RUN mounts: \n%A{run_mounts}\n"
+    
+    if Config.DEBUG then
+        Logger.log Config.LOG_MODE <| (LogHeader "MOUNTS @ scan: RUN MOUNTS")
+        printfn $" \n%A{run_mounts}\n"
 
     // put the vloume and --mount mounts into one object
     let all_Mounts = RunCommandList.mergeTwoRunCommandLists volume_mounts run_mounts
@@ -130,4 +136,3 @@ let scan (mounts:RunCommandList) (instructions: instruction list) =
     
     loadMountPointsIntoMemory 
     |> runMountScan cmds_list
-

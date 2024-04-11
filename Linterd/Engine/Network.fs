@@ -55,32 +55,36 @@ module private PortScanInternals =
         if List.length in_range <> len then out_range else []
         
         
-    //@TODO:
-    // Handle logging 'nicer'
     // Logs a port warning if its outside UNIX range
     let logPortWarning (e: int * expose) =
         match e with
-        | l, Port p ->
+        | line, Port p ->
             if portInRange p then ()
-            else printfn $"Around Line %i{l}: Port %i{p} outside UNIX Range (0 - 65535)\n"
-        | l, PortM (p1, p2) ->
+            else
+                Logger.log Config.LOG_MODE <| LogPortWarn(line, p)
+            
+        | line, PortM (p1, p2) ->
             if portTupleInRange (p1, p2) then ()
-            elif portInRange p1 then printfn $"Around Line %i{l}: Port %i{p2} outside UNIX Range (0 - 65535)\n"
-            elif portInRange p2 then printfn $"Around Line %i{l}: Port %i{p1} outside UNIX Range (0 - 65535)\n"
-            else printfn $"Around Line %i{l}: Port %i{p1} and %i{p2} outside UNIX Range (0 - 65535)\n"
-        | l, Ports lst ->
+            elif portInRange p1 then
+                Logger.log Config.LOG_MODE <| LogPortWarn(line, p2)
+            elif portInRange p2 then
+                Logger.log Config.LOG_MODE <| LogPortWarn(line, p1)
+            else
+                Logger.log Config.LOG_MODE <| LogPortWarnTuple(line, (p1,p2))
+            
+        | line, Ports lst ->
             let bad_ports = portsNotInRange lst
             if List.length bad_ports = 0 then
                 ()
             else
-                printfn $"Around Line %i{l}: Port(s) %A{bad_ports} outside UNIX Range (0 - 65535)\n"
+                Logger.log Config.LOG_MODE <| LogPortsWarnList(line, bad_ports)
 
     
     // Logs all port warnings to std out 
     let logAllPortWarnings (instrs: instruction list) =
         instrs
         |> List.choose instructionToExpose  // Filter and convert to expose instances
-        |> List.map logPortWarning |> ignore    // Log warnings
+        |> List.map logPortWarning |> ignore              // Log warnings
     
     // Runs the port scan
     let scanPorts instrs =
@@ -120,8 +124,8 @@ module private NetworkInternals =
     
     
     // Print the network warning
-    let printNetWarnings (line: int) (err: MiscWarn) =
-        printfn $"\nAround Line: %i{line}\n%s{err.ErrorCode} Network Warning: '%s{err.Problem}' \nInfo message: %s{err.ErrorMsg}\n"
+    let printNetWarnings (line: int) (warn: MiscWarn) =
+        Logger.log Config.LOG_MODE <| LogNetWarn(line, warn)
 
     
     // Matches a cmd_list with the known network warnings sequence
@@ -166,7 +170,10 @@ let scan (cmds: RunCommandList) (instrs: instruction list)=
     let filtered_cmds = RunCommandList.includePrefixedCmds "--network" cmds
        
     let cmds_list = RunCommand.removeEmptyEntries <| filtered_cmds
-    if Config.DEBUG then printfn $"FILTERED NETCMDS (REMOVED EMPTY): %A{cmds_list}\n"
+    
+    if Config.DEBUG then
+        Logger.log Config.LOG_MODE <| (LogHeader "NETWORK @ scan: FILTERED NETCMDS")
+        printfn $"\n%A{cmds_list}\n"
     
     loadNetWarningsIntoMemory
     |> runNetworkScan cmds_list 

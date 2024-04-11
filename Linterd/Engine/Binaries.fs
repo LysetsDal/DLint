@@ -29,7 +29,7 @@ module private Helpers =
     // Split a cmd and update the cmd's internal 'split' list        
     let splitCmd (cmd: RunCommand) =
         match RunCommand.getAsList cmd with
-        | [] -> failwith "No cmds to split" 
+        | [] -> failwithf $"Error in Binaries.fs: No cmd to split" 
         | x ->
             let split = splitCommands x
             RunCommand.setAsSplitCmd cmd split
@@ -89,8 +89,8 @@ module private BinariesInternals =
    
      
     // Print the binary warnings to stdout
-    let printShellWarnings (bin: binWarn) line =
-        printfn $"Around line: %d{line} \n%s{bin.ErrorCode}:\nProblematic Binary: %s{bin.Binary}\nInfo message: %s{bin.ErrorMsg}\n"
+    let printShellWarnings (warn: BinWarn) line =
+        Logger.log Config.LOG_MODE <| LogBinWarn(line, warn)
 
 
 module private AptHelpers =
@@ -129,7 +129,9 @@ module private AptHelpers =
     let checkAptInstall lst =
         match lst with
         | _ :: "install" :: "-y" :: "--no-install-recommends" :: _ 
+        | _ :: "install" :: "-y" :: _ :: ["--no-install-recommends"]
         | _ :: "install" :: "--no-install-recommends" :: "-y" :: _
+        | _ :: "install" :: "--no-install-recommends" :: _ :: ["-y"] 
         | _ :: "install" :: _ :: "-y" :: [ "--no-install-recommends" ]
         | _ :: "install" :: _ :: "--no-install-recommends" :: [ "-y" ] -> true
         | _ -> false
@@ -158,10 +160,9 @@ module private AptHelpers =
                     Problem = $"%s{unSplitRunCommands cmd}"
                     ErrorMsg = warn.ErrorMsg
                 }
-    
-        printfn $"Around line: %d{line} \n%s{apt_warn.ErrorCode}:\nProblem: %s{apt_warn.Problem}\nInfo message: %s{apt_warn.ErrorMsg}\n"
-    
-        
+                
+        Logger.log Config.LOG_MODE <| LogAptWarn(line, apt_warn)   
+
     
     // Checks the format of apt-get install and log warnings
     let checkAptOk (entry: (int * string) * string list) = 
@@ -197,18 +198,21 @@ module private AptHelpers =
 open BinariesInternals
 open AptHelpers
 open Helpers
-
 let scan (cmds: RunCommandList) =
     
     let split_cmds = splitCommandsInternalLists cmds
-    if Config.DEBUG then printfn $"SPLITTED RUNCMDS: \n%A{split_cmds}\n"
+    if Config.DEBUG then
+        Logger.log Config.LOG_MODE <| (LogHeader "BINARIES @ scan: SPLIT RUNCMDS")
+        printfn $"\n%A{split_cmds}\n"
     
     let base_cmds =
         split_cmds
         |> getBaseCommands
 
     
-    if Config.DEBUG then printfn $"BASECMDS LST: \n%A{base_cmds}\n"
+    if Config.DEBUG then
+        Logger.log Config.LOG_MODE <| (LogHeader "BINARIES @ scan: BASE_CMDS")
+        printfn $"\n%A{base_cmds}\n"
     
     let binaryWarnings = loadBinaryWarningsIntoMemmory 
     
@@ -221,8 +225,11 @@ let scan (cmds: RunCommandList) =
             | _ -> ()
         ) binaryWarnings
         
+        
+    if Config.DEBUG then
+        Logger.log Config.LOG_MODE <| (LogHeader "APT-SCAN CHECK:")
+        
     // check apt command:
-    if Config.DEBUG then Utils.printHeaderMsg "APT-SCAN CHECK:"
     RunCommandList.collectSplitRuncommandList split_cmds  // 1. Concat each cmds 'split' list into one list
     |> List.zip base_cmds                     // 2. Zip to list of (base_cmd, split_command_lst)
     |> getAptCommands                         // 3. Extract apt-get commands

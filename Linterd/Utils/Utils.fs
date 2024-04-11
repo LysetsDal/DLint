@@ -4,20 +4,6 @@
 
 module Utils
 
-
-
-// Print a list 
-let printStringList lst (prefix: string) =
-    printfn $"\n%s{prefix.ToUpper()} CONTENT: "
-    let rec aux lst = 
-        match lst with
-        | [] -> printfn ""
-        | x :: rest ->
-            printfn $"[ %s{string x} ]"
-            aux rest
-    aux lst
-
-
 // Trim multiple following spaces into one space
 let trimWhitespace str =
     let rec aux str acc =
@@ -65,7 +51,7 @@ let splitCmdAt (delim: string[]) (cmd: string) =
 // Used to split a multiline or '&& separate'
 // shellcommand into single shellcommands
 let split (cmd: string)  =
-    let delims = [|"&&"; ";"; "|"; "<<"; ">>"|]
+    let delims = [|"&&"; ";"; "<<"; ">>"|]
     splitCmdAt delims cmd
     |> List.map (fun (x:string) -> x.Trim(' '))
 
@@ -78,8 +64,8 @@ let splitList (input: string list) =
 // Construct a tuple of the first two elements of a list 
 let returnPair lst = 
     match lst with
-    | [] -> failwith "Empty list"
-    | [_] -> failwith "Only one path"
+    | [] -> failwith "UTILS @ returnPair: Empty list provided (needs two)"
+    | [_] -> failwith "UTILS @ returnPair: Only one path provided (needs two)"
     | x :: y :: _ -> (x, y)
 
 
@@ -100,7 +86,6 @@ let isNullOrWhiteSpace (str: string) =
     str = null || str.Trim() = ""
 
 
-
 // Gat a command by a prefix (returns a list of mathces)
 let getCmdByPrefix (lst: string list) (prefix: string) =    
     let rec aux (lst: string list) acc =
@@ -111,16 +96,3 @@ let getCmdByPrefix (lst: string list) (prefix: string) =
             | true ->  aux rest (x :: acc)
             | _ ->  aux rest acc
     aux (List.rev lst) []
-    
-
-// Debugging header print function      
-let printHeaderMsg msg =
-    let msgLength = String.length msg
-    let paddingLength = (70 - msgLength) / 2  // Assuming the total width is 70 characters
-    
-    let paddedMsg = 
-        sprintf "%*s%s%*s" paddingLength " " msg paddingLength " "
-    
-    printfn "======================================================================"
-    printfn "%s" paddedMsg
-    printfn "======================================================================"

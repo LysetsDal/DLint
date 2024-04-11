@@ -5,6 +5,7 @@
 module Linterd.Engine.Syntax
 
 open Absyn
+open Types
 
 module private UserScanInternals =
     open Rules.Misc.UserWarns
@@ -51,8 +52,9 @@ module private UserScanInternals =
         match List.length users with
         | 0 ->
             let warn = userWarn101
-            printf $"%s{warn.ErrorCode} \nProblem: %s{warn.Problem} \nInfo Messagw:%s{warn.ErrorMsg}"
+            Logger.log Config.LOG_MODE <| LogMiscWarnNoLine(warn)
             users
+            
         | _ -> users
 
     
@@ -61,24 +63,24 @@ module private UserScanInternals =
         | (line, (name, uid)) :: _ ->
             let warn = userWarn100
             if userIsRoot (line, (name, uid)) then
-                printfn $"Around Line %i{line} \n%s{warn.ErrorCode} \nProblem: %s{warn.Problem} \nInfo Messagw:%s{warn.ErrorMsg}"
+                Logger.log Config.LOG_MODE <| LogMiscWarn (line, warn)
             else
                 ()
         | _ -> ()         
-        
 
-    
+// =======================================================
+//                   Exposed Functions
+// =======================================================
 open UserScanInternals
+
 let scan (instr: instruction list) =       
     let user_instructions = getUserInstructions instr
     
     if Config.DEBUG then
-        Utils.printHeaderMsg "USER INSTRUCTIONS"
+        Logger.log Config.LOG_MODE <| (LogHeader "USER INSTRUCTIONS")
         printfn $"%A{user_instructions}\n"
     
     user_instructions
     |> instructionsToTuples
     |> userListEmpty
-    |> List.filter userIsRoot
     |> lastUserRoot
-
