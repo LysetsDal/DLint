@@ -31,7 +31,7 @@
 
         <!-- Absyn -->
         <Compile Include="Absyn.fs" />
-        <Compile Include="Infrastructure.fs" />
+        <Compile Include="Types.fs" />
         
         <!-- DPar.fsi -->
         <Compile Include="Parser\DPar.fsi" />

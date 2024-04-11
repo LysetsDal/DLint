@@ -7,7 +7,7 @@ module Linterd.Engine.Binaries
 open System.Text.RegularExpressions
 open Rules.Misc.AptWarn
 open Rules.ShellWarn
-open Infrastructure
+open Types
 open System.IO
 
 module private Helpers =

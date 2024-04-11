@@ -1,10 +1,9 @@
 // =======================================================
 //        INTERPRETER FOR LINTING DOCKERFILES
 // =======================================================
-
 module Linterd.Engine.Interp
 
-open Infrastructure
+open Types
 open Absyn             
 
 // The store is an in-memory representation of the dockerfile.

@@ -1,10 +1,13 @@
-module Infrastructure
+// =======================================================
+//       RUNCOMMAND TYPES FOR DATA MANIPULATION  
+// =======================================================
+module Types
 
 type RunCommand = {
     LineNum: int
     AsString: string
     AsList: string list option
-    mutable AsSplitCmd: string list list option
+    AsSplitCmd: string list list option
 }
 
 module RunCommand =
@@ -79,6 +82,7 @@ module RunCommand =
             List.filter (fun (str:string) -> not (str.StartsWith prefix)) lst
             |> List.rev
 
+    
     // Filter IN strings that start with the prefix
     let includePrefixedItems (prefix:string) cmd =
         match cmd.AsList with
@@ -169,7 +173,7 @@ module RunCommandList =
         res
     
     
-    // Used for debug prints
+    // Used for debug print
     let runCommandListToString cmds =
         let mutable result = ""
         let cmds_list = cmds.List

@@ -6,8 +6,8 @@ module Linterd.Engine.Mounts
 
 open System.Text.RegularExpressions
 open Rules.MountWarn
-open Infrastructure
 open System.IO
+open Types
 open Absyn
 
 module private Helpers =
@@ -45,24 +45,24 @@ module private MountInternals =
     // This function Uses regexes to parse the mount rules from their files.
     // Returns a SensitiveMount(struct) list
     let extractSensitiveMountsFromFile (filePath: string) =
-        let fileContents = File.ReadAllText(filePath)
-        let mountRegex = Regex(@"MountPoint\s*=\s*""([^""]+)""")
-        let mountMatches = mountRegex.Matches(fileContents) |> Seq.map (_.Groups[1].Value)
-        let codeRegex = Regex(@"ErrorCode\s*=\s*""([^""]+)""")
-        let msgRegex = Regex(@"ErrorMsg\s*=\s*""([^""]+)""")
+        let file_contents = File.ReadAllText(filePath)
+        let mount_regex = Regex(@"MountPoint\s*=\s*""([^""]+)""")
+        let matches = mount_regex.Matches(file_contents) |> Seq.map (_.Groups[1].Value)
+        let code_regex = Regex(@"ErrorCode\s*=\s*""([^""]+)""")
+        let msg_regex = Regex(@"ErrorMsg\s*=\s*""([^""]+)""")
         
 
         let code = 
-            match codeRegex.Match(fileContents).Groups[1].Value with
+            match code_regex.Match(file_contents).Groups[1].Value with
             | code when not (Utils.isNullOrWhiteSpace code) -> code
             | _ -> ""
         
         let msg =
-            match msgRegex.Match(fileContents).Groups[1].Value with
+            match msg_regex.Match(file_contents).Groups[1].Value with
             | msg when not (Utils.isNullOrWhiteSpace msg) -> msg
             | _ -> ""
 
-        [ for mount in mountMatches -> { ErrorCode = code; MountPoint = mount; ErrorMsg = msg } ]
+        [ for mount in matches -> { ErrorCode = code; MountPoint = mount; ErrorMsg = msg } ]
 
 
     // Sequence of all SensitiveMount objects 
@@ -73,7 +73,7 @@ module private MountInternals =
     
     // Print the sensitive mounts
     let printMountWarnings (line: int) (mnt: SensitiveMount) =
-        printfn $"Around Line: %i{line}\n%s{mnt.ErrorCode}:\nSensetive Mount:%s{mnt.MountPoint}\nInfo message: %s{mnt.ErrorMsg}\n"
+        printfn $"Around Line: %i{line} \n%s{mnt.ErrorCode}: \nSensetive Mount:%s{mnt.MountPoint} \nInfo message: %s{mnt.ErrorMsg}\n"
 
     
     // Control logic for processing mountpoint warnings.
@@ -85,8 +85,7 @@ module private MountInternals =
                 Seq.iter (fun w ->
                     match w with
                     | _ when x = w.MountPoint || x.Contains w.MountPoint ->
-                        if Config.VERBOSE then
-                            if Config.VERBOSE then (printMountWarnings line w)
+                        printMountWarnings line w
                     | _ ->  ()
                 ) warnings
                 aux xs
@@ -99,7 +98,7 @@ module private MountInternals =
         cmds_list
         |> List.iter (fun c ->
             let line, mounts = c.LineNum, RunCommand.getAsSplitCmd c
-            
+                        
             mounts
             |> List.iter (fun lst ->
                 processMountWarning warnings <| line <| lst
@@ -124,7 +123,7 @@ let scan (mounts:RunCommandList) (instructions: instruction list) =
     if Config.DEBUG then printfn $"RUN mounts: \n%A{run_mounts}\n"
 
     // put the vloume and --mount mounts into one object
-    let all_Mounts = RunCommandList.mergeTwoRunCommandLists run_mounts volume_mounts
+    let all_Mounts = RunCommandList.mergeTwoRunCommandLists volume_mounts run_mounts
     
     // Remove empty entries from the list of all mounts
     let cmds_list = RunCommand.removeEmptyEntries <| all_Mounts.List

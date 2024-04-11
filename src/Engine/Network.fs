@@ -6,9 +6,9 @@
 module Linterd.Engine.Network
 
 open System.Text.RegularExpressions
-open Infrastructure
 open Rules.MiscWarn
 open System.IO
+open Types
 open Absyn
 
 module private PortScanInternals =

@@ -5,8 +5,8 @@
 module Linterd.Engine.Shellcheck
 
 open System.Diagnostics
-open Infrastructure
 open System.IO      
+open Types
 
 module private Helpers =
     
