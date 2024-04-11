@@ -1,0 +1,30 @@
+# TEST 1
+# Base img 
+
+# CASE: string : string
+FROM test1:latest
+
+# CASE: string : int
+FROM test2:18
+
+# CASE: string : string DASH string
+FROM test3:alpine-stable
+
+# CASE: string : string DASH int
+FROM test4:string-17 
+
+# CASE: string : string DASH int DOT int
+FROM test5:string-17.2
+
+# CASE: string : int DOT int
+FROM test6:18.06
+
+# CASE: string : int DASH string
+FROM test7:7.0.7-jammy
+
+# CASE: string : int DOT (x2) DASH string int
+FROM test8:7.0.7-jammy12
+
+# Error: 
+# CASE: string : int DOT (x2) DASH string int dot int
+#FROM test9:7.0.7-jammy12.01

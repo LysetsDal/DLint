@@ -1,0 +1,17 @@
+# TEST 1
+# Base img 
+
+# inside range
+FROM test1:assert-true
+EXPOSE 22, 80, 443
+EXPOSE 80:8080
+
+# outside range
+FROM test2:assert-false
+EXPOSE 0
+EXPOSE 69420
+EXPOSE 80:69000
+EXPOSE 69000:443
+EXPOSE 22, 80, 69699, 123
+EXPOSE 22, 70000, 80000, 90000
+EXPOSE 80:8080

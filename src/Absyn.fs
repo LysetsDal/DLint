@@ -1,23 +1,56 @@
+// ================================================
+//                ABSTRACT SYNTAX  
+// ================================================
+
 module Absyn
 
-type instr =
-    | BaseImage of string * tag (* Build Image <name>:<tag> *)
-    | Workdir of path (* Specify working directory  *)
-    | Copy of path * path (* Copy from:<path> to:<path> *)
-    | Var of string (* No Use so far  *)
-    | Expose of expose (* Expose a port of int *)
-    | User of string option * int option
+// Supported Dockerfile instructions
+type instruction =
+    | BaseImage of int * string * tag            (* Build Image <name>:<tag>     *)
+    | Workdir of int * wpath                     (* Working directory <path>     *)
+    | Copy of int * cpath
+    | Var of int * string                        (* Discard invalid docker cmds  *)
+    | Volume of int * mnt_pt                     (* Volume mounts <mount_point>  *)
+    | Expose of int * expose  
+    | User of int * (string option * int option) (* Name, GUID or both    *)
+    | EntryCmd of int * shellcmd                 (* Entry shell cmd of container *)
+    | Run of int * shellcmd
+    | Env of int * env
+    | Add of int * apath                         (* Add files from path, to path *)
 
-and path = Dirs of dir list
+// A WORKDIR path (single)
+and wpath = 
+    | WPath of string
 
-and dir = Dir of string
+// A Volume mountpoint (single)
+and mnt_pt = 
+    | Mnt_pt of string
 
+// A COPY path (double)
+and cpath = 
+    | CPath of string * string
+
+// An ADD path (double)
+and apath =
+    | APath of string * string
+
+// A Shell command 
+and shellcmd =
+    | ShellCmd of string 
+
+// Environment Variables. A <Key>=<Value> pair of strings
+and env = EnvVar of string * string
+
+// Expose ports
 and expose =
     | Port of int
-    | Ports of int * int
+    | PortM of int * int
+    | Ports of int list
 
+// Parse Docker image tags 
 and tag =
     | Tag of string
     | TagV of int * string
 
-and dockerfile = DFile of instr list
+// The Abstract representation of a dockerfile
+and dockerfile = DFile of instruction list

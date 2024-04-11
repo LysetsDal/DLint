@@ -1,0 +1,192 @@
+// ================================================
+//         PARSER-GENERATOR SPECIFICATION 
+// ================================================
+%{
+open Absyn
+
+let extract tup =
+    (fst tup, snd tup)
+
+let extract_last tup p = 
+    (fst tup, p(snd tup))
+
+%}
+
+/*   CONSTRUCTORS   */
+%token <int * string> NAME MNTPT WPATH RCMD ECMD CSTST
+%token <int * (string * string)> CPATH APATH ENVVAR
+%token <int> INT
+
+
+/*   LEXER TOKENS   */
+%token <int> FROM USER 
+%token DASH COMMA EQ
+%token <int> EXPOSE 
+%token COLON DOT
+%token EOF
+
+/*   PRECEDENCE RULES    */
+%nonassoc COLON DOT           /* Lowest */
+%left USER FROM
+%left COMMA
+%left EQ
+%left EXPOSE                  /* Highest */
+
+/*   START SYMBOL   */
+%start Main
+%type <Absyn.dockerfile> Main 
+
+%%
+
+Main:
+    File EOF                      { DFile $1 }
+;
+
+/*
+ * Parse one isntruction or many
+ */
+File:
+    BaseImg                       { [$1]       }
+  | BaseImg Instrs                { $1 :: $2   }
+;
+
+/*
+ * Base Image (Single stage build only pt.)
+ */
+BaseImg:
+    FROM NAME COLON Version       { BaseImage($1, snd $2, Tag $4)  }
+;
+
+/*
+ * Parse one isntruction or many
+ */
+Instrs:
+    Instr                         { [$1]        }
+  | Instr Instrs                  { $1 :: $2    }
+;
+
+/*
+ * Docker instructions that are supported
+ */
+Instr:
+    NAME                          { Var $1                        }
+  | FROM NAME COLON Version       { BaseImage($1, snd $2, Tag $4) }
+  | MntPt                         { Volume $1                     } 
+  | EXPOSE Expose                 { Expose ($1, $2)               }
+  | USER User                     { User ($1, $2)                 }
+  | WPath                         { Workdir $1                    }
+  | Runcmd                        { Run $1                        }
+  | Entrycmd                      { EntryCmd $1                   }
+  | CPath                         { Copy $1                       }
+  | AddPath                       { Add $1                        }
+  | EnvVar                        { Env $1                        }
+;
+
+/*
+ * ENV: parsed as a key-value pair of strings
+ */
+EnvVar:
+    ENVVAR                        { extract_last $1 (fun x -> EnvVar x)  }
+;
+
+/*
+ * Copy Path: parsed as a tuple (string * string)
+ */
+CPath:
+    CPATH                         { extract_last $1 (fun x -> CPath x) }  
+;
+
+/*
+ * Add Path: parsed as a tuple (string * string)
+ */
+AddPath:
+    APATH                         { extract_last $1 (fun x -> APath x) }  
+;
+
+/*
+ * Parsing shell commands as a string
+ */
+Runcmd:
+    RCMD                          { extract_last $1 (fun x -> ShellCmd x) }
+;
+
+/*
+ * Parsing the CMD command (string)
+ */
+Entrycmd:
+    ECMD                          { extract_last $1 (fun x -> ShellCmd x) }
+;
+
+
+/*
+ * Volume Mount point: parsed as a string 
+ */
+MntPt:
+    MNTPT                         { extract_last $1 (fun x -> Mnt_pt x) }  
+;
+
+/*
+ * Workdir Path: parsed as a string 
+ */
+WPath:
+    WPATH                         { extract_last $1 (fun x -> WPath x) }  
+;
+
+
+/*
+ * Expose instr:  port, port:port or [port; ..; port]  
+ */
+Expose:
+    INT                           { Port $1          }   /*  EXPOSE 80          */
+  | INT COLON INT                 { PortM ($1, $3)   }  /*  EXPOSE 80 : 808    */
+  | INT COMMA Ports               { Ports ($1 :: $3) }  /*  EXPOSE 22, 80, 443 */
+;
+
+/*
+ * Construct a list of ports 
+ */
+Ports:
+    INT                           { [$1]     }
+  | INT COMMA Ports               { $1 :: $3 }
+;
+
+/*
+ * User instr (Name || GUID) inside the container  
+ */
+User:
+    NAME                          { (Some (snd $1), None)    }
+  | INT                           { (None, Some $1)          }
+  | NAME INT                      { (Some (snd $1), Some $2) }
+  | NAME COLON INT                { (Some (snd $1), Some $3) }
+;
+
+/* 
+ * Version of BaseImg
+ */
+Version:
+    NAME                          { snd $1                          }
+  | INT                           { string $1                       }
+  | INT DottedName                { string $1 + "." + $2            } 
+  | INT DashedName                { string $1 + "-" + $2            }
+  | NAME DottedName               { string (snd $1) + "." + $2      }
+  | NAME DashedName               { string (snd $1) + "-" + $2      }
+  | INT DottedName DashedName     { string $1 + "." + $2 + "-" + $3 }     
+;
+
+/* 
+ * Used to parse tag numbers with dots
+ */
+DottedName:
+    DOT INT                       { string $2               }
+  | DOT INT DottedName            { string $2 + "." + $3    }   
+;
+
+/* 
+ * Used to parse tag numbers with dashes
+ */
+DashedName:
+    DASH NAME                     { string (snd $2)            }
+  | DASH INT                      { string $2                  }
+  | DASH INT DottedName           { string $2 + "." + $3       }
+  | DASH NAME DashedName          { string (snd $2) + "-" + $3 }
+;

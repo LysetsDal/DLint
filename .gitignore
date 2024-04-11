@@ -1,1 +1,44 @@
-/resources/dockerfiles/
+# Exclude reources
+**/resources/
+**/Rules/Bash/*.md
+
+# Exlude build files
+**/obj
+**/bin
+**/.idea
+**/.vscode
+nupkg/
+
+# Files and types
+.fake
+*.DS_Store
+*.fsx
+*.output
+project.lock.json
+**/Dockerfile
+**/tmp/*
+
+# Visual Studio Code
+
+
+# Rider
+.idea/
+
+# Visual Studio
+.vs/
+
+# Build results
+[Dd]ebug/
+[Dd]ebugPublic/
+[Rr]elease/
+[Rr]eleases/
+x64/
+x86/
+build/
+bld/
+[Bb]in/
+[Oo]bj/
+[Oo]ut/
+msbuild.log
+msbuild.err
+msbuild.wrn
