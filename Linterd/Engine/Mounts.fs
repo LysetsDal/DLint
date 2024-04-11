@@ -73,7 +73,7 @@ module private MountInternals =
     
     // Print the sensitive mounts
     let printMountWarnings (line: int) (mnt: SensitiveMount) =
-        Logger.log Config.LOG_MODE <| LogMountWarn(line, mnt)
+        Logger.log Config.LOG_AS_CSV <| LogMountWarn(line, mnt)
 
     
     // Control logic for processing mountpoint warnings.
@@ -119,13 +119,13 @@ let scan (mounts:RunCommandList) (instructions: instruction list) =
     let volume_mounts = getVolumeMounts instructions
     
     if Config.DEBUG then
-        Logger.log Config.LOG_MODE <| (LogHeader "MOUNTS @ scan: VOLUME MOUNTS")
+        Logger.log Config.LOG_AS_CSV <| (LogHeader "MOUNTS @ scan: VOLUME MOUNTS")
         printfn $"\n%A{volume_mounts}\n"
     
     let run_mounts = getRunMounts mounts
     
     if Config.DEBUG then
-        Logger.log Config.LOG_MODE <| (LogHeader "MOUNTS @ scan: RUN MOUNTS")
+        Logger.log Config.LOG_AS_CSV <| (LogHeader "MOUNTS @ scan: RUN MOUNTS")
         printfn $" \n%A{run_mounts}\n"
 
     // put the vloume and --mount mounts into one object

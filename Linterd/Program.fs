@@ -25,7 +25,7 @@ let prepareFile file =
     in_memory.Append("EOF\n") |> ignore
     
     // Convert the accumulated content to a string
-    printfn $"File Read: %s{file_name}\n"
+    printfn $"\nFile Read: %s{file_name}\n"
     in_memory.ToString()
 
 
@@ -41,14 +41,44 @@ let parseDockerfile file_name file_stream =
                  failwithf $"%s{err.Message} in file %s{file_name} near line %d{pos.Line+1}, \
                  column %d{pos.Column}, last parsed: '%s{String(lexbuf.Lexeme)}' \n"
     docker_file
-    
 
+// Choosing Logging mode
+let setLogModeTrue () =
+    Config.LOG_AS_CSV <- true
+
+let setLogModeFalse () =
+    Config.LOG_AS_CSV <- false
+
+// Scanning args for flags
+let argsContainLogCSVFlag args =
+    args |> Array.exists (fun arg -> arg = "--log-mode=csv")
+
+let argsContainLogNormalFlag args =
+    args |> Array.exists (fun arg -> arg = "--log-mode=normal")
+
+// Reomving flag so only files to be scanned remain
+let removeLogModeFlag args flag =
+    args |> Array.filter (fun arg -> arg <> flag)
+
+
+// Entrypoint of Linterd
 [<EntryPoint>]
-let Main args =
-    for arg in args do
-        arg 
-        |> prepareFile  
+let main args =
+    let argList =
+        if argsContainLogCSVFlag args then
+            setLogModeTrue ()
+            removeLogModeFlag args "--log-mode=csv"
+        elif argsContainLogNormalFlag args then
+            setLogModeFalse ()
+            removeLogModeFlag args "--log-mode=normal"
+        else
+            args
+
+    Array.iter (fun arg ->
+        arg
+        |> prepareFile
         |> parseDockerfile arg
-        |> run
+        |> run) argList
     0
+
     

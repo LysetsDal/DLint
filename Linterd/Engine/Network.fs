@@ -61,23 +61,23 @@ module private PortScanInternals =
         | line, Port p ->
             if portInRange p then ()
             else
-                Logger.log Config.LOG_MODE <| LogPortWarn(line, p)
+                Logger.log Config.LOG_AS_CSV <| LogPortWarn(line, p)
             
         | line, PortM (p1, p2) ->
             if portTupleInRange (p1, p2) then ()
             elif portInRange p1 then
-                Logger.log Config.LOG_MODE <| LogPortWarn(line, p2)
+                Logger.log Config.LOG_AS_CSV <| LogPortWarn(line, p2)
             elif portInRange p2 then
-                Logger.log Config.LOG_MODE <| LogPortWarn(line, p1)
+                Logger.log Config.LOG_AS_CSV <| LogPortWarn(line, p1)
             else
-                Logger.log Config.LOG_MODE <| LogPortWarnTuple(line, (p1,p2))
+                Logger.log Config.LOG_AS_CSV <| LogPortWarnTuple(line, (p1,p2))
             
         | line, Ports lst ->
             let bad_ports = portsNotInRange lst
             if List.length bad_ports = 0 then
                 ()
             else
-                Logger.log Config.LOG_MODE <| LogPortsWarnList(line, bad_ports)
+                Logger.log Config.LOG_AS_CSV <| LogPortsWarnList(line, bad_ports)
 
     
     // Logs all port warnings to std out 
@@ -125,7 +125,7 @@ module private NetworkInternals =
     
     // Print the network warning
     let printNetWarnings (line: int) (warn: MiscWarn) =
-        Logger.log Config.LOG_MODE <| LogNetWarn(line, warn)
+        Logger.log Config.LOG_AS_CSV <| LogNetWarn(line, warn)
 
     
     // Matches a cmd_list with the known network warnings sequence
@@ -172,7 +172,7 @@ let scan (cmds: RunCommandList) (instrs: instruction list)=
     let cmds_list = RunCommand.removeEmptyEntries <| filtered_cmds
     
     if Config.DEBUG then
-        Logger.log Config.LOG_MODE <| (LogHeader "NETWORK @ scan: FILTERED NETCMDS")
+        Logger.log Config.LOG_AS_CSV <| (LogHeader "NETWORK @ scan: FILTERED NETCMDS")
         printfn $"\n%A{cmds_list}\n"
     
     loadNetWarningsIntoMemory

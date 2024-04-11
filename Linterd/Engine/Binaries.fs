@@ -90,7 +90,7 @@ module private BinariesInternals =
      
     // Print the binary warnings to stdout
     let printShellWarnings (warn: BinWarn) line =
-        Logger.log Config.LOG_MODE <| LogBinWarn(line, warn)
+        Logger.log Config.LOG_AS_CSV <| LogBinWarn(line, warn)
 
 
 module private AptHelpers =
@@ -161,7 +161,7 @@ module private AptHelpers =
                     ErrorMsg = warn.ErrorMsg
                 }
                 
-        Logger.log Config.LOG_MODE <| LogAptWarn(line, apt_warn)   
+        Logger.log Config.LOG_AS_CSV <| LogAptWarn(line, apt_warn)   
 
     
     // Checks the format of apt-get install and log warnings
@@ -202,7 +202,7 @@ let scan (cmds: RunCommandList) =
     
     let split_cmds = splitCommandsInternalLists cmds
     if Config.DEBUG then
-        Logger.log Config.LOG_MODE <| (LogHeader "BINARIES @ scan: SPLIT RUNCMDS")
+        Logger.log Config.LOG_AS_CSV <| (LogHeader "BINARIES @ scan: SPLIT RUNCMDS")
         printfn $"\n%A{split_cmds}\n"
     
     let base_cmds =
@@ -211,7 +211,7 @@ let scan (cmds: RunCommandList) =
 
     
     if Config.DEBUG then
-        Logger.log Config.LOG_MODE <| (LogHeader "BINARIES @ scan: BASE_CMDS")
+        Logger.log Config.LOG_AS_CSV <| (LogHeader "BINARIES @ scan: BASE_CMDS")
         printfn $"\n%A{base_cmds}\n"
     
     let binaryWarnings = loadBinaryWarningsIntoMemmory 
@@ -227,7 +227,7 @@ let scan (cmds: RunCommandList) =
         
         
     if Config.DEBUG then
-        Logger.log Config.LOG_MODE <| (LogHeader "APT-SCAN CHECK:")
+        Logger.log Config.LOG_AS_CSV <| (LogHeader "APT-SCAN CHECK:")
         
     // check apt command:
     RunCommandList.collectSplitRuncommandList split_cmds  // 1. Concat each cmds 'split' list into one list

@@ -18,6 +18,7 @@ let printStore (s: store) =
             aux rest
     aux s
     
+    
 // Debugging header print function      
 let printHeaderMsg msg =
     let msgLength = String.length msg
@@ -29,6 +30,7 @@ let printHeaderMsg msg =
     printfn "======================================================================"
     printfn $"%s{paddedMsg}"
     printfn "======================================================================"
+
 
 // Handles all info and warning logging. Errors are handled locally out in the modules
 // Two modes of logging: human readable and CSV (controlled in Config.fs)
