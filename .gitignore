@@ -15,7 +15,6 @@ nupkg/
 *.fsx
 *.output
 project.lock.json
-**/Dockerfile
 **/tmp/*
 
 # Visual Studio Code
