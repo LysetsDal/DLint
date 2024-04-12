@@ -4,7 +4,7 @@
 [<RequireQualifiedAccess>]
 module Program
 
-open Linterd.Engine.Interp
+open Linterd.Interpreter
 open FSharp.Text.Lexing
 open System.Text
 open System.IO
