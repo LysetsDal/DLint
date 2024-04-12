@@ -8,7 +8,9 @@ open Rules.MiscWarn
 open Types
 
 
-// STORE LOGGER
+// LOGGING STORE 
+/// <summary> Print the content of the store (in-memory AST instruction list)</summary>
+/// <param name="s"> The store </param>
 let printStore (s: store) =
     let rec aux s =
         match s with
@@ -18,8 +20,10 @@ let printStore (s: store) =
             aux rest
     aux s
     
-    
-// Debugging header print function      
+
+
+/// <summary> Print a header with a message </summary>
+/// <param name="msg"> The message to include in the header </param>
 let printHeaderMsg msg =
     let msgLength = String.length msg
     let paddingLength = (70 - msgLength) / 2  // Assuming the total width is 70 characters
@@ -32,10 +36,18 @@ let printHeaderMsg msg =
     printfn "======================================================================"
 
 
-// Handles all info and warning logging. Errors are handled locally out in the modules
-// Two modes of logging: human readable and CSV (controlled in Config.fs)
+
+/// <summary>
+///  Handles all info and warning logging.
+///  Two modes of logging: human readable and CSV (controlled in Config.fs)
+///  Note. Errors are handled locally in the src .fs files 
+/// </summary>
+/// <param name="csv"> Boolean flag to swith from normal logging to CSV format </param>
 let log csv = function
     | LogHeader msg -> printHeaderMsg msg
+    | LogFileName name ->
+        if not csv then printfn $"\nFile Read: %s{name}\n"
+        else printfn $"\nFile Read,%s{name}\n"
 
     | LogShellcheckWarn (line, char, problem, msg) ->
         if not csv then printfn $"Around Line: %i{line}, char %s{char} \nShellcheck Warning: \nProblem: '%s{problem}' \nInfo message: %s{msg}\n"

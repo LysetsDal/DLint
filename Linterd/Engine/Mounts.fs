@@ -7,26 +7,30 @@ module Linterd.Engine.Mounts
 open System.Text.RegularExpressions
 open Rules.MountWarn
 open System.IO
-open Types
 open Absyn
+open Types
 
 module private Helpers =
     
-    // A predicate filter for Volume instructions
+    /// <summary> A predicate filter for Volume instructions </summary>
+    /// <param name="ins"> An instruction to check</param>
     let isVolume (ins: instruction) =
         match ins with
         | Volume _ -> true
         | _ -> false
 
     
-    // Unpack a Volume to an tuple (pre-cmd transformation)
+    /// <summary> Unpack a Volume to an tuple (pre-cmd transformation) </summary>
+    /// <param name="ins"> An instruction to transform </param>
     let volumeToTuple (ins: instruction) =
         match ins with
         | Volume (line, Mnt_pt mp) -> RunCommand.createCmd line mp (RunCommand.split mp)
         | _ -> failwith "Error at Mounts @ volumeToTuple: Instruction is not a volume"
 
             
-    // Exctracts and transforms volume instructions to a commands type
+
+    /// <summary> Exctracts and transforms volume instructions to a commands type </summary>
+    /// <param name="lst"> An instrcution lsit to extract them from </param>
     let rec getVolumeMounts (lst: instruction list) =
         lst
         |> List.filter isVolume
@@ -34,7 +38,8 @@ module private Helpers =
         |> RunCommandList.createRunCommandList
 
     
-    // Extracts --mount=type run commands
+    /// <summary> Extracts --mount=type run commands </summary>
+    /// <param name="mounts"> A RunCommandList with all mount commands </param>
     let getRunMounts (mounts: RunCommandList) =
         mounts
         |> RunCommandList.includePrefixedCmds "--mount"  
@@ -42,8 +47,9 @@ module private Helpers =
         
 
 module private MountInternals =
-    // This function Uses regexes to parse the mount rules from their files.
-    // Returns a SensitiveMount(struct) list
+    /// <summary> Uses regexes to parse the mount rules from their files.
+    /// Returns a SensitiveMount(struct) list </summary>
+    /// <param name="filePath"> The file to scan with the regex </param>
     let extractSensitiveMountsFromFile (filePath: string) =
         let file_contents = File.ReadAllText(filePath)
         let mount_regex = Regex(@"MountPoint\s*=\s*""([^""]+)""")
@@ -65,18 +71,24 @@ module private MountInternals =
         [ for mount in matches -> { ErrorCode = code; MountPoint = mount; ErrorMsg = msg } ]
 
 
-    // Sequence of all SensitiveMount objects 
+    /// <summary> Loads the sequence of all Sensitive Mounts into memory </summary>
     let loadMountPointsIntoMemory =
         Directory.GetFiles(Config.MOUNT_RULE_DIR)
         |> Seq.collect extractSensitiveMountsFromFile
-   
+
     
-    // Print the sensitive mounts
+    /// <summary> Print the sensitive mounts </summary>
+    /// <param name="line"> The line number of the warning </param>
+    /// <param name="mnt"> The SensitiveMount warning to log </param>
     let printMountWarnings (line: int) (mnt: SensitiveMount) =
         Logger.log Config.LOG_AS_CSV <| LogMountWarn(line, mnt)
 
     
-    // Control logic for processing mountpoint warnings.
+     
+    /// <summary> Control logic for processing mountpoint warnings. </summary>
+    /// <param name="warnings"> A list of all SensitiveMounts (sequence) </param>
+    /// <param name="line"> The line number of the warning </param>
+    /// <param name="mnt_list"> The collected mount list (Run and Volume)</param>
     let processMountWarning (warnings: SensitiveMount seq) (line: int) (mnt_list: string list) =
         let rec aux lst = 
             match lst with
@@ -92,8 +104,9 @@ module private MountInternals =
         aux mnt_list
         
         
-    // Execute the scan
-    // Needs a list of commands and sensitive mounts
+    /// <summary> Execute the mount scan </summary>
+    /// <param name="cmds_list"> A list of Runcommands to scan </param>
+    /// <param name="warnings"> A list of all SensitiveMounts (sequence) </param>
     let runMountScan (cmds_list: RunCommand list) (warnings: SensitiveMount seq) =
         cmds_list
         |> List.iter (fun c ->
@@ -113,8 +126,10 @@ open MountInternals
 open Helpers
 
 
-// Loops through the provided volume mounts and --mount=types to
-// looks for matches with known sensitive mounts.
+/// <summary> Loops through the provided volume mounts and --mount=types to looks
+/// for matches with known sensitive mounts.</summary>
+/// <param name="mounts"> RunCommandList to get run --mounts from </param>
+/// <param name="instructions"> instruction list to get volume mounts </param>
 let scan (mounts:RunCommandList) (instructions: instruction list) =
     let volume_mounts = getVolumeMounts instructions
     

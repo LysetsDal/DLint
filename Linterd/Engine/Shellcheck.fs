@@ -10,11 +10,13 @@ open Types
 
 module private Helpers =
     
-    // Append shebang to each string
+    /// <summary> Append '#!/bin/bash \n' (Shebang) to string </summary>
+    /// <param name="s"> String to prepend </param>
     let prependSheBang s = Config.SHEBANG_PREFIX + s
     
     
-    // Appply appendShebang to list of strings
+    /// <summary> Appply appendShebang to list of strings </summary>
+    /// <param name="lst"> list of strings to prepend </param>
     let prependSheBangs (lst: string list) =
         let rec aux lst acc =
             match lst with  
@@ -23,14 +25,16 @@ module private Helpers =
         aux (List.rev lst) []
     
     
-    // Prepend shebangs to Cmd.
+    /// <summary> Prepend shebangs to Cmd's internal list </summary>
+    /// <param name="cmd"> Cmd whose internal list to prepend to </param>
     let prependShebangToCmd(cmd: RunCommand) =
         let line, lst = cmd.LineNum, RunCommand.getAsList cmd
         let shebang_list = prependSheBangs lst
         RunCommand.createCmdWithList line cmd.AsString (Some shebang_list)
     
     
-    // Used for striping the shabang off after shellcheck has run
+    /// <summary> Used for striping the shabang off after shellcheck has run </summary>
+    /// <param name="str"> string to strip shebang from </param>
     let stripSheBang (str:string) =
         match str with
         | _ when str.StartsWith("#!/bin/bash") || str.StartsWith("#!/usr/bin/bash") -> 
@@ -39,17 +43,23 @@ module private Helpers =
         
         
 module private InputOutput =
-    // Create a temporary shell file (used to to invoke shellcheck on)
+    /// <summary> Create a temporary file with shellcode in (used to to invoke shellcheck on) </summary>
+    /// <param name="filepath"> File creation path (relative to fsproj file) </param>
+    /// <param name="cmd"> cmd (as string) to write to file </param>
     let openOrCreateRWFile (filepath: string) (cmd: string) =
         File.WriteAllText(filepath, cmd)
         File.Open(filepath, FileMode.OpenOrCreate, FileAccess.ReadWrite)
     
     
+    /// <summary> Close a filestream </summary>
+    /// <param name="stream"> filestream to close </param>
     let closeFile (stream: FileStream) =
         stream.Close()
     
-        
-    // Delete the tmpfiles created for the shellcheck scan
+    
+    /// <summary> Delete the tmpfiles created for the shellcheck scan </summary>
+    /// <param name="file_path"> File to delete </param>
+    /// <param name="verbose"> Set verbose (bool) printing mode </param>
     let deleteTmpFile (file_path: string) verbose =
         try
             File.Delete(file_path)
@@ -65,8 +75,11 @@ module private InputOutput =
 module private ShellChekInternals =
     open InputOutput
     open Helpers 
-    // Spawn a shellcheck process and redirect stdin + stdout.
-    // Returns the output of shellcheck applied to that context
+
+    /// <summary>Spawn a shellcheck process and redirect stdin + stdout. Returns the output of shellcheck applied to that context. </summary>
+    /// <param name="shellcheck">The path to chellcheck</param>
+    /// <param name="file">The tmp filename</param>
+    /// <param name="input">A filestream</param>
     let shellcheck (shellcheck: string) (file: string) (input: FileStream) =
         // Define a new context for a shellcheck process
         let shellcheck_start_cmd = $"%s{Config.SHELLCHECK_ARGS} %s{file}"
@@ -90,7 +103,9 @@ module private ShellChekInternals =
         thread.Close()
         output
         
-    // Controls the shellcheck logic
+        
+    /// <summary> Controls and runs the main shellcheck logic </summary>
+    /// <param name="cmds"> A list of runcommands to run shellcheck on </param>
     let runShellCheck (cmds : RunCommandList) =
                 
         cmds.List
@@ -108,14 +123,13 @@ module private ShellChekInternals =
                 let tmp_file = openOrCreateRWFile file_path unit    
             
                 // Spawn a new shellcheck process ad split output
-                
-                
                 let mutable shellcheck_output = ""
                 try
                     shellcheck_output <- shellcheck Config.SHELLCHECK file_path tmp_file    
                     closeFile tmp_file
                 with 
                     | :? IOException as err -> printfn $"%s{err.Message}"
+                
                 
                 // If shellcheck found something
                 if shellcheck_output <> "" then
@@ -140,7 +154,8 @@ open ShellChekInternals
 open InputOutput
 open Helpers
 
-// Delete all tmp files
+
+/// <summary> Delete all tmp files </summary>
 let flushTmpFiles  =
     let files = Directory.GetFiles(Config.OUTPUT_DIR)
     for file in files do
@@ -148,10 +163,10 @@ let flushTmpFiles  =
     if Config.VERBOSE then Logger.log Config.LOG_AS_CSV <| FlushFiles
 
 
-// Perform the shcellChek on the given commands
+/// <summary> Perform the shcellChek on the given commands </summary>
+/// <param name="cmds"> List of runcommands to check</param>
 let scan (cmds: RunCommandList) =
     
-    // the RUN --mount is a docker specific cmd. Hence we discardd it before shellcheck.
     let filtered_cmds =
         cmds
         |> RunCommandList.exlcudePrefixedCmds "--mount"

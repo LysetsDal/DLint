@@ -3,22 +3,26 @@
 // =======================================================
 module Linterd.Engine.Interp
 
-open Types
 open Absyn
+open Types
 
 
-// The store is an in-memory representation of the dockerfile.
-// It is used to perform the linters checks on.
-
+/// <summary>
+/// The store is an in-memory representation of the dockerfile.
+/// It is used to perform the linters checks on
+/// </summary>
 let emptyStore : (int * instruction) list = List.empty 
 
-// Unpacks a dfile to an instruction list.
+
+/// <summary> Unpacks a dfile to an instruction list </summary>
+/// <param name="dfile"> A dockerfile (instruction list) </param>
 let unpackDFile (dfile: dockerfile) : instruction list =
     match dfile with
     | DFile instruction -> instruction
 
 
-// Initilize the store
+/// <summary> Initilize the store with the dockerfile as Abstract Syntax </summary>
+/// <param name="dfile"> An dockerfile (instruction list) </param>
 let initStore (dfile: dockerfile) : store =
     let rec addInstr instructions counter store =
         match instructions with 
@@ -32,18 +36,9 @@ let initStore (dfile: dockerfile) : store =
     |> List.rev
 
 
-// Print the content in the store
-let printStore (s: store) =
-    let rec aux s =
-        match s with
-        | [] -> printfn ""
-        | (idx, instr) :: rest -> 
-            printfn $"%d{idx} = [ %A{instr} ]; "
-            aux rest
-    aux s
 
-
-// Return the instructions in the store
+/// <summary> Return the instructions in the store </summary>
+/// <param name="s"> The active store </param>
 let returnStore (s: store) : instruction list =
     let rec aux s acc =
         match s with
@@ -52,14 +47,17 @@ let returnStore (s: store) : instruction list =
     aux s []
 
 
-// Take an instruction and return a list
+/// <summary> Take an instruction and return a RunCommand  </summary>
+/// <param name="ins"> An instruction to transform </param>
 let instrToRunCmd (ins: instruction) =
     match ins with
     | Run (line, ShellCmd cmd) -> Some (RunCommand.createCmd line cmd (RunCommand.split cmd))
     | _ -> None
         
 
-// Extract RUN commands from instruction list
+
+/// <summary> Extract RUN commands from instruction list </summary>
+/// <param name="lst"> An instruction list to get a RunCommandList from </param>
 let getRunCmds (lst: instruction list)  =
     lst
     |> List.map instrToRunCmd
@@ -67,16 +65,14 @@ let getRunCmds (lst: instruction list)  =
     |> RunCommandList.createRunCommandList
     
     
-// =======================================================
-//                   Exposed Functions
-// =======================================================
 
-// Run: The 'main' logic of the interpreter
+/// <summary> Controls the logic of the interpreter </summary>
+/// <param name="dfile"> A dockerfile (instruction list), to run the interpreter on </param>
 let run dfile =
     let gstore = initStore <| dfile  // Load dfile into store
     if Config.DEBUG then
         Logger.printHeaderMsg "INTERP @ initStore: STORE"
-        printStore gstore
+        Logger.printStore gstore
     
     // Transform dfile to instructions
     let instrs = returnStore <| gstore

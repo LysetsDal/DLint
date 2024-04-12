@@ -9,6 +9,7 @@ open FSharp.Text.Lexing
 open System.Text
 open System.IO
 open System
+open Types
 
 /// <summary> Prepare the Dockerfile for parsing. This step reads the file into
 /// a stringbuidler and appends a EOF character to ensure proper file termination.</summary>
@@ -26,14 +27,14 @@ let prepareFile file =
     // Append "EOF" to indicate the end of the file
     in_memory.Append("EOF\n") |> ignore
     
-    // Convert the accumulated content to a string
+    Logger.log Config.LOG_AS_CSV <| LogFileName(file_name)
     printfn $"\nFile Read: %s{file_name}\n"
     in_memory.ToString()
 
 
-/// <summary> Parses the Dockerfile into the abstract syntax tree.</summary>
-/// <param name="file_name">Dockerfile path</param>
-/// <param name="file_stream">Filestream is the file as a string</param>
+/// <summary> Parses the Dockerfile into the abstract syntax tree </summary>
+/// <param name="file_name">Dockerfile path </param>
+/// <param name="file_stream">Filestream is the file as a string </param>
 let parseDockerfile file_name file_stream =
     let lexbuf = LexBuffer<char>.FromString file_stream
     let docker_file =
@@ -46,28 +47,28 @@ let parseDockerfile file_name file_stream =
                  column %d{pos.Column}, last parsed: '%s{String(lexbuf.Lexeme)}' \n"
     docker_file
 
-/// <summary>Set log mode to csv format</summary>
+/// <summary>Set log mode to csv format </summary>
 let setLogModeTrue () =
     Config.LOG_AS_CSV <- true
 
-/// <summary>Set log mode to normal format</summary>
+/// <summary>Set log mode to normal format </summary>
 let setLogModeFalse () =
     Config.LOG_AS_CSV <- false
 
-/// <summary> Check if the arg list contains the --log-mode=csv flag.</summary>
-/// <param name="args">List of arguments</param>
+/// <summary> Check if the arg list contains the --log-mode=csv flag </summary>
+/// <param name="args">List of arguments </param>
 let argsContainLogCSVFlag args =
     args |> Array.exists (fun arg -> arg = "--log-mode=csv")
 
-/// <summary> Check if the arg list contains the --log-mode=normal flag.</summary>
-/// <param name="args">List of arguments</param>
+/// <summary> Check if the arg list contains the --log-mode=normal flag </summary>
+/// <param name="args">List of arguments </param>
 let argsContainLogNormalFlag args =
     args |> Array.exists (fun arg -> arg = "--log-mode=normal")
 
 
-/// <summary>Removing flags so only files to be scanned remain.</summary>
-/// <param name="args">List of arguments</param>
-/// <param name="flag">flag to remove</param>
+/// <summary>Removing flags so only files to be scanned remain </summary>
+/// <param name="args">List of arguments </param>
+/// <param name="flag">flag to remove </param>
 let removeLogModeFlag args flag =
     args |> Array.filter (fun arg -> arg <> flag)
 
