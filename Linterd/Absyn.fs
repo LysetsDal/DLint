@@ -4,7 +4,7 @@
 
 module Absyn
 
-// Supported Dockerfile instructions
+/// <summary> Supported Dockerfile instructions in the Abstract syntax </summary>
 type instruction =
     | BaseImage of int * string * tag            (* Build Image <name>:<tag>     *)
     | Workdir of int * wpath                     (* Working directory <path>     *)
@@ -18,39 +18,46 @@ type instruction =
     | Env of int * env
     | Add of int * apath                         (* Add files from path, to path *)
 
-// A WORKDIR path (single)
+
+/// <summary> A WORKDIR path (single) </summary>
 and wpath = 
     | WPath of string
 
-// A Volume mountpoint (single)
+
+/// <summary> A Volume mountpoint (single) </summary>
 and mnt_pt = 
     | Mnt_pt of string
 
-// A COPY path (double)
+
+/// <summary> A COPY path (double) </summary>
 and cpath = 
     | CPath of string * string
 
-// An ADD path (double)
+
+/// <summary> An ADD path (double) </summary>
 and apath =
     | APath of string * string
 
-// A Shell command 
+
+/// <summary> A Shell command </summary>
 and shellcmd =
     | ShellCmd of string 
 
-// Environment Variables. A <Key>=<Value> pair of strings
+
+/// <summary> Environment Variables. A 'Key'='Value' pair of strings </summary>
 and env = EnvVar of string * string
 
-// Expose ports
+
+/// <summary> Expose ports </summary>
 and expose =
     | Port of int
     | PortM of int * int
     | Ports of int list
 
-// Parse Docker image tags 
+/// <summary> Parse Docker image tags </summary>
 and tag =
     | Tag of string
     | TagV of int * string
 
-// The Abstract representation of a dockerfile
+/// <summary> The Abstract representation of a dockerfile </summary>
 and dockerfile = DFile of instruction list

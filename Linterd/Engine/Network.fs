@@ -13,26 +13,33 @@ open Absyn
 
 module private PortScanInternals =
         
-    // Predicate filter for expose type
+
+    /// <summary> Predicate filter for expose isntruction </summary>
+    /// <param name="ins"> The isntruction to check </param>
     let isExpose (ins: instruction) =
         match ins with
         | Expose _ -> true
         | _ -> false
     
     
-    // Returns a list of Expose instructions
+    /// <summary> Returns a list of Expose instructions </summary>
+    /// <param name="lst"> The instruction list </param>
     let getExposeInstructions lst =  
         List.filter isExpose lst
     
     
-    // 'Converts' an instruction to type expose
+
+    /// <summary> 'Converts' an instruction to type expose </summary>
+    /// <param name="ins"> The instruction to cast to (line * expose) </param>
     let instructionToExpose (ins: instruction) =
         match ins with
         | Expose (line, e) -> Some (line, e)
         | _ -> None
 
     
-    // Determines if a single port is in range
+
+    /// <summary> Determines if a single port is in range </summary>
+    /// <param name="port"> The port to check </param>
     let portInRange (port: int) =
         match port with
         | _ when port <= Config.UNIX_MIN_PORT -> false
@@ -40,14 +47,18 @@ module private PortScanInternals =
         | _ -> true  
         
         
-    // Determines if both ports in the tuple is in range
+    /// <summary> Determines if both ports in the tuple is in range </summary>
+    /// <param name="port"> The PortTuple to check </param>
     let portTupleInRange (port: int * int) = 
         match port with
         | host, con -> (portInRange host && portInRange con)
     
     
-    // Compares the length of the inputed list with the 'in_range' lists.
-    // If theyr not equal in size it returns the out-of-range ports.
+    /// <summary>
+    /// Compares the length of the inputed list with the 'in_range' lists.
+    /// If theyr not equal in size it returns the out-of-range ports.
+    /// </summary>
+    /// <param name="lst"> The list to check for bad ports </param>
     let portsNotInRange (lst: int list) = 
         let len = List.length lst
         let in_range = List.filter portInRange lst
@@ -55,7 +66,9 @@ module private PortScanInternals =
         if List.length in_range <> len then out_range else []
         
         
-    // Logs a port warning if its outside UNIX range
+
+    /// <summary> Logs a port warning if its outside UNIX range </summary>
+    /// <param name="e"> The int * expose instruction to check </param>
     let logPortWarning (e: int * expose) =
         match e with
         | line, Port p ->
@@ -80,22 +93,27 @@ module private PortScanInternals =
                 Logger.log Config.LOG_AS_CSV <| LogPortsWarnList(line, bad_ports)
 
     
-    // Logs all port warnings to std out 
+
+    /// <summary> Logs all port warnings to stdOut </summary>
+    /// <param name="instrs"> The instruction lsit to log warnings from </param>
     let logAllPortWarnings (instrs: instruction list) =
         instrs
         |> List.choose instructionToExpose  // Filter and convert to expose instances
         |> List.map logPortWarning |> ignore              // Log warnings
     
-    // Runs the port scan
+    
+    /// <summary> Runs the port scan </summary>
+    /// <param name="instrs"> The lsit of instructions to check </param>
     let scanPorts instrs =
         let expose_cmds = getExposeInstructions instrs 
         logAllPortWarnings expose_cmds
 
 
 module private NetworkInternals =
-    //@TODO: Code Duplication with Mounts.fs
-    // This function Uses regexes to parse the network rule from its file.
-    // Returns a MiscWarn(struct) list
+    
+    /// <summary> This function Uses regexes to parse the network rule from its file.
+    /// Returns a MiscWarn(struct) list </summary>
+    /// <param name="file_path"> The file path to perform the regex match scan on </param>
     let extractNetWarnFromFile (file_path: string) =
         let file_contents = File.ReadAllText(file_path)
         let warn_regex = Regex(@"Problem\s*=\s*""([^""]+)""")
@@ -117,18 +135,25 @@ module private NetworkInternals =
         [ for warn in matches -> { ErrorCode = code; Problem = warn; ErrorMsg = msg } ]
 
 
-    // Sequence of all netwarning objects 
+
+    /// <summary> Sequence of all netwarning objects </summary>
     let loadNetWarningsIntoMemory  =
         Directory.GetFiles(Config.MISC_RULE_DIR)
         |> Seq.collect extractNetWarnFromFile
     
     
-    // Print the network warning
+    /// <summary> Print the network warning </summary>
+    /// <param name="line"> The line number </param>
+    /// <param name="warn"> The MiscWarn object </param>
     let printNetWarnings (line: int) (warn: MiscWarn) =
         Logger.log Config.LOG_AS_CSV <| LogNetWarn(line, warn)
 
     
-    // Matches a cmd_list with the known network warnings sequence
+
+    /// <summary> Matches a cmd_list with the known network warnings sequence </summary>
+    /// <param name="warnings"> Sequence of all MiscWarnings </param>
+    /// <param name="line"> The line number (passd on for logging) </param>
+    /// <param name="cmd_list"> The list of commands to check </param>
     let processNetworkWarning (warnings: MiscWarn seq) (line: int) (cmd_list: string list) =
         let rec aux lst = 
             match lst with
@@ -145,7 +170,10 @@ module private NetworkInternals =
         aux cmd_list
 
 
-    // Check if there are any --network=host run commands  
+    
+    /// <summary> Check if there are any --network=host run commands </summary>
+    /// <param name="cmd_list"> List of RunCommands </param>
+    /// <param name="networkWarnings"> MiscWarn seq</param>
     let runNetworkScan (cmd_list: RunCommand list) (networkWarnings:MiscWarn seq) =
         cmd_list
         |> List.iter (fun c ->
@@ -164,8 +192,9 @@ module private NetworkInternals =
 open NetworkInternals
 open PortScanInternals
 
-
-// Loops through the provided network cmds to looks for matches with known problems.
+/// <summary> Loops through the provided network cmds to looks for matches with known problems </summary>
+/// <param name="cmds"> RunCommandList object to scan </param>
+/// <param name="instrs"> The instruction liste (used for port scan) </param>
 let scan (cmds: RunCommandList) (instrs: instruction list)=
     let filtered_cmds = RunCommandList.includePrefixedCmds "--network" cmds
        

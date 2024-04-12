@@ -12,8 +12,8 @@ open System.IO
 
 module private Helpers =
     
-    // Takes the list of commands, and splits at the ' '.
-    // retruns the commands as a list of a list of the splitted commands 
+    /// <summary> Splits the string list at ' ' (spaces) </summary>
+    /// <param name="cmd"> The list of commands</param>
     let splitCommands (cmd: string list) =
         let delim = [|" "|]
         let rec aux cmd acc =
@@ -26,7 +26,8 @@ module private Helpers =
         aux (List.rev cmd) []
    
     
-    // Split a cmd and update the cmd's internal 'split' list        
+    /// <summary> Split a cmd and update the cmd's internal 'split' list </summary>
+    /// <param name="cmd"> A RunCommand to split and update </param>
     let splitCmd (cmd: RunCommand) =
         match RunCommand.getAsList cmd with
         | [] -> failwithf $"Error in Binaries.fs: No cmd to split" 
@@ -35,12 +36,14 @@ module private Helpers =
             RunCommand.setAsSplitCmd cmd split
       
         
-    // Splits a list of commands and updates the internal field 'split' of each cmd 
+    /// <summary> Splits a RunCommandList and updates the internal field 'asList' of each cmd </summary>
+    /// <param name="cmds"> A RunCommandList to update </param>
     let splitCommandsInternalLists (cmds: RunCommandList) : RunCommand list =
         cmds.List |> List.map splitCmd
     
     
-    // Update line num according to multiline run cmds
+    /// <summary> Update line num according to multiline run cmds </summary>
+    /// <param name="lst"> A list of (line * cmd_names) to update </param>
     let updateLineNum (lst: (int * string) list) =
         let rec aux lst acc idx =
             match lst with
@@ -52,7 +55,8 @@ module private Helpers =
         aux lst [] 0
     
     
-    // Extracts base commands from cmd list
+    /// <summary> Extracts base commands (binary called) from RunCommands list </summary>
+    /// <param name="rcmds"> A list of Runcommands to extract from </param>
     let getBaseCommands (rcmds: RunCommand list) = 
         rcmds |> List.fold (fun acc (x:RunCommand) -> (RunCommand.getBaseCommand x)::acc) []
         |> List.rev
@@ -60,8 +64,8 @@ module private Helpers =
 
 
 module private BinariesInternals =
-    // This function Uses regexes to parse the Bash rules.
-    // Returns a BashWarn(struct) list
+    /// <summary> This function Uses regexes to parse the Bash rules. Returns a BashWarn(struct) list </summary>
+    /// <param name="file_path"> The file to scan with the regex </param>
     let extractShellWarningsFromFile (file_path: string) =
         let file_contents = File.ReadAllText(file_path)
         let bin_regex = Regex(@"Binary\s*=\s*""([^""]+)""")
@@ -82,38 +86,53 @@ module private BinariesInternals =
         [ for bin in matches -> { ErrorCode = code; Binary = bin; ErrorMsg = msg } ]
 
 
-    // Sequence of all binWarnings  
+    /// <summary> Sequence of all binWarnings </summary>
     let loadBinaryWarningsIntoMemmory =
         Directory.GetFiles(Config.BASH_RULE_DIR)
         |> Seq.collect extractShellWarningsFromFile
    
      
-    // Print the binary warnings to stdout
+    /// <summary> Print the binary warnings to stdout </summary>
+    /// <param name="warn"> A Shellwarn.BinWarn warning </param>
+    /// <param name="line"> A line number </param>
     let printShellWarnings (warn: BinWarn) line =
         Logger.log Config.LOG_AS_CSV <| LogBinWarn(line, warn)
 
 
 module private AptHelpers =
     
-    // Predicate filter for apt-get update command    
+    /// <summary> Predicate filter for apt-get update command </summary>
+    /// <param name="lst"> A lsit to check </param>
     let isAptUpdate lst =
         List.exists (fun x -> x = "update") lst
     
-    // Predicate for apt-get install flag
+
+    /// <summary> Predicate for apt-get install flag </summary>
+    /// <param name="lst"> A list of a single (splitted) apt-install command </param>
     let aptHasDashY lst =
         List.contains "-y" lst
                 
-    // Predicate for apt-get install flag
+                
+    /// <summary> Predicate for apt-get install flag </summary>
+    /// <param name="lst"> A list of a single (splitted) apt-install command </param>
     let aptHasNoInstallRec lst =
         List.contains "--no-install-recommends" lst
     
-    // unsplit a runcommand  
+    
+
+    /// <summary> Unsplit a list </summary>
+    /// <param name="rcmds"> A string list of a splitted command </param>
     let unSplitRunCommands (rcmds: string list) =
         List.fold(fun acc x -> acc + x + " ") "" rcmds |> Utils.trimWhitespace
     
     
-    // Extracts commands with apt-get as base cmd from the dict .
-    // List is in order of occurance in the dockerfile.
+
+    /// <summary>
+    /// Extracts commands with apt-get as base cmd from the dict.
+    /// List is in order of occurance in the dockerfile.
+    /// </summary>
+    /// <param name="dict"> A custom data structure list of:
+    /// ((line *  base_command) * cmd_flags) </param>
     let getAptCommands (dict: ((int * string) * string list) list) =
         let rec aux lst acc =
             match lst with
@@ -121,11 +140,11 @@ module private AptHelpers =
             | ((line, "apt-get"), lst) :: rest -> aux rest (((line, "apt-get"), lst) :: acc)
             | (_, _) :: rest -> aux rest acc
         aux dict []
-
     
     
-    // Predicate that pattern matches the apt-get command to see if it contains
-    // the two recommended flags for dockerfiles.
+    /// <summary> Predicate that pattern matches the apt-get command to see if it contains
+    /// the two recommended flags for dockerfiles </summary>
+    /// <param name="lst"> A string list of a splitted apt-get command </param>
     let checkAptInstall lst =
         match lst with
         | _ :: "install" :: "-y" :: "--no-install-recommends" :: _ 
@@ -136,7 +155,12 @@ module private AptHelpers =
         | _ :: "install" :: _ :: "--no-install-recommends" :: [ "-y" ] -> true
         | _ -> false
     
-    // The print function for apt-get install.
+    
+    /// <summary> The print function for apt-get install </summary>
+    /// <param name="hasY"> Predicate to check '-y' flag </param>
+    /// <param name="hasNoInstall">Predicate to check '--no-install-recommends' flag </param>
+    /// <param name="cmd"> A splitted string list of the apt-get command </param>
+    /// <param name="line"> A line number </param>
     let printAptWarnings hasY hasNoInstall cmd line =
         let apt_warn =
             if hasNoInstall then
@@ -164,7 +188,8 @@ module private AptHelpers =
         Logger.log Config.LOG_AS_CSV <| LogAptWarn(line, apt_warn)   
 
     
-    // Checks the format of apt-get install and log warnings
+    /// <summary> Checks the format of apt-get install and log warnings </summary>
+    /// <param name="entry"> A single entry of the ((line *  base_command) * cmd_flags) data structure </param>
     let checkAptOk (entry: (int * string) * string list) = 
         match entry with
         | (line, _), lst ->
@@ -179,11 +204,11 @@ module private AptHelpers =
                 printAptWarnings has_y has_no_install lst line
         
         
-    // Scan through the apt-get commands 
+    /// <summary> Scan through the apt-get commands </summary>
+    /// <param name="dict"> The ((line *  base_command) * cmd_flags list) list data structure</param>
     let scanApt dict =
         let mutable count = 0
         let rec aux (dict: ((int * string) * string list) list) count =
-            
             match dict with
             | [] -> ()
             | (cmd, lst) :: rest ->
@@ -198,6 +223,9 @@ module private AptHelpers =
 open BinariesInternals
 open AptHelpers
 open Helpers
+
+/// <summary> The Scan command of the Binaries module </summary>
+/// <param name="cmds"> A RunCommandList to scan </param>
 let scan (cmds: RunCommandList) =
     
     let split_cmds = splitCommandsInternalLists cmds
