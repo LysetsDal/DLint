@@ -61,7 +61,7 @@
         <Compile Include="Engine\SyntaxChecks.fs" />
         <Compile Include="Engine\Interp.fs" />
 
-        <None Include="LSP\LSP.fsx" />
+        <Compile Include="LSP\client.fs" />
 
         <Content Include="LSP\lsp_tmp" />
         <!-- Shellcheck tmp file location -->
