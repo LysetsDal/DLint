@@ -56,7 +56,6 @@ let instrToRunCmd (ins: instruction) =
     | _ -> None
         
 
-
 /// <summary> Extract RUN commands from instruction list </summary>
 /// <param name="lst"> An instruction list to get a RunCommandList from </param>
 let getRunCmds (lst: instruction list)  =
@@ -64,7 +63,7 @@ let getRunCmds (lst: instruction list)  =
     |> List.map instrToRunCmd
     |> List.choose id
     |> RunCommandList.createRunCommandList
-    
+
     
 
 /// <summary> Controls the logic of the interpreter </summary>

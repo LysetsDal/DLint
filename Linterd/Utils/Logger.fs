@@ -46,7 +46,7 @@ let log = function
     | LogHeader msg -> printHeaderMsg msg
     | LogFileName name ->
         if not Config.LOG_AS_CSV then printfn $"\nFile Read: %s{name}\n"
-        else printfn $"\nFile Read,%s{name}\n"
+        else printfn $"File Read,%s{name}\n"
 
     | LogShellcheckWarn (line, char, problem, msg) ->
         if not Config.LOG_AS_CSV then printfn $"Around Line: %i{line}, char %s{char} \nShellcheck Warning: \nProblem: '%s{problem}' \nInfo message: %s{msg}\n"

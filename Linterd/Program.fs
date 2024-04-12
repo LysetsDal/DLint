@@ -48,11 +48,11 @@ let parseDockerfile file_name file_stream =
     docker_file
 
 /// <summary>Set log mode to csv format </summary>
-let setLogModeTrue () =
+let setCSVLogModeTrue () =
     Config.LOG_AS_CSV <- true
 
 /// <summary>Set log mode to normal format </summary>
-let setLogModeFalse () =
+let setCSVLogModeFalse () =
     Config.LOG_AS_CSV <- false
 
 /// <summary> Check if the arg list contains the --log-mode=csv flag </summary>
@@ -73,20 +73,28 @@ let removeLogModeFlag args flag =
     args |> Array.filter (fun arg -> arg <> flag)
 
 
+/// <summary> Control logic for parsing flags and setting log mode </summary>
+/// <param name="args"> A string array of run-time arguments for Linterd </param>
+let switchLogMode args =
+    let argList =
+        match args with
+        | _ when argsContainLogCSVFlag args -> 
+            setCSVLogModeTrue ()
+            removeLogModeFlag args "--log-mode=csv"
+        | _ when argsContainLogNormalFlag args ->
+            setCSVLogModeFalse ()
+            removeLogModeFlag args "--log-mode=normal"
+        | _ -> 
+            setCSVLogModeFalse ()
+            args
+    argList
+
 
 /// <summary> Entrypoint of Linterd </summary>
 /// <param name="args"> List of dockerfiles and runtime flags </param>
 [<EntryPoint>]
 let main (args: string array) =
-    let argList =
-        if argsContainLogCSVFlag args then
-            setLogModeTrue ()
-            removeLogModeFlag args "--log-mode=csv"
-        elif argsContainLogNormalFlag args then
-            setLogModeFalse ()
-            removeLogModeFlag args "--log-mode=normal"
-        else
-            args
+    let argList = switchLogMode args
 
     Array.iter (fun arg ->
         arg
@@ -94,5 +102,3 @@ let main (args: string array) =
         |> parseDockerfile arg
         |> run) argList
     0
-
-    
