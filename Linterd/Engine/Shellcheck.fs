@@ -139,7 +139,7 @@ module private ShellChekInternals =
                     let char_pos = split_output[2]
                     let response_msg = split_output[4].Trim()
                     
-                    Logger.log Config.LOG_AS_CSV <| LogShellcheckWarn(line, char_pos, problem, response_msg)
+                    Logger.log <| LogShellcheckWarn(line, char_pos, problem, response_msg)
 
                 count <- count + 1
             )
@@ -160,7 +160,7 @@ let flushTmpFiles  =
     let files = Directory.GetFiles(Config.OUTPUT_DIR)
     for file in files do
         deleteTmpFile file false
-    if Config.VERBOSE then Logger.log Config.LOG_AS_CSV <| FlushFiles
+    if Config.VERBOSE then Logger.log <| FlushFiles
 
 
 /// <summary> Perform the shcellChek on the given commands </summary>
@@ -174,7 +174,7 @@ let scan (cmds: RunCommandList) =
         |> RunCommandList.exlcudePrefixedCmds "--network"
     
     if Config.DEBUG then
-        Logger.log Config.LOG_AS_CSV <| (LogHeader "SHELLCHECK @ scan: FILTERED CMDS")
+        Logger.log <| (LogHeader "SHELLCHECK @ scan: FILTERED CMDS")
         printfn $"%A{filtered_cmds}\n"
     
     filtered_cmds

@@ -81,12 +81,12 @@ let run dfile =
     // Extract run cmds from instructions
     let rcmds = getRunCmds <| instrs   
     if Config.DEBUG then
-        Logger.log Config.LOG_AS_CSV (LogHeader "INTERP @ getRunCmds: INSTRUCTIONS") 
+        Logger.log (LogHeader "INTERP @ getRunCmds: INSTRUCTIONS") 
         printfn $"%A{instrs}\n"
     
     // 1. Execute shellcheck
     if Config.DEBUG then
-        Logger.log Config.LOG_AS_CSV (LogHeader "INTERP @ Shellcheck.scan: RCMDS")
+        Logger.log (LogHeader "INTERP @ Shellcheck.scan: RCMDS")
         printfn $"%A{RunCommandList.runCommandListToString rcmds}\n"
      
     Shellcheck.scan <| rcmds

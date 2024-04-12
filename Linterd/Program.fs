@@ -27,7 +27,7 @@ let prepareFile file =
     // Append "EOF" to indicate the end of the file
     in_memory.Append("EOF\n") |> ignore
     
-    Logger.log Config.LOG_AS_CSV <| LogFileName(file_name)
+    Logger.log <| LogFileName(file_name)
     printfn $"\nFile Read: %s{file_name}\n"
     in_memory.ToString()
 
@@ -77,7 +77,7 @@ let removeLogModeFlag args flag =
 /// <summary> Entrypoint of Linterd </summary>
 /// <param name="args"> List of dockerfiles and runtime flags </param>
 [<EntryPoint>]
-let main args =
+let main (args: string array) =
     let argList =
         if argsContainLogCSVFlag args then
             setLogModeTrue ()

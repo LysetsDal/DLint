@@ -81,7 +81,7 @@ module private MountInternals =
     /// <param name="line"> The line number of the warning </param>
     /// <param name="mnt"> The SensitiveMount warning to log </param>
     let printMountWarnings (line: int) (mnt: SensitiveMount) =
-        Logger.log Config.LOG_AS_CSV <| LogMountWarn(line, mnt)
+        Logger.log <| LogMountWarn(line, mnt)
 
     
      
@@ -134,13 +134,13 @@ let scan (mounts:RunCommandList) (instructions: instruction list) =
     let volume_mounts = getVolumeMounts instructions
     
     if Config.DEBUG then
-        Logger.log Config.LOG_AS_CSV <| (LogHeader "MOUNTS @ scan: VOLUME MOUNTS")
+        Logger.log <| (LogHeader "MOUNTS @ scan: VOLUME MOUNTS")
         printfn $"\n%A{volume_mounts}\n"
     
     let run_mounts = getRunMounts mounts
     
     if Config.DEBUG then
-        Logger.log Config.LOG_AS_CSV <| (LogHeader "MOUNTS @ scan: RUN MOUNTS")
+        Logger.log <| (LogHeader "MOUNTS @ scan: RUN MOUNTS")
         printfn $" \n%A{run_mounts}\n"
 
     // put the vloume and --mount mounts into one object

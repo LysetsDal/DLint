@@ -74,23 +74,23 @@ module private PortScanInternals =
         | line, Port p ->
             if portInRange p then ()
             else
-                Logger.log Config.LOG_AS_CSV <| LogPortWarn(line, p)
+                Logger.log <| LogPortWarn(line, p)
             
         | line, PortM (p1, p2) ->
             if portTupleInRange (p1, p2) then ()
             elif portInRange p1 then
-                Logger.log Config.LOG_AS_CSV <| LogPortWarn(line, p2)
+                Logger.log <| LogPortWarn(line, p2)
             elif portInRange p2 then
-                Logger.log Config.LOG_AS_CSV <| LogPortWarn(line, p1)
+                Logger.log <| LogPortWarn(line, p1)
             else
-                Logger.log Config.LOG_AS_CSV <| LogPortWarnTuple(line, (p1,p2))
+                Logger.log <| LogPortWarnTuple(line, (p1,p2))
             
         | line, Ports lst ->
             let bad_ports = portsNotInRange lst
             if List.length bad_ports = 0 then
                 ()
             else
-                Logger.log Config.LOG_AS_CSV <| LogPortsWarnList(line, bad_ports)
+                Logger.log <| LogPortsWarnList(line, bad_ports)
 
     
 
@@ -146,7 +146,7 @@ module private NetworkInternals =
     /// <param name="line"> The line number </param>
     /// <param name="warn"> The MiscWarn object </param>
     let printNetWarnings (line: int) (warn: MiscWarn) =
-        Logger.log Config.LOG_AS_CSV <| LogNetWarn(line, warn)
+        Logger.log <| LogNetWarn(line, warn)
 
     
 
@@ -201,7 +201,7 @@ let scan (cmds: RunCommandList) (instrs: instruction list)=
     let cmds_list = RunCommand.removeEmptyEntries <| filtered_cmds
     
     if Config.DEBUG then
-        Logger.log Config.LOG_AS_CSV <| (LogHeader "NETWORK @ scan: FILTERED NETCMDS")
+        Logger.log <| (LogHeader "NETWORK @ scan: FILTERED NETCMDS")
         printfn $"\n%A{cmds_list}\n"
     
     loadNetWarningsIntoMemory
