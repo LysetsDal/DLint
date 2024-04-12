@@ -72,7 +72,7 @@ module private UserScanInternals =
         match List.length users with
         | 0 ->
             let warn = userWarn101
-            Logger.log Config.LOG_AS_CSV <| LogMiscWarnNoLine(warn)
+            Logger.log <| LogMiscWarnNoLine(warn)
             users
         | _ -> users
 
@@ -84,7 +84,7 @@ module private UserScanInternals =
         | (line, (name, uid)) :: _ ->
             let warn = userWarn100
             if userIsRoot (line, (name, uid)) then
-                Logger.log Config.LOG_AS_CSV <| LogMiscWarn (line, warn)
+                Logger.log <| LogMiscWarn (line, warn)
             else
                 ()
         | _ -> ()         
@@ -101,7 +101,7 @@ let scan (instr: instruction list) =
     let user_instructions = getUserInstructions instr
     
     if Config.DEBUG then
-        Logger.log Config.LOG_AS_CSV <| (LogHeader "USER INSTRUCTIONS")
+        Logger.log <| (LogHeader "USER INSTRUCTIONS")
         printfn $"%A{user_instructions}\n"
     
     user_instructions
