@@ -28,7 +28,6 @@ let prepareFile file =
     in_memory.Append("EOF\n") |> ignore
     
     Logger.log <| LogFileName(file_name)
-    printfn $"\nFile Read: %s{file_name}\n"
     in_memory.ToString()
 
 
