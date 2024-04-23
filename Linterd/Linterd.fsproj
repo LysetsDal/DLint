@@ -25,15 +25,12 @@
         <Compile Include="Utils\Utils.fs" />
         
         <!-- FsLex Dlex.fsl -->
-        <FsLex Include="DLex.fsl">
-            <OtherFlags>--module DLex --unicode</OtherFlags>
-        </FsLex>
 
         <!-- Absyn -->
         <Compile Include="Absyn.fs" />
         <Compile Include="Types.fs" />
         
-        <!-- DPar.fsi -->
+        <!-- Parser -->
         <Compile Include="Parser\DPar.fsi" />
         <!-- FsYacc DPar.fsy -->
         <FsYacc Include="Parser\DPar.fsy">
@@ -41,9 +38,6 @@
         </FsYacc>
         <!-- DPar.fs -->
         <Compile Include="Parser\DPar.fs" />
-
-        <!-- Dlex.fs -->
-        <Compile Include="DLex.fs" />
         
         <!-- Static congifuration variables -->
         <Compile Include="Config.fs" />
@@ -63,6 +57,12 @@
 
         <!-- Interpreter -->
         <Compile Include="Interp.fs" />
+        
+        <!-- Lexer -->
+        <Compile Include="Lexer\DLex.fs" />
+        <FsLex Include="Lexer\DLex.fsl">
+          <OtherFlags>--module DLex --unicode</OtherFlags>
+        </FsLex>
         
         <!-- Program -->
         <Compile Include="Program.fs" />
