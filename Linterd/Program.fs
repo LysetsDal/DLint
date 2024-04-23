@@ -30,7 +30,6 @@ let prepareFile file =
     Logger.log <| LogFileName(file_name)
     in_memory.ToString()
 
-
 /// <summary> Parses the Dockerfile into the abstract syntax tree </summary>
 /// <param name="file_name">Dockerfile path </param>
 /// <param name="file_stream">Filestream is the file as a string </param>
@@ -38,7 +37,7 @@ let parseDockerfile file_name file_stream =
     let lexbuf = LexBuffer<char>.FromString file_stream
     let docker_file =
         try
-            DPar.Main DLex.Token lexbuf
+            DPar.Main DLex.Tokenize lexbuf
         with
             | err ->
                  let pos = lexbuf.EndPos 
@@ -64,13 +63,11 @@ let argsContainLogCSVFlag args =
 let argsContainLogNormalFlag args =
     args |> Array.exists (fun arg -> arg = "--log-mode=normal")
 
-
 /// <summary>Removing flags so only files to be scanned remain </summary>
 /// <param name="args">List of arguments </param>
 /// <param name="flag">flag to remove </param>
 let removeLogModeFlag args flag =
     args |> Array.filter (fun arg -> arg <> flag)
-
 
 
 /// <summary> Entrypoint of Linterd </summary>
@@ -93,5 +90,4 @@ let main (args: string array) =
         |> parseDockerfile arg
         |> run) argList
     0
-
     

@@ -12,7 +12,7 @@ type LogParams =
     | LogHeader of string
     | LogFileName of string
     | LogShellcheckWarn of int * string * string * string
-    | LogMiscWarnNoLine of MiscWarn.MiscWarn    // ErrorCode, Problem, ErrorMsg
+    | LogMiscWarnNoLine of MiscWarn.MiscWarn   
     | LogMiscWarn of int * MiscWarn.MiscWarn
     | LogBinWarn of int * ShellWarn.BinWarn
     | LogAptWarn of int * ShellWarn.AptWarn
