@@ -1,7 +1,7 @@
 module DLex
 
-/// Rule Token
-val Token: lexbuf: LexBuffer<char> -> token
+/// Rule Tokenize
+val Tokenize: lexbuf: LexBuffer<char> -> token
 /// Rule EndLineComment
 val EndLineComment: lexbuf: LexBuffer<char> -> token
 /// Rule Path

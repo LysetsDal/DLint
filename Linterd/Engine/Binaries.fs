@@ -30,7 +30,7 @@ module private Helpers =
     /// <param name="cmd"> A RunCommand to split and update </param>
     let splitCmd (cmd: RunCommand) =
         match RunCommand.getAsList cmd with
-        | [] -> failwithf $"Error in Binaries.fs: No cmd to split" 
+        | [] -> failwithf "Error in Binaries.fs: No cmd to split" 
         | x ->
             let split = splitCommands x
             RunCommand.setAsSplitCmd cmd split
@@ -144,7 +144,7 @@ module private AptHelpers =
     
     /// <summary> Predicate that pattern matches the apt-get command to see if it contains
     /// the two recommended flags for dockerfiles </summary>
-    /// <param name="lst"> A string list of a splitted apt-get command </param>
+    /// <param name="lst"> A string list of split apt-get command </param>
     let checkAptInstall lst =
         match lst with
         | _ :: "install" :: "-y" :: "--no-install-recommends" :: _ 

@@ -7,7 +7,6 @@ module Logger
 open Rules.MiscWarn
 open Types
 
-
 // LOGGING STORE 
 /// <summary> Print the content of the store (in-memory AST instruction list)</summary>
 /// <param name="s"> The store </param>
@@ -20,7 +19,6 @@ let printStore (s: store) =
             aux rest
     aux s
     
-
 
 /// <summary> Print a header with a message </summary>
 /// <param name="msg"> The message to include in the header </param>
@@ -36,10 +34,9 @@ let printHeaderMsg msg =
     printfn "======================================================================"
 
 
-
 /// <summary>
 ///  Handles all info and warning logging.
-///  Two modes of logging: human readable and CSV (controlled in Config.fs)
+///  Two modes of logging: human-readable and CSV (controlled in Config.fs)
 ///  Note. Errors are handled locally in the src .fs files 
 /// </summary>
 let log = function

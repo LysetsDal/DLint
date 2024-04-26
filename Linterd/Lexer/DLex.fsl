@@ -2,7 +2,6 @@
 // ================================================
 //          LEXER-GENERATOR SPECIFICATION
 // ================================================
-
 open FSharp.Text.Lexing
 open System
 open DPar
@@ -12,8 +11,7 @@ open Utils
 let lexeme (lexbuf: LexBuffer<char>) = 
     LexBuffer<char>.LexemeString lexbuf
 
-
-let mutable currentPos = 1
+let mutable linePos = 1
 let mutable tmpCount = 0
 
 (* Used to parse paths s for the ADD instruction *)
@@ -54,7 +52,6 @@ let letter = ['a'-'z''A'-'Z']['a'-'z''A'-'Z''0'-'9''_']*
 // Parse a space a tab or a carriage return 
 let whitespace = [' ' '\t' '\r'] 
 
-
 // RegEx for instructions
 let add = "ADD"[' ']+
 let cmd = "CMD"[' ']+
@@ -65,56 +62,61 @@ let run = "RUN"[' ']+
 let volume = "VOLUME"[' ']+
 let wpath = "WORKDIR"[' ']+
 
-
-rule Token = parse
-    | whitespace      { Token lexbuf }
-    | '\n'            { lexbuf.EndPos <- lexbuf.EndPos.NextLine; currentPos <- currentPos + 1; Token lexbuf }
+rule Tokenize = parse
+    | whitespace      { Tokenize lexbuf }
+    | '\n'            { lexbuf.EndPos <- lexbuf.EndPos.NextLine; 
+                        linePos <- linePos + 1; Tokenize lexbuf }
     | int+            { INT (System.Int32.Parse (lexeme lexbuf)) }  
-    | add             { aPath (currentPos) (Path [] lexbuf)  }
-    | cmd             { entrycmd (currentPos) (Shell [] lexbuf) }
-    | cpath           { cPath (currentPos) (Path [] lexbuf)  }
-    | entrypoint      { entrycmd (currentPos) (Shell [] lexbuf) }
-    | env             { envVar (currentPos) (Path [] lexbuf) }
-    | run             { runcmd (currentPos) (Shell [] lexbuf) } 
-    | volume          { mntPt (currentPos) (Path [] lexbuf)  }
-    | wpath           { wPath (currentPos) (Path [] lexbuf)  }
-    | letter          { keyword (currentPos) ((lexeme lexbuf).ToLower()) }
+    | add             { aPath (linePos) (Path [] lexbuf)  }
+    | cmd             { entrycmd (linePos) (Shell [] lexbuf) }
+    | cpath           { cPath (linePos) (Path [] lexbuf)  }
+    | entrypoint      { entrycmd (linePos) (Shell [] lexbuf) }
+    | env             { envVar (linePos) (Path [] lexbuf) }
+    | run             { runcmd (linePos) (Shell [] lexbuf) } 
+    | volume          { mntPt (linePos) (Path [] lexbuf)  }
+    | wpath           { wPath (linePos) (Path [] lexbuf)  }
+    | letter          { keyword (linePos) ((lexeme lexbuf).ToLower()) }
     | ':'             { COLON }
     | '.'             { DOT }
     | ','             { COMMA }
     | '='             { EQ }
     | '-'             { DASH }
-    | '#'             { EndLineComment lexbuf; currentPos <- currentPos + 1; Token lexbuf }
-    | '"'             { CSTST (currentPos, (String [] lexbuf)) }
-    | eof             { currentPos <- 1; EOF }
-    | _               { currentPos <- 1; failwith "Lexer error: illegal symbol" }
+    | '#'             { EndLineComment lexbuf; 
+                        linePos <- linePos + 1; 
+                        Tokenize lexbuf }
+    | '"'             { CSTST (linePos, (String [] lexbuf)) }
+    | eof             { linePos <- 1; EOF }
+    | _               { linePos <- 1; failwith "Lexer error: illegal symbol" }
 
 // Parse a single line comment: (# I am a comment)
 and EndLineComment = parse
     | '\n'            { lexbuf.EndPos <- lexbuf.EndPos.NextLine; }
-    | (eof | '\026')  { currentPos <- 1; () }
+    | (eof | '\026')  { linePos <- 1; () }
     | _               { EndLineComment lexbuf }
 
 // Parse a Path: Terminates on '\n'.
 and Path acc = parse
-    | [' ']*'\n'[' ']* { currentPos <- currentPos + 1; Microsoft.FSharp.Core.String.concat "" (List.map string (List.rev acc)) }
-    | (eof | '\026')   { currentPos <- 1; failwith "Lexer error: unterminated path" }
+    | [' ']*'\n'[' ']* { linePos <- linePos + 1; 
+                         Microsoft.FSharp.Core.String.concat "" (List.map string (List.rev acc)) }
+    | (eof | '\026')   { linePos <- 1; failwith "Lexer error: unterminated path" }
     | _                { Path (char (lexbuf.LexemeChar 0) :: acc)  lexbuf }
 
 // Parse a shell command: supports multi line with '\'. Terminates on '\n'.
 and Shell acc = parse
     | '\\'[' ']*'\n'  { lexbuf.EndPos <- lexbuf.EndPos.NextLine; 
-                        currentPos <- currentPos + 1
+                        linePos <- linePos + 1
                         Shell acc lexbuf }
-    | '\n'            { currentPos <- currentPos + 1; Microsoft.FSharp.Core.String.concat "" (List.map string (List.rev acc)) }
+    | '\n'            { linePos <- linePos + 1; 
+                        Microsoft.FSharp.Core.String.concat "" (List.map string (List.rev acc)) }
     | '\t'            { Shell acc lexbuf }
-    | (eof | '\026')  { currentPos <- 1; failwith "Lexer error: unterminated shell cmd" }
+    | (eof | '\026')  { linePos <- 1; failwith "Lexer error: unterminated shell cmd" }
     | _               { Shell (char (lexbuf.LexemeChar 0) :: acc) lexbuf }
 
 // Parse a Path: Terminates on '"'. Escapes single line quotes with '\'
 and String chars = parse 
-    | '"' { currentPos <- currentPos + 1; Microsoft.FSharp.Core.String.concat "" (List.map string (List.rev chars)) }
-    | "''" { String ('\'' :: chars) lexbuf }    
-    | (eof | '\026') { currentPos <- 1; failwith "Lexer error: unterminated string" }
-    | ['\000'-'\031' '\127' '\255'] { currentPos <- 1; failwith "Lexer error: invalid character in string" }
-    | _ { String (char (lexbuf.LexemeChar 0) :: chars) lexbuf }
+    | '"'             { linePos <- linePos + 1; 
+                        Microsoft.FSharp.Core.String.concat "" (List.map string (List.rev chars)) }
+    | "''"            { String ('\'' :: chars) lexbuf }    
+    | (eof | '\026')  { linePos <- 1; failwith "Lexer error: unterminated string" }
+    | ['\000'-'\031' '\127' '\255'] { linePos <- 1; failwith "Lexer error: invalid character in string" }
+    | _               { String (char (lexbuf.LexemeChar 0) :: chars) lexbuf }
