@@ -1,7 +1,7 @@
 // =======================================================
 //        INTERPRETER FOR LINTING DOCKERFILES
 // =======================================================
-module Linterd.Interpreter
+module Linterd.Linter
 
 open Linterd.Engine
 open Absyn
@@ -67,8 +67,8 @@ let getRunCmds (lst: instruction list)  =
     
     
 
-/// <summary> Controls the logic of the interpreter </summary>
-/// <param name="dfile"> A dockerfile (instruction list), to run the interpreter on </param>
+/// <summary> Controls the logic of the Linter </summary>
+/// <param name="dfile"> A dockerfile (instruction list), to run the Linter on </param>
 let run dfile =
     let gstore = initStore <| dfile  // Load dfile into store
     if Config.DEBUG then

@@ -1,6 +1,6 @@
 module DLex
 
-# 1 "DLex.fsl"
+# 1 "Lexer/DLex.fsl"
  
 // ================================================
 //          LEXER-GENERATOR SPECIFICATION
@@ -47,7 +47,7 @@ let keyword (idx: int) (s: string) =
     | _             -> NAME (idx, s)
 
 
-# 50 "DLex.fs"
+# 50 "Lexer/DLex.fs"
 let trans : uint16[] array = 
     [| 
     (* State 0 *)
@@ -256,214 +256,214 @@ let rec _fslex_dummy () = _fslex_dummy()
 and Tokenize  lexbuf =
   match _fslex_tables.Interpret(31,lexbuf) with
   | 0 -> ( 
-# 66 "DLex.fsl"
+# 66 "Lexer/DLex.fsl"
                                        Tokenize lexbuf 
-# 261 "DLex.fs"
+# 261 "Lexer/DLex.fs"
           )
   | 1 -> ( 
-# 67 "DLex.fsl"
+# 67 "Lexer/DLex.fsl"
                                        lexbuf.EndPos <- lexbuf.EndPos.NextLine; 
                                        linePos <- linePos + 1; Tokenize lexbuf 
-# 267 "DLex.fs"
+# 267 "Lexer/DLex.fs"
           )
   | 2 -> ( 
-# 69 "DLex.fsl"
+# 69 "Lexer/DLex.fsl"
                                        INT (System.Int32.Parse (lexeme lexbuf)) 
-# 272 "DLex.fs"
+# 272 "Lexer/DLex.fs"
           )
   | 3 -> ( 
-# 70 "DLex.fsl"
+# 70 "Lexer/DLex.fsl"
                                        aPath (linePos) (Path [] lexbuf)  
-# 277 "DLex.fs"
+# 277 "Lexer/DLex.fs"
           )
   | 4 -> ( 
-# 71 "DLex.fsl"
+# 71 "Lexer/DLex.fsl"
                                        entrycmd (linePos) (Shell [] lexbuf) 
-# 282 "DLex.fs"
+# 282 "Lexer/DLex.fs"
           )
   | 5 -> ( 
-# 72 "DLex.fsl"
+# 72 "Lexer/DLex.fsl"
                                        cPath (linePos) (Path [] lexbuf)  
-# 287 "DLex.fs"
+# 287 "Lexer/DLex.fs"
           )
   | 6 -> ( 
-# 73 "DLex.fsl"
+# 73 "Lexer/DLex.fsl"
                                        entrycmd (linePos) (Shell [] lexbuf) 
-# 292 "DLex.fs"
+# 292 "Lexer/DLex.fs"
           )
   | 7 -> ( 
-# 74 "DLex.fsl"
+# 74 "Lexer/DLex.fsl"
                                        envVar (linePos) (Path [] lexbuf) 
-# 297 "DLex.fs"
+# 297 "Lexer/DLex.fs"
           )
   | 8 -> ( 
-# 75 "DLex.fsl"
+# 75 "Lexer/DLex.fsl"
                                        runcmd (linePos) (Shell [] lexbuf) 
-# 302 "DLex.fs"
+# 302 "Lexer/DLex.fs"
           )
   | 9 -> ( 
-# 76 "DLex.fsl"
+# 76 "Lexer/DLex.fsl"
                                        mntPt (linePos) (Path [] lexbuf)  
-# 307 "DLex.fs"
+# 307 "Lexer/DLex.fs"
           )
   | 10 -> ( 
-# 77 "DLex.fsl"
+# 77 "Lexer/DLex.fsl"
                                        wPath (linePos) (Path [] lexbuf)  
-# 312 "DLex.fs"
+# 312 "Lexer/DLex.fs"
           )
   | 11 -> ( 
-# 78 "DLex.fsl"
+# 78 "Lexer/DLex.fsl"
                                        keyword (linePos) ((lexeme lexbuf).ToLower()) 
-# 317 "DLex.fs"
+# 317 "Lexer/DLex.fs"
           )
   | 12 -> ( 
-# 79 "DLex.fsl"
+# 79 "Lexer/DLex.fsl"
                                        COLON 
-# 322 "DLex.fs"
+# 322 "Lexer/DLex.fs"
           )
   | 13 -> ( 
-# 80 "DLex.fsl"
+# 80 "Lexer/DLex.fsl"
                                        DOT 
-# 327 "DLex.fs"
+# 327 "Lexer/DLex.fs"
           )
   | 14 -> ( 
-# 81 "DLex.fsl"
+# 81 "Lexer/DLex.fsl"
                                        COMMA 
-# 332 "DLex.fs"
+# 332 "Lexer/DLex.fs"
           )
   | 15 -> ( 
-# 82 "DLex.fsl"
+# 82 "Lexer/DLex.fsl"
                                        EQ 
-# 337 "DLex.fs"
+# 337 "Lexer/DLex.fs"
           )
   | 16 -> ( 
-# 83 "DLex.fsl"
+# 83 "Lexer/DLex.fsl"
                                        DASH 
-# 342 "DLex.fs"
+# 342 "Lexer/DLex.fs"
           )
   | 17 -> ( 
-# 84 "DLex.fsl"
+# 84 "Lexer/DLex.fsl"
                                        EndLineComment lexbuf; 
                                        linePos <- linePos + 1; 
                                        Tokenize lexbuf 
-# 349 "DLex.fs"
+# 349 "Lexer/DLex.fs"
           )
   | 18 -> ( 
-# 87 "DLex.fsl"
+# 87 "Lexer/DLex.fsl"
                                        CSTST (linePos, (String [] lexbuf)) 
-# 354 "DLex.fs"
+# 354 "Lexer/DLex.fs"
           )
   | 19 -> ( 
-# 88 "DLex.fsl"
+# 88 "Lexer/DLex.fsl"
                                        linePos <- 1; EOF 
-# 359 "DLex.fs"
+# 359 "Lexer/DLex.fs"
           )
   | 20 -> ( 
-# 89 "DLex.fsl"
+# 89 "Lexer/DLex.fsl"
                                        linePos <- 1; failwith "Lexer error: illegal symbol" 
-# 364 "DLex.fs"
+# 364 "Lexer/DLex.fs"
           )
   | _ -> failwith "Tokenize"
 // Rule EndLineComment
 and EndLineComment  lexbuf =
   match _fslex_tables.Interpret(26,lexbuf) with
   | 0 -> ( 
-# 93 "DLex.fsl"
+# 93 "Lexer/DLex.fsl"
                                        lexbuf.EndPos <- lexbuf.EndPos.NextLine; 
-# 373 "DLex.fs"
+# 373 "Lexer/DLex.fs"
           )
   | 1 -> ( 
-# 94 "DLex.fsl"
+# 94 "Lexer/DLex.fsl"
                                        linePos <- 1; () 
-# 378 "DLex.fs"
+# 378 "Lexer/DLex.fs"
           )
   | 2 -> ( 
-# 95 "DLex.fsl"
+# 95 "Lexer/DLex.fsl"
                                        EndLineComment lexbuf 
-# 383 "DLex.fs"
+# 383 "Lexer/DLex.fs"
           )
   | _ -> failwith "EndLineComment"
 // Rule Path
 and Path acc lexbuf =
   match _fslex_tables.Interpret(17,lexbuf) with
   | 0 -> ( 
-# 99 "DLex.fsl"
+# 99 "Lexer/DLex.fsl"
                                         linePos <- linePos + 1; 
                                         Microsoft.FSharp.Core.String.concat "" (List.map string (List.rev acc)) 
-# 393 "DLex.fs"
+# 393 "Lexer/DLex.fs"
           )
   | 1 -> ( 
-# 101 "DLex.fsl"
+# 101 "Lexer/DLex.fsl"
                                         linePos <- 1; failwith "Lexer error: unterminated path" 
-# 398 "DLex.fs"
+# 398 "Lexer/DLex.fs"
           )
   | 2 -> ( 
-# 102 "DLex.fsl"
+# 102 "Lexer/DLex.fsl"
                                         Path (char (lexbuf.LexemeChar 0) :: acc)  lexbuf 
-# 403 "DLex.fs"
+# 403 "Lexer/DLex.fs"
           )
   | _ -> failwith "Path"
 // Rule Shell
 and Shell acc lexbuf =
   match _fslex_tables.Interpret(8,lexbuf) with
   | 0 -> ( 
-# 106 "DLex.fsl"
+# 106 "Lexer/DLex.fsl"
                                        lexbuf.EndPos <- lexbuf.EndPos.NextLine; 
                                        linePos <- linePos + 1
                                        Shell acc lexbuf 
-# 414 "DLex.fs"
+# 414 "Lexer/DLex.fs"
           )
   | 1 -> ( 
-# 109 "DLex.fsl"
+# 109 "Lexer/DLex.fsl"
                                        linePos <- linePos + 1; 
                                        Microsoft.FSharp.Core.String.concat "" (List.map string (List.rev acc)) 
-# 420 "DLex.fs"
+# 420 "Lexer/DLex.fs"
           )
   | 2 -> ( 
-# 111 "DLex.fsl"
+# 111 "Lexer/DLex.fsl"
                                        Shell acc lexbuf 
-# 425 "DLex.fs"
+# 425 "Lexer/DLex.fs"
           )
   | 3 -> ( 
-# 112 "DLex.fsl"
+# 112 "Lexer/DLex.fsl"
                                        linePos <- 1; failwith "Lexer error: unterminated shell cmd" 
-# 430 "DLex.fs"
+# 430 "Lexer/DLex.fs"
           )
   | 4 -> ( 
-# 113 "DLex.fsl"
+# 113 "Lexer/DLex.fsl"
                                        Shell (char (lexbuf.LexemeChar 0) :: acc) lexbuf 
-# 435 "DLex.fs"
+# 435 "Lexer/DLex.fs"
           )
   | _ -> failwith "Shell"
 // Rule String
 and String chars lexbuf =
   match _fslex_tables.Interpret(0,lexbuf) with
   | 0 -> ( 
-# 117 "DLex.fsl"
+# 117 "Lexer/DLex.fsl"
                                        linePos <- linePos + 1; 
                                        Microsoft.FSharp.Core.String.concat "" (List.map string (List.rev chars)) 
-# 445 "DLex.fs"
+# 445 "Lexer/DLex.fs"
           )
   | 1 -> ( 
-# 119 "DLex.fsl"
+# 119 "Lexer/DLex.fsl"
                                        String ('\'' :: chars) lexbuf 
-# 450 "DLex.fs"
+# 450 "Lexer/DLex.fs"
           )
   | 2 -> ( 
-# 120 "DLex.fsl"
+# 120 "Lexer/DLex.fsl"
                                        linePos <- 1; failwith "Lexer error: unterminated string" 
-# 455 "DLex.fs"
+# 455 "Lexer/DLex.fs"
           )
   | 3 -> ( 
-# 121 "DLex.fsl"
+# 121 "Lexer/DLex.fsl"
                                                      linePos <- 1; failwith "Lexer error: invalid character in string" 
-# 460 "DLex.fs"
+# 460 "Lexer/DLex.fs"
           )
   | 4 -> ( 
-# 122 "DLex.fsl"
+# 122 "Lexer/DLex.fsl"
                                        String (char (lexbuf.LexemeChar 0) :: chars) lexbuf 
-# 465 "DLex.fs"
+# 465 "Lexer/DLex.fs"
           )
   | _ -> failwith "String"
 
-# 3000000 "DLex.fs"
+# 3000000 "Lexer/DLex.fs"
