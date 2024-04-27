@@ -98,8 +98,8 @@ let run dfile =
     // 3. Execute mount check
     Mounts.scan rcmds instrs
 
-    // 4. Execute syntax check (Users)
-    Syntax.scan instrs
+    // 4. Execute user check 
+    User.scan instrs
     
     // 5. Scan network interface + ports
     Network.scan rcmds instrs 

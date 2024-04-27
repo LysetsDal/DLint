@@ -1,8 +1,8 @@
 // ================================================
-//          CHEKS ON THE ABSTRACT SYNTAX
+//             CHEKS ON USER DIRECTIVES
 // ================================================
 [<RequireQualifiedAccess>]
-module Linterd.Engine.Syntax
+module Linterd.Engine.User
 
 open Absyn
 open Types

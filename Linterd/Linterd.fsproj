@@ -50,7 +50,7 @@
         <Compile Include="Engine\Mounts.fs" />
         <Compile Include="Engine\Network.fs" />
         <Compile Include="Engine\Binaries.fs" />
-        <Compile Include="Engine\Syntax.fs" />
+        <Compile Include="Engine\User.fs" />
         
         <!-- Shellcheck tmp file location -->
         <Folder Include="tmp\" />
