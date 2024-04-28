@@ -23,7 +23,7 @@ let MOUNT_RULE_DIR = "./Rules/Mounts"
 
 
 // VULNERABLE NETWORK 
-let MISC_RULE_DIR = "./Rules/Misc"
+let NET_RULE_DIR = "./Rules/Net"
 let UNIX_MAX_PORT = 65535
 let UNIX_MIN_PORT = 0
 

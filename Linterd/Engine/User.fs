@@ -56,7 +56,7 @@ module private UserScanInternals =
         match user with
         | _, (_, id) ->
             match id with
-            | 0 -> true
+            | 0  -> true
             | _ -> false
     
     

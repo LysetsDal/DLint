@@ -13,9 +13,10 @@
         <Compile Include="Rules\MountWarn.fs" />
         <Compile Include="Rules\Mounts\*.fs" />
         <Compile Include="Rules\MiscWarn.fs" />
-        <Compile Include="Rules\Misc\*.fs" />
+        <Compile Include="Rules\User\*.fs" />
         <Compile Include="Rules\ShellWarn.fs" />
         <Compile Include="Rules\Bash\*.fs" />
+        <Compile Include="Rules\Net\NetWarn.fs" />
         <PackageReference Include="FSharp.Json" Version="0.4.1" />
         
         <!-- FsLexYacc Pkg ref -->

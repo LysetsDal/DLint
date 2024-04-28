@@ -138,7 +138,7 @@ module private NetworkInternals =
 
     /// <summary> Sequence of all netwarning objects </summary>
     let loadNetWarningsIntoMemory  =
-        Directory.GetFiles(Config.MISC_RULE_DIR)
+        Directory.GetFiles(Config.NET_RULE_DIR)
         |> Seq.collect extractNetWarnFromFile
     
     
