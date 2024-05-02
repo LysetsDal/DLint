@@ -50,11 +50,11 @@ let log = function
         else printfn $"Around Line,%i{line}\nchar,%s{char}\nShellcheckWarn\nProblem,'%s{problem}'\nInfo message,\"%s{msg}\"\n"
     
     | LogMiscWarnNoLine warn ->
-        if not Config.LOG_AS_CSV then printf $"%s{warn.ErrorCode} \nProblem: %s{warn.Problem} \nInfo Message: %s{warn.ErrorMsg}"
+        if not Config.LOG_AS_CSV then printf $"%s{warn.ErrorCode} \nProblem: %s{warn.Problem} \nInfo Message: %s{warn.ErrorMsg}\n"
         else printf $"ErrorCode,%s{warn.ErrorCode}\nProblem,%s{warn.Problem}\nInfo Message,\"%s{warn.ErrorMsg}\"\n"
     
     | LogMiscWarn (line, warn) ->
-        if not Config.LOG_AS_CSV then printfn $"Around Line: %i{line} \n%s{warn.ErrorCode}: \nProblem: %s{warn.Problem} \nInfo Message: %s{warn.ErrorMsg}"
+        if not Config.LOG_AS_CSV then printfn $"Around Line: %i{line} \n%s{warn.ErrorCode}: \nProblem: %s{warn.Problem} \nInfo Message: %s{warn.ErrorMsg}\n"
         else printfn $"Around Line,%i{line}\nErrorCode,%s{warn.ErrorCode}\nProblem,%s{warn.Problem}\nInfo Message,\"%s{warn.ErrorMsg}\"\n"
     
     | LogBinWarn (line, bin) -> 
