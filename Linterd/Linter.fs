@@ -83,6 +83,9 @@ let run dfile =
     if Config.DEBUG then
         Logger.log (LogHeader "INTERP @ getRunCmds: INSTRUCTIONS") 
         printfn $"%A{instrs}\n"
+        
+    // NEW SECTION:
+    Image.scan <| instrs
     
     // 1. Execute shellcheck
     if Config.DEBUG then
