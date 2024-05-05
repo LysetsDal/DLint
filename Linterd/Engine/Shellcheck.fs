@@ -122,7 +122,7 @@ module private ShellChekInternals =
                 let file_path = $"%s{Config.OUTPUT_DIR}cmd_%s{string count}"
                 let tmp_file = openOrCreateRWFile file_path unit    
             
-                // Spawn a new shellcheck process ad split output
+                // Spawn a new shellcheck process and split output
                 let mutable shellcheck_output = ""
                 try
                     shellcheck_output <- shellcheck Config.SHELLCHECK file_path tmp_file    

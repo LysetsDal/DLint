@@ -164,27 +164,12 @@ module private AptHelpers =
     let printAptWarnings hasY hasNoInstall cmd line =
         let apt_warn =
             if hasNoInstall then
-                let warn = shb201
-                {
-                    ErrorCode = warn.ErrorCode
-                    Problem = $"%s{unSplitRunCommands cmd}"
-                    ErrorMsg = warn.ErrorMsg
-                }
+                { shb201 with Problem = $"%s{unSplitRunCommands cmd}" }
             elif hasY then
-                let warn = shb202
-                {
-                    ErrorCode = warn.ErrorCode
-                    Problem = $"%s{unSplitRunCommands cmd}"
-                    ErrorMsg = warn.ErrorMsg
-                }
+                { shb202 with Problem = $"%s{unSplitRunCommands cmd}" }
             else
-                let warn = shb203
-                {
-                    ErrorCode = warn.ErrorCode
-                    Problem = $"%s{unSplitRunCommands cmd}"
-                    ErrorMsg = warn.ErrorMsg
-                }
-                
+                { shb203 with Problem = $"%s{unSplitRunCommands cmd}" }
+
         Logger.log <| LogAptWarn(line, apt_warn)   
 
     

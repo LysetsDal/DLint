@@ -1,8 +1,8 @@
 // ================================================
-//          CHEKS ON THE ABSTRACT SYNTAX
+//             CHEKS ON USER DIRECTIVES
 // ================================================
 [<RequireQualifiedAccess>]
-module Linterd.Engine.Syntax
+module Linterd.Engine.User
 
 open Absyn
 open Types
@@ -56,7 +56,7 @@ module private UserScanInternals =
         match user with
         | _, (_, id) ->
             match id with
-            | 0 -> true
+            | 0  -> true
             | _ -> false
     
     

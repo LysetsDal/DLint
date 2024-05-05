@@ -1,8 +1,8 @@
-FROM ubuntu:latests
+# Base image warning
+FROM ubuntu:latest
 
 USER asly 
 WORKDIR /tmp/var
-
 
 ## Env vars
 ENV DB_KEY="Secret_key" 
@@ -23,14 +23,15 @@ VOLUME /data/acubiz.db
 VOLUME /dev/sda1
 VOLUME /var/docker.sock
 
+## User test
 USER root
 
 ## apt-install checks:
-#RUN sudo apt-get update && \
-#    apt-get install -y --no-install-recommends libxzma && \
-#    apt-get install -y nginx && \
-#    apt-get install --no-install-recommends apache && \
-#    apt-get install exploit_db 
+RUN sudo apt-get update && \
+    apt-get install -y --no-install-recommends libxzma && \
+    apt-get install -y nginx && \
+    apt-get install --no-install-recommends apache && \
+    apt-get install exploit_db 
 
 ## Run Mounts
 RUN --mount=type=cache,target=/var/cache/apt,sharing=locked && \
@@ -43,7 +44,6 @@ RUN mkdir -p /app/myapp && \
     ssh -P 22 dummy_user@172.132.0.23 && \
     shutdown -h now 
     
-
 ## Network 
 RUN --network=host pip install vulnerable_lib 
 

@@ -68,3 +68,14 @@ chmod +x ./bin/Debug/net6.0/Linterd &&
 ./bin/Debug/net6.0/Linterd <Dockerfile_path> <Dockerfile_path2> ...
 ```
 Note: the dockerfile paths needs to be relative to your current directory.
+
+## Run all Provided Dockerfiles through Linterd
+```
+ls -l ../resources | awk 'NR > 1 {print $9}'
+| xargs -I {} dotnet run ../resources/{} \
+| awk '{gsub(/File Read:/, "\033[1;31m&\033[0m"); print}'
+```
+Note:
+- First line gets the filenames of the folder with the Dockerfiles. 
+- Second command passes the filename to run sequentially through xargs.
+- Third line highlights 'File Read' in read, each time a new file is scanned.
