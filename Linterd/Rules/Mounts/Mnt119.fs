@@ -1,7 +1,7 @@
 module Rules.Mounts.Mnt119
 
 open Rules.MountWarn
-//@TODO: Needs sources...
+
 let mnt119 : SensitiveMount = {
     ErrorCode = "MNTW119"
     MountPoint = "/proc/sys/vm/panic_on_oom"
