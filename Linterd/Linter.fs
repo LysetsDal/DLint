@@ -56,7 +56,6 @@ let instrToRunCmd (ins: instruction) =
     | _ -> None
         
 
-
 /// <summary> Extract RUN commands from instruction list </summary>
 /// <param name="lst"> An instruction list to get a RunCommandList from </param>
 let getRunCmds (lst: instruction list)  =
@@ -64,7 +63,7 @@ let getRunCmds (lst: instruction list)  =
     |> List.map instrToRunCmd
     |> List.choose id
     |> RunCommandList.createRunCommandList
-    
+
     
 
 /// <summary> Controls the logic of the Linter </summary>
@@ -84,10 +83,10 @@ let run dfile =
         Logger.log (LogHeader "INTERP @ getRunCmds: INSTRUCTIONS") 
         printfn $"%A{instrs}\n"
         
-    // NEW SECTION:
+    // Execute Base Image check:
     Image.scan <| instrs
     
-    // 1. Execute shellcheck
+    // Execute shellcheck
     if Config.DEBUG then
         Logger.log (LogHeader "INTERP @ Shellcheck.scan: RCMDS")
         printfn $"%A{RunCommandList.runCommandListToString rcmds}\n"
@@ -95,14 +94,14 @@ let run dfile =
     Shellcheck.scan <| rcmds
     if not Config.DEBUG then Shellcheck.flushTmpFiles  // Delete the tmp files 
     
-    // 2. Scan other commands and binaries
+    // Scan other commands and binaries
     Binaries.scan <| rcmds
     
-    // 3. Execute mount check
+    // Execute mount check
     Mounts.scan rcmds instrs
 
-    // 4. Execute user check 
+    // Execute user check 
     User.scan instrs
     
-    // 5. Scan network interface + ports
+    // Scan network interface + ports
     Network.scan rcmds instrs 
