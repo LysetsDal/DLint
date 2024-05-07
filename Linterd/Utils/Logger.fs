@@ -42,7 +42,7 @@ let printHeaderMsg msg =
 let log = function
     | LogHeader msg -> printHeaderMsg msg
     | LogFileName name ->
-        if not Config.LOG_AS_CSV then printfn $"\nFile Read: %s{name}\n"
+        if not Config.LOG_AS_CSV then printfn $"File Read: %s{name}\n"
         else printfn $"File Read,%s{name}\n"
 
     | LogShellcheckWarn (line, char, problem, msg) ->
@@ -50,8 +50,8 @@ let log = function
         else printfn $"Around Line,%i{line}\nchar,%s{char}\nShellcheckWarn\nProblem,'%s{problem}'\nInfo message,\"%s{msg}\"\n"
     
     | LogMiscWarnNoLine warn ->
-        if not Config.LOG_AS_CSV then printf $"%s{warn.ErrorCode} \nProblem: %s{warn.Problem} \nInfo Message: %s{warn.ErrorMsg}\n"
-        else printf $"ErrorCode,%s{warn.ErrorCode}\nProblem,%s{warn.Problem}\nInfo Message,\"%s{warn.ErrorMsg}\"\n"
+        if not Config.LOG_AS_CSV then printfn $"%s{warn.ErrorCode} \nProblem: %s{warn.Problem} \nInfo Message: %s{warn.ErrorMsg}\n"
+        else printfn $"ErrorCode,%s{warn.ErrorCode}\nProblem,%s{warn.Problem}\nInfo Message,\"%s{warn.ErrorMsg}\"\n"
     
     | LogMiscWarn (line, warn) ->
         if not Config.LOG_AS_CSV then printfn $"Around Line: %i{line} \n%s{warn.ErrorCode}: \nProblem: %s{warn.Problem} \nInfo Message: %s{warn.ErrorMsg}\n"

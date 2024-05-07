@@ -86,8 +86,8 @@ let splitList (input: string list) =
 /// <param name="lst"> The list to construct a tuple from </param>
 let returnPair lst = 
     match lst with
-    | [] -> failwith "UTILS @ returnPair: Empty list provided (needs two)"
-    | [_] -> failwith "UTILS @ returnPair: Only one path provided (needs two)"
+    | [] -> failwith "UTILS @ returnPair: Empty list provided (needs two elements)"
+    | [_] -> failwith "UTILS @ returnPair: Only one element provided (needs two)"
     | x :: y :: _ -> (x, y)
 
 

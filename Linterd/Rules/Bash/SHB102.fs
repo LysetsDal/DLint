@@ -5,6 +5,6 @@ open Rules.ShellWarn
 let shb102 : BinWarn = {
     ErrorCode = "SHB102"
     Binary = "shutdown"
-    ErrorMsg = "Running shutdown inside a containers is nonsensical. Use kill on PID 1 (container init process) instead."
+    ErrorMsg = "Running shutdown in a Dockerfile is nonsensical, as it is in the image building process."
 }
     

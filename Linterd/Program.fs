@@ -12,7 +12,7 @@ open System
 open Types
 
 /// <summary> Prepare the Dockerfile for parsing. This step reads the file into
-/// a stringbuidler and appends a EOF character to ensure proper file termination.</summary>
+/// a stringbuidler and appends an EOF character to ensure proper file termination.</summary>
 /// <param name="file">Dockerfile</param>
 let prepareFile file =
     let file_name = string file
@@ -45,7 +45,7 @@ let parseDockerfile file_name file_stream =
                  column %d{pos.Column}, last parsed: '%s{String(lexbuf.Lexeme)}' \n"
     docker_file
 
-/// <summary>Set log mode to csv format </summary>
+/// <summary> Set log mode to csv format </summary>
 let setLogModeTrue () =
     Config.LOG_AS_CSV <- true
 
