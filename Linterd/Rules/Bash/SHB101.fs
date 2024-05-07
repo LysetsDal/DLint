@@ -5,6 +5,6 @@ open Rules.ShellWarn
 let shb101 : BinWarn = {
     ErrorCode = "SHB101"
     Binary = "sudo"
-    ErrorMsg = "Running sudo inside a Docker container is unnecessary and risky. Containers should run with minimal privileges, and tasks requiring elevated permissions should be managed outside the container or through Dockerfile configurations."
+    ErrorMsg = "Running sudo in the dockerfiles commands is unnecessary and risky. Containers should run with minimal privileges, and tasks requiring elevated permissions should be managed outside the container or through Dockerfile configurations."
 }
     
