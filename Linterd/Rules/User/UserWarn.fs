@@ -12,5 +12,5 @@ let userWarn100 : MiscWarn = {
 let userWarn101 : MiscWarn = {
     ErrorCode = "USERW101"
     Problem = "Warning: No user specified!"
-    ErrorMsg = "If a service can run without privileges, it is recommended to create a non-root user to run the container."
+    ErrorMsg = "Configuring the container to use an unprivileged user is the best way to prevent privilege escalation attacks. Add a USER instruction to the Dockerfile"
 }
