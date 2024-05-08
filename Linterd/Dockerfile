@@ -42,7 +42,7 @@ RUN --mount=type=cache,target=/var/cache/apt,sharing=locked && \
 RUN mkdir -p /app/myapp && \
     cd ./app || exit && \
     ssh -P 22 dummy_user@172.132.0.23 && \
-    shutdown -h now 
+    shutdown -h now
     
 ## Network 
 RUN --network=host pip install vulnerable_lib 

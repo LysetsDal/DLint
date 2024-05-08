@@ -21,6 +21,12 @@ let trimWhitespace str =
     |> String.concat ""
 
 
+/// <summary> Trims the quote char from the string </summary>
+/// <param name="input"></param>
+let trimQuotesAndWhitespace (input: string) =
+    input.Trim('"').Trim()
+
+
 /// <summary> Construct a spaceseparated string from the string list </summary>
 /// <param name="lst"> The string list to construct from </param>
 let reconstructToString (lst: string list) =
@@ -34,13 +40,17 @@ let reconstructToShellCmd (lst: string list) =
     
 
 
-/// <summary> Used to split a string (envVar) at the '=' </summary>
+/// <summary> Used to split a string (envVar) at the '=' if present, else split at ' ' </summary>
 /// <param name="input"> The env var to split </param>
-let splitEnvVar input =
-    let pattern = @"(?<!\\)=" // match un-escaped '=' sign
-    Regex.Split(input, pattern)
-    |> List.ofArray
-
+let splitEnvVar (input: string) =
+    let pattern = "(?<!\\\\)="
+    let result = Regex.Split(input, pattern)
+    
+    if result.Length = 1 then
+        input.Split([|' '|], System.StringSplitOptions.RemoveEmptyEntries)
+        |> Array.toList
+    else
+        result |> Array.toList
 
 
 /// <summary> Used to split a string (path) at the ' ' (space) </summary>
@@ -86,8 +96,8 @@ let splitList (input: string list) =
 /// <param name="lst"> The list to construct a tuple from </param>
 let returnPair lst = 
     match lst with
-    | [] -> failwith "UTILS @ returnPair: Empty list provided (needs two)"
-    | [_] -> failwith "UTILS @ returnPair: Only one path provided (needs two)"
+    | [] -> failwith "UTILS @ returnPair: Empty list provided (needs two elements)"
+    | [_] -> failwith "UTILS @ returnPair: Only one element provided (needs two)"
     | x :: y :: _ -> (x, y)
 
 
@@ -104,6 +114,7 @@ let stringToPath str =
 /// <param name="str"> The string to attempt to split into (Key, value) </param>
 let stringToEnvPair str =
     splitEnvVar str
+    |> List.map trimQuotesAndWhitespace 
     |> returnPair
     
 

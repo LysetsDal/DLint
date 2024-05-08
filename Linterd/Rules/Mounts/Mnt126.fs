@@ -5,5 +5,5 @@ open Rules.MountWarn
 let mnt126 : SensitiveMount = {
     ErrorCode = "MNTW126"
     MountPoint = "/sys/kernel/security"
-    ErrorMsg = "Here the securityfs interface is mounted, which allows configuration of Linux Security Modules. This allows configuration of AppArmor policies, and access to this mount may allow a container to disable its MAC system."
+    ErrorMsg = "Here resides the Linux Security Modules, which allows configuration of SELinux and AppArmor policies. Access to this mount may allow a container to replace policies and disable Mandatory Access Control."
 }
