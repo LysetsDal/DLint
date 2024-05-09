@@ -18,6 +18,7 @@
         <Compile Include="Rules\Bash\*.fs" />
         <Compile Include="Rules\Net\NetWarn.fs" />
         <Compile Include="Rules\Image\ImageWarn.fs" />
+        <Compile Include="Rules\Image\EnvWarns.fs" />
         <PackageReference Include="FSharp.Json" Version="0.4.1" />
         
         <!-- FsLexYacc Pkg ref -->
