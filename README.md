@@ -9,7 +9,7 @@ The linter scans for a number of common misconfigurations and tries to uphold Do
 
 # Downloading
 ## For Production Use
-Although DLint offers valuable insights into misconfigurations and vulnerabilities, it is only a prototype! Linterd is not currently intended for prodution use, but encourage you to clone or fork this repository and extend it.
+Although DLint offers valuable insights into misconfigurations and vulnerabilities, it is only a prototype! DLint is not currently intended for prodution use, but encourage you to clone or fork this repository and extend it.
 
 ## For Testing and Development
 For testing and development, having a local copy of the git repository with the entire project history gives you much more insight into the code base.
