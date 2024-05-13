@@ -3,7 +3,7 @@
 // ================================================
 
 [<RequireQualifiedAccess>]
-module Linterd.Engine.Network
+module DLint.Engine.Network
 
 open System.Text.RegularExpressions
 open Rules.MiscWarn

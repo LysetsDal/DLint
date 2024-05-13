@@ -1,5 +1,5 @@
 // ================================================
-//        UTILITY FUNCTIONS FOR LIMNTERD 
+//        UTILITY FUNCTIONS FOR DLINT 
 // ================================================
 
 module Utils

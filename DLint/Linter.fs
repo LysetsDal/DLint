@@ -1,9 +1,9 @@
 // =======================================================
 //        INTERPRETER FOR LINTING DOCKERFILES
 // =======================================================
-module Linterd.Linter
+module DLint.Linter
 
-open Linterd.Engine
+open DLint.Engine
 open Absyn
 open Types
 

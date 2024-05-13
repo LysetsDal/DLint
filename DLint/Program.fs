@@ -4,7 +4,7 @@
 [<RequireQualifiedAccess>]
 module Program
 
-open Linterd.Linter
+open DLint.Linter
 open FSharp.Text.Lexing
 open System.Text
 open System.IO

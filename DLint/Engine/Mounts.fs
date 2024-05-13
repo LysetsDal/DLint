@@ -2,7 +2,7 @@
 //                Linting for Mounts
 // ================================================
 [<RequireQualifiedAccess>]
-module Linterd.Engine.Mounts
+module DLint.Engine.Mounts
 
 open System.Text.RegularExpressions
 open Rules.MountWarn

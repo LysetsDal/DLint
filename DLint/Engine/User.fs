@@ -2,7 +2,7 @@
 //             CHEKS ON USER DIRECTIVES
 // ================================================
 [<RequireQualifiedAccess>]
-module Linterd.Engine.User
+module DLint.Engine.User
 
 open Absyn
 open Types

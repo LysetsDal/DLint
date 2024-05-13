@@ -1,5 +1,5 @@
 // ================================================
-//            SET CONFIGS FOR LINTERD 
+//            SET CONFIGS FOR DLINT 
 // ================================================
 
 [<RequireQualifiedAccess>]

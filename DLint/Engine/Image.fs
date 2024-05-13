@@ -2,7 +2,7 @@
 //                LINTING BASE IMAGE
 // ================================================
 [<RequireQualifiedAccess>]
-module Linterd.Engine.Image
+module DLint.Engine.Image
 
 open Rules.Misc.ImageWarn
 open Rules.Misc.EnvWarns

@@ -2,7 +2,7 @@
 //        SCAN FOR USE OF CERTAIN BINARIES 
 // ================================================
 [<RequireQualifiedAccess>]
-module Linterd.Engine.Binaries
+module DLint.Engine.Binaries
 
 open System.Text.RegularExpressions
 open Rules.Misc.AptWarn

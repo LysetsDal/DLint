@@ -2,7 +2,7 @@
 //             SHELL CHECK INTEGRATION 
 // ===============================================
 [<RequireQualifiedAccess>]
-module Linterd.Engine.Shellcheck
+module DLint.Engine.Shellcheck
 
 open System.Diagnostics
 open System.IO      
