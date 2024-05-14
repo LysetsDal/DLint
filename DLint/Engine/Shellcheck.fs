@@ -127,14 +127,14 @@ module private ShellChekInternals =
             let cmd_list = RunCommand.getAsList cmd
             if Config.DEBUG then printfn $"SHELLCHECK @ runShellCheck: \n%A{cmd_list}\n"
             
-
-            ensureTmpDirExists |> ignore
+            let directory = ensureTmpDirExists
+            if Config.DEBUG then printfn $"SHELLCHECK @ tmp_directory: \n%A{directory}\n"
 
             
             cmd_list
             |> List.iter ( fun unit ->
                 // Create the tmp. file
-                let file_path = $"%s{Config.OUTPUT_DIR}cmd_%s{string count}"
+                let file_path = $"%s{directory.Name}/cmd_%s{string count}"
                 let tmp_file = openOrCreateRWFile file_path unit    
             
                 // Spawn a new shellcheck process and split output
