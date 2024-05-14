@@ -43,6 +43,17 @@ module private Helpers =
         
         
 module private InputOutput =
+    /// <summary>
+    /// Ensure the existence of the ./tmp directory
+    /// </summary>
+    let ensureTmpDirExists =
+        let tmpDir = Path.Combine(".", "tmp")
+        if not (Directory.Exists tmpDir) then
+            let out_dir = Directory.CreateDirectory tmpDir
+            out_dir
+        else
+            DirectoryInfo(tmpDir)
+    
     /// <summary> Create a temporary file with shellcode in (used to to invoke shellcheck on) </summary>
     /// <param name="filepath"> File creation path (relative to fsproj file) </param>
     /// <param name="cmd"> cmd (as string) to write to file </param>
@@ -115,7 +126,11 @@ module private ShellChekInternals =
             
             let cmd_list = RunCommand.getAsList cmd
             if Config.DEBUG then printfn $"SHELLCHECK @ runShellCheck: \n%A{cmd_list}\n"
-                
+            
+
+            ensureTmpDirExists |
+
+            
             cmd_list
             |> List.iter ( fun unit ->
                 // Create the tmp. file

@@ -12,7 +12,7 @@ let mutable LOG_AS_CSV = false
 
 
 // SHELLCHECK CONFIGS
-let SHELLCHECK = "../shellcheck/shellcheck"
+let SHELLCHECK = "./Shellcheck/shellcheck"
 let SHELLCHECK_ARGS = "-s bash -f gcc"
 let SHEBANG_PREFIX = "#!/bin/bash \n"
 let OUTPUT_DIR = "./tmp/"

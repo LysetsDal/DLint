@@ -5,6 +5,7 @@
         <TargetFramework>net6.0</TargetFramework>
         <FsLexToolExe>fslex.dll</FsLexToolExe>
         <FsYaccToolExe>fsyacc.dll</FsYaccToolExe>
+        <SelfContained>true</SelfContained>
         <RootNamespace>DLint</RootNamespace>
     </PropertyGroup>
     
@@ -58,7 +59,6 @@
         <Compile Include="Engine\Image.fs" />
         
         <!-- Shellcheck tmp file location -->
-        <Folder Include="tmp\" />
 
         <!-- Linter Controller -->
         <Compile Include="Linter.fs" />
@@ -75,5 +75,13 @@
 
     <ItemGroup>
       <EmbeddedResource Remove="obj\**" />
+    </ItemGroup>
+    <ItemGroup>
+        <Content Include="Rules\**" CopyToOutputDirectory="PreserveNewest" />
+        <Content Include="Shellcheck\shellcheck" CopyToOutputDirectory="PreserveNewest">
+            <Link>shellcheck\%(RecursiveDir)%(Filename)%(Extension)</Link>
+        </Content>
+        <Content Include="Shellcheck\README.md" />
+        <Content Include="Shellcheck\shellcheck" />
     </ItemGroup>
 </Project>
