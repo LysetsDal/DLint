@@ -128,7 +128,7 @@ module private ShellChekInternals =
             if Config.DEBUG then printfn $"SHELLCHECK @ runShellCheck: \n%A{cmd_list}\n"
             
 
-            ensureTmpDirExists |
+            ensureTmpDirExists |> ignore
 
             
             cmd_list
