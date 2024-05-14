@@ -6,15 +6,10 @@ The linter scans for a number of common misconfigurations and tries to uphold Do
 
 ## Overview
 1. [Downloading](#downloading)
-   2. [For Production Use](#for-production-use)
-   3. [For Testing and Development](#for-testing-and-development)
 4. [Prerequisites](#prerequisites)
 5. [Building the Project](#building-the-project)
-   6. [Mac](#on-macos-(arm64-/-aarch64))
-   7. [Windows](#on-windows)
 8. [Running the project](#running-the-project)
-   9. [Run all test Dockerfiles](#run-all-test-dockerfiles)
-   10. [Logging Mode](#set-csv-logging-mode)
+10. [Logging Mode](#set-csv-logging-mode)
    
 
 
