@@ -111,7 +111,7 @@ let bad_env = [
 
 
 let envWarn100 : MiscWarn = {
-    ErrorCode = "IMGW100"
+    ErrorCode = "ENVW100"
     Problem =  ""
-    ErrorMsg = "Are you passing in secrets, tokens or credentials? Don't hardcode them into the Dockerfile with the ENV instruction. Use Docker secrets or a third party pasword manager instead."
+    ErrorMsg = "Are you passing in secrets, tokens or credentials? Don't hardcode them into the Dockerfile with the ENV instruction. Use Docker secrets or a third party password manager instead."
 }

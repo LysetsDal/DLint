@@ -5,5 +5,5 @@ open Rules.MountWarn
 let mnt105 : SensitiveMount = {
     ErrorCode = "MNTW105"
     MountPoint = "/dev/sdb"
-    ErrorMsg = "If this is visible in /dev, privileges might be too high. Reconsider using devices."
+    ErrorMsg = "Careful, mounting this can grant access to the hosts second disk. Reconsider using devices."
 }
