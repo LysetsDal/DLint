@@ -39,8 +39,8 @@ dotnet clean && dotnet restore;
 dotnet publish -c Release -r osx-arm64 
 ```
 Binary compiled to: ``DLint/DLint/bin/Release/net6.0/osx-arm64``
-
-
+</br>
+</br>
 ## On Windows
 To compile the program on windows, choose architecture: 
 - win-x64 
@@ -52,6 +52,7 @@ dotnet clean && dotnet restore;
 dotnet publish -c Release -r <insert_architecture>
 ```
 Binary compiled to: ``DLint/DLint/bin/Release/net6.0/osx-arm64``
+</br>
 
 
 # Running the project
@@ -59,8 +60,8 @@ If dotnet is installed you can simply use this command:
 ```
 dotnet run Dockerfile
 ```
-Dockerfile = path to the dockerfile you want to run (relative to the project folder)
-*NOTE:* DLint can take multiple Dockerfiles. Just separate them bu a singel space:
+Dockerfile = path to the dockerfile you want to run (relative to the project folder) </br>
+*NOTE:* DLint can take multiple Dockerfiles. Just separate them by a singel space:
 ```
 dotnet run ./Dockerfile1 ./backend/Dockerfile2
 ```
@@ -71,6 +72,8 @@ chmod +x ./bin/Release/net6.0/osx-arm64/DLint &&
 ./bin/Release/net6.0/osx-arm64/DLint Dockerfile
 ```
 Note: the dockerfile paths needs to be relative to your current directory.
+</br>
+</br>
 
 ## Run all test Dockerfiles
 ```
@@ -82,6 +85,8 @@ Note:
 - First line gets the filenames of the folder with the Dockerfiles. 
 - Second command passes the filename to run sequentially through xargs.
 - Third line highlights 'File Read' in read, each time a new file is scanned.
+</br>
+</br>
 
 ## Set CSV-Logging Mode
 DLint supports two flags:
