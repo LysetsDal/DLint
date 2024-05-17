@@ -36,7 +36,7 @@ DLint was developed on a macOS system. In the DLint folder is a Dockerfile that 
 From the DLint/DLint folder (the one with the .fsproj file in it) do:
 ```
 dotnet clean && dotnet restore;
-dotnet publish -c Release -r osx-arm64 
+dotnet publish -c Release -r osx-arm64 --self-contained -p:PublishSingleFile=true
 ```
 Binary compiled to: ``DLint/DLint/bin/Release/net6.0/osx-arm64``
 </br>
