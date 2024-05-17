@@ -49,7 +49,7 @@ To compile the program on windows, choose architecture:
 For full list see: https://learn.microsoft.com/en-us/dotnet/core/rid-catalog
 ```
 dotnet clean && dotnet restore;
-dotnet publish -c Release -r <insert_architecture>
+dotnet publish -c Release -r osx-arm64 --self-contained -p:PublishSingleFile=true
 ```
 Binary compiled to: ``DLint/DLint/bin/Release/net6.0/osx-arm64``
 </br>
