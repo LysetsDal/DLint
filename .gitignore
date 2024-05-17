@@ -1,12 +1,12 @@
 # Exclude reources
 **/resources/
-**/Rules/Bash/*.md
 
 # Exlude build files
 **/obj
 **/.idea
 **/.vscode
 nupkg/
+**/bin/Debug
 
 # Files and types
 .fake
@@ -34,7 +34,6 @@ x64/
 x86/
 build/
 bld/
-[Bb]in/
 [Oo]bj/
 [Oo]ut/
 msbuild.log
