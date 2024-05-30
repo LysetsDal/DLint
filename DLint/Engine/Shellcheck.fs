@@ -59,7 +59,7 @@ module private InputOutput =
     /// <param name="cmd"> cmd (as string) to write to file </param>
     let openOrCreateRWFile (filepath: string) (cmd: string) =
         File.WriteAllText(filepath, cmd)
-        File.Open(filepath, FileMode.OpenOrCreate, FileAccess.ReadWrite)
+        File.Open(filepath, FileMode.OpenOrCreate, FileAccess.ReadWrite, FileShare.None)
     
     
     /// <summary> Close a filestream </summary>
@@ -103,7 +103,11 @@ module private ShellChekInternals =
         let thread = Process.Start(process_info)
         use writer = thread.StandardInput
         use reader = thread.StandardOutput
-        writer.WriteLine(input)
+        
+        // Write to the shellcheck process from the input file stream
+        use streamReader = new StreamReader(input)
+        let fileContent = streamReader.ReadToEnd()
+        writer.WriteLine(fileContent)
         writer.Close()
         
         // Reirect output back to main-process again
