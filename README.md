@@ -11,6 +11,14 @@ The linter scans for a number of common misconfigurations and tries to uphold Do
 8. [Running the project](#running-the-project)
 10. [Logging Mode](#set-csv-logging-mode)
    
+### Notice: Exec format error
+DLint depends on the shellcheck binary. It ships with the one for macOS. If running into an **'Exec format error'**, replace the binary in Shellcheck/shellcheck with the one compatible to your system. 
+```
+# On Linux you can simply:
+apt-get install shellcheck
+cp /usr/bin/shellcheck ./Shellcheck/shellcheck
+```
+For Windows based systems you can download pre compiled binaries from: https://github.com/koalaman/shellcheck?tab=readme-ov-file#installing in the bottom of the installation section, and replace the .\hellcheck\shellcheck file with the downloaded one.
 
 
 # Downloading
