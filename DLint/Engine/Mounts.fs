@@ -96,7 +96,7 @@ module private MountInternals =
             | x :: xs -> 
                 Seq.iter (fun w ->
                     match w with
-                    | _ when x = w.MountPoint || x.Equals w.MountPoint ->
+                    | _ when x = w.MountPoint || x.Contains w.MountPoint ->
                         printMountWarnings line w
                     | _ ->  ()
                 ) warnings
